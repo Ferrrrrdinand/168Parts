@@ -105,121 +105,168 @@
 /* Stage Animasi */
 .shopping-anim-stage {
   position: relative;
-  width: 140px;
-  height: 110px;
-  margin-bottom: 24px;
+  width: 170px;
+  height: 120px;
+  margin-bottom: 22px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: visible;
+}
+
+/* Lintasan Jalan Bergerak (Speed Ground Track) */
+.ground-track-svg {
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.track-dash {
+  animation: trackRun 0.45s linear infinite;
+  stroke: #cbd5e1;
+}
+
+@keyframes trackRun {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -22; }
+}
+
+/* Keranjang Belanja dengan Suspensi Halus & Nyata */
+.cart-chassis-wrap {
+  position: relative;
+  width: 106px;
+  height: 88px;
+  will-change: transform;
+  animation: cartMotionRide 1.25s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
   display: flex;
   align-items: flex-end;
   justify-content: center;
 }
 
-/* Keranjang Belanja Berjalan */
-.shopping-cart-vehicle {
-  position: relative;
-  width: 76px;
-  height: 76px;
-  animation: cartCoast 1.8s ease-in-out infinite alternate;
-}
-
-.cart-svg {
+.cart-svg-pro {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 4px 10px rgba(29, 63, 13, 0.15));
+  filter: drop-shadow(0 6px 14px rgba(29, 63, 13, 0.18));
+  overflow: visible;
 }
 
-.cart-wheel {
-  transform-origin: center;
-  animation: wheelSpin 1.2s linear infinite;
-}
-
-.cart-shadow {
-  position: absolute;
-  bottom: -4px;
-  left: 10%;
-  width: 80%;
-  height: 6px;
-  background: rgba(29, 63, 13, 0.12);
-  border-radius: 50%;
-  animation: shadowPulse 1.8s ease-in-out infinite alternate;
-}
-
-/* Barang-barang Belanjaan Melompat Masuk ke Keranjang */
-.falling-item {
-  position: absolute;
-  font-size: 22px;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.item-gift {
-  left: 20px;
-  animation: dropItem 2.2s cubic-bezier(0.25, 1, 0.5, 1) infinite;
-  animation-delay: 0.1s;
-}
-
-.item-bag {
-  left: 54px;
-  animation: dropItem 2.2s cubic-bezier(0.25, 1, 0.5, 1) infinite;
-  animation-delay: 0.55s;
-}
-
-.item-box {
-  left: 88px;
-  animation: dropItem 2.2s cubic-bezier(0.25, 1, 0.5, 1) infinite;
-  animation-delay: 1.0s;
-}
-
-.item-tag {
-  left: 36px;
-  animation: dropItem 2.2s cubic-bezier(0.25, 1, 0.5, 1) infinite;
-  animation-delay: 1.45s;
-}
-
-.item-star {
-  left: 70px;
-  animation: dropItem 2.2s cubic-bezier(0.25, 1, 0.5, 1) infinite;
-  animation-delay: 1.85s;
-}
-
-@keyframes dropItem {
+/* Suspensi Berkendara Keranjang yang Halus (Bounce & Tilt) */
+@keyframes cartMotionRide {
   0% {
-    top: -24px;
-    opacity: 0;
-    transform: scale(0.6) rotate(-20deg);
+    transform: translate3d(0, 0, 0) rotate(0deg);
   }
-  30% {
-    opacity: 1;
-    transform: scale(1.15) rotate(10deg);
+  20% {
+    transform: translate3d(2px, -3.5px, 0) rotate(1.2deg);
   }
-  65% {
-    top: 50px;
-    opacity: 1;
-    transform: scale(0.9) rotate(0deg);
+  45% {
+    transform: translate3d(0.5px, 0.5px, 0) rotate(-0.8deg);
   }
-  80%, 100% {
-    top: 58px;
-    opacity: 0;
-    transform: scale(0.4);
-  }
-}
-
-@keyframes cartCoast {
-  0% {
-    transform: translateX(-8px) rotate(-1deg);
+  70% {
+    transform: translate3d(-2px, -2px, 0) rotate(0.6deg);
   }
   100% {
-    transform: translateX(8px) rotate(1.5deg);
+    transform: translate3d(0, 0, 0) rotate(0deg);
   }
 }
 
-@keyframes wheelSpin {
-  0% { transform: rotate(0deg); }
+/* Roda Berputar 360 Derajat Sempurna Tanpa Wobble */
+.wheel-group {
+  transform-box: fill-box;
+  transform-origin: center center;
+  animation: wheelSpinSmooth 0.55s linear infinite;
+}
+
+@keyframes wheelSpinSmooth {
+  0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-@keyframes shadowPulse {
-  0% { transform: scaleX(0.85); opacity: 0.15; }
-  100% { transform: scaleX(1.15); opacity: 0.3; }
+/* Bayangan Tanah yang Berdenyut Alami Sesuai Suspensi */
+.cart-ground-shadow {
+  transform-box: fill-box;
+  transform-origin: center center;
+  animation: shadowPulseSmooth 1.25s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+@keyframes shadowPulseSmooth {
+  0%, 100% {
+    transform: scaleX(1) scaleY(1);
+    opacity: 0.14;
+  }
+  20% {
+    transform: scaleX(0.88) scaleY(0.8);
+    opacity: 0.09;
+  }
+  45% {
+    transform: scaleX(1.06) scaleY(1.1);
+    opacity: 0.18;
+  }
+  70% {
+    transform: scaleX(0.94) scaleY(0.9);
+    opacity: 0.12;
+  }
+}
+
+/* Barang-barang Belanjaan Melompat Halus (Parabolic Arc & Elastic Landing) */
+.item-arc {
+  position: absolute;
+  pointer-events: none;
+  will-change: transform, opacity;
+  opacity: 0;
+  z-index: 5;
+}
+
+.item-emoji {
+  display: block;
+  font-size: 26px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.18));
+}
+
+.item-1 {
+  animation: smoothJumpIntoCart 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  animation-delay: 0s;
+}
+
+.item-2 {
+  animation: smoothJumpIntoCart 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  animation-delay: 0.6s;
+}
+
+.item-3 {
+  animation: smoothJumpIntoCart 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  animation-delay: 1.2s;
+}
+
+.item-4 {
+  animation: smoothJumpIntoCart 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  animation-delay: 1.8s;
+}
+
+@keyframes smoothJumpIntoCart {
+  0% {
+    opacity: 0;
+    transform: translate3d(-34px, -35px, 0) scale(0.3) rotate(-35deg);
+  }
+  16% {
+    opacity: 1;
+    transform: translate3d(-14px, -62px, 0) scale(1.18) rotate(-12deg);
+  }
+  38% {
+    opacity: 1;
+    transform: translate3d(8px, -18px, 0) scale(1.02) rotate(14deg);
+  }
+  50% {
+    opacity: 0.95;
+    transform: translate3d(12px, 2px, 0) scale(0.9) rotate(2deg);
+  }
+  62%, 100% {
+    opacity: 0;
+    transform: translate3d(14px, 14px, 0) scale(0.25) rotate(-5deg);
+  }
 }
 
 /* Info & Teks */
@@ -284,30 +331,32 @@
   50% { opacity: 1; transform: scale(1.2); }
 }
 
-/* Progress Bar Belanja */
+/* Progress Bar Belanja Super Halus */
 .shopping-progress-track {
   width: 220px;
-  height: 6px;
+  height: 5px;
   background: #f1f5f9;
-  border-radius: 10px;
+  border-radius: 999px;
   overflow: hidden;
-  margin-top: 14px;
+  margin-top: 16px;
   position: relative;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
 .shopping-progress-bar {
-  width: 45%;
-  height: 100%;
-  background: linear-gradient(90deg, #1d3f0d 0%, #285715 50%, #16a34a 100%);
-  border-radius: 10px;
   position: absolute;
-  animation: progressSlide 1.5s ease-in-out infinite;
+  top: 0;
+  bottom: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #1d3f0d 0%, #16a34a 60%, #4ade80 100%);
+  box-shadow: 0 0 10px rgba(22, 163, 74, 0.45);
+  animation: progressSlide 1.5s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 }
 
 @keyframes progressSlide {
-  0% { left: -45%; width: 35%; }
-  50% { left: 35%; width: 55%; }
-  100% { left: 100%; width: 40%; }
+  0%   { left: -40%; width: 35%; }
+  50%  { left: 30%; width: 55%; }
+  100% { left: 105%; width: 35%; }
 }
 
 /* =========================================================
