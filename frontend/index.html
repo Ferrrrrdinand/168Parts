@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light only">
+  <title>Pasarin Indonesia | Belanja Online Murah, Aman & Terpercaya</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/gmaps-picker.css">
+  <link rel="stylesheet" href="css/responsive-sensor.css">
+  <!-- Leaflet Map CSS & JS untuk Pemilihan Lokasi GMaps -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+<body>
+
+  <!-- NAVBAR HEADER GLOBAL -->
+  <header class="hd">
+    <div class="w">
+      <div class="top">
+        <div>
+          <a href="admin.html" title="Dashboard Admin Pasarin" style="font-weight:700; color:#ffffff; background:rgba(255,255,255,0.18); padding:2px 8px; border-radius:4px; margin-right:6px;">👑 Dashboard Admin</a>
+          <a href="#" onclick="if(window.PasarinApp) window.PasarinApp.openProductCrudModal(); return false;" title="Kelola Produk Cepat (Modal)">⚙️ Kanal Penjual</a>
+          <a href="#/">Unduh Aplikasi</a>
+          <span>Ikuti kami di 
+            <svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"></rect><circle cx="12" cy="12" r="4.5"></circle><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"></circle></svg>
+            <svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+          </span>
+        </div>
+        <div style="display: flex; align-items: center;">
+          <a href="#">
+            <svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            Notifikasi
+          </a>
+          <a href="#">
+            <svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            Bantuan
+          </a>
+          <span>
+            <svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            Bahasa Indonesia
+          </span>
+          
+          <!-- User Auth Status Container -->
+          <div class="auth-user-container">
+            <a class="auth-link" href="login.html#register"><b>Daftar</b></a>
+            <span class="auth-divider">|</span>
+            <a class="auth-link" href="login.html#login"><b>Log In</b></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search & Cart -->
+      <div class="sr">
+        <a class="logo" href="#/" title="Pasarin">
+          <div class="shopee-logo-icon pasarin-logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path><text x="12" y="15" font-size="7" font-weight="900" fill="currentColor" text-anchor="middle" font-family="sans-serif">P</text></svg>
+          </div>
+          <span>Pasarin</span>
+        </a>
+
+        <div class="cart-header-title-wrap" id="cart-header-title" style="display: none;">
+          <span class="cart-header-sep">|</span>
+          <span class="cart-header-text">Keranjang Saya</span>
+        </div>
+
+        <div class="sb">
+          <form id="form-home">
+            <input placeholder="Cari produk, merek dan toko" aria-label="Cari">
+            <button aria-label="Cari" type="submit" class="btn-search-shopee">
+              <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </button>
+          </form>
+          <div class="sg" id="search-frequent-tags">
+            <!-- Di-render dinamis oleh PasarinSearchHistory berdasarkan pencarian yang sering dicari -->
+          </div>
+        </div>
+
+        <!-- Trigger Keranjang -->
+        <a class="cart cart-trigger-btn" href="#/cart" aria-label="Keranjang Belanja">
+          <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+          <span class="cart-badge" style="display: none;">0</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== VIEW 1: LANDING PAGE (#/) ==================== -->
+  <div id="view-home" class="view active">
+    <main class="w">
+      
+      <!-- Hero Banner (Shopee Style Split Banners) -->
+      <section class="hero-shopee-row" id="hero-shopee-banners">
+        <!-- Banner Kiri: Shopee Pilih Lokal -->
+        <div class="hero-shopee-left" id="hero-banner-left">
+          <div class="shopee-hero-content">
+            <div class="shopee-hero-info">
+              <div class="hero-tag-badge" id="banner-left-badge">✨ PASARIN PILIH LOKAL</div>
+              <h2 class="hero-banner-title" id="banner-left-title">Kreasi Unggulan & Inovasi Nusantara</h2>
+              <div class="shopee-hero-pills" id="banner-left-pills">
+                <span class="shopee-pill"><span class="pill-icon">🏷️</span> Produk Unik Asli Indonesia</span>
+                <span class="shopee-pill"><span class="pill-icon">⚡</span> Inovasi Lokal Rasa Global</span>
+                <span class="shopee-pill"><span class="pill-icon">⭐</span> Kualitas Unggulan Nusantara</span>
+              </div>
+            </div>
+            <div class="shopee-hero-models">
+              <img id="banner-left-img" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=320&auto=format&fit=crop&q=80" alt="Model Fashion Pria" class="model-hero-img">
+            </div>
+          </div>
+          <!-- Dots Indicator -->
+          <div class="shopee-dots">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+        </div>
+
+        <!-- Banner Kanan: Diskon & Voucher -->
+        <div class="hero-shopee-right" id="hero-banner-right">
+          <img id="banner-right-img1" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=240&auto=format&fit=crop&q=80" alt="Model Kiri" class="side-model">
+          <div class="side-promo-content">
+            <div class="side-promo-pill pill-diskon">
+              <span class="tag-title" id="banner-right-pill1-title">DISKON S.D.</span>
+              <span class="tag-val" id="banner-right-pill1-val">80%</span>
+            </div>
+            <div class="side-promo-pill pill-voucher">
+              <span class="tag-title" id="banner-right-pill2-title">VOUCHER</span>
+              <span class="tag-val" id="banner-right-pill2-val">100RB</span>
+            </div>
+          </div>
+          <img id="banner-right-img2" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=240&auto=format&fit=crop&q=80" alt="Model Kanan" class="side-model">
+        </div>
+      </section>
+
+      <!-- Quick Services Nav (10 Circular Icons) -->
+      <nav class="qk" id="qk"></nav>
+
+      <!-- Kategori Pilihan (Shopee 2-Row Grid x 10 Columns) -->
+      <section class="box cats-box">
+        <div class="bh">
+          <h2>Kategori</h2>
+        </div>
+        <div class="cats-wrap">
+          <div class="cats" id="cats"></div>
+          <button class="cats-scroll-btn" onclick="document.getElementById('cats').scrollBy({left: 300, behavior: 'smooth'})" aria-label="Lihat Kategori Lainnya">›</button>
+        </div>
+      </section>
+
+      <!-- Flash Sale -->
+      <section class="box fs">
+        <div class="bh fs-header">
+          <div class="fs-title-wrap">
+            <h2 class="fs-logo">
+              <svg class="i" viewBox="0 0 24 24" fill="#ee4d2d" stroke="#ee4d2d" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              <span>FLASH SALE</span>
+            </h2>
+            <div class="fs-timer" id="tm">
+              <span class="tm-digit">01</span>
+              <span class="tm-colon">:</span>
+              <span class="tm-digit">30</span>
+              <span class="tm-colon">:</span>
+              <span class="tm-digit">35</span>
+            </div>
+          </div>
+          <a href="#/search?q=flash" class="fs-see-all">Lihat Semua &rsaquo;</a>
+        </div>
+        <div class="row" id="fs"></div>
+      </section>
+
+      <!-- Top Produk -->
+      <div class="tabs" id="produk">
+        <div>Rekomendasi Produk Terbaik</div>
+      </div>
+      <div class="grid" id="grid"></div>
+      <a class="more" href="#/search">Jelajahi Lebih Banyak Produk &rsaquo;</a>
+
+      <!-- SEO Content -->
+      <section class="seo">
+        <h3>Pasarin Indonesia - Platform Belanja Online Terpercaya</h3>
+        <p>Pasarin adalah marketplace belanja online yang memudahkan jutaan masyarakat di seluruh Indonesia untuk menemukan kebutuhan elektronik, fashion, gadget, fotografi, kecantikan, dan perlengkapan rumah tangga dengan harga terbaik. Didukung sistem pembayaran aman, gratis ongkir, dan jaminan perlindungan pembeli.</p>
+        <h3>Jual Beli Mudah dan Bebas Khawatir di Pasarin</h3>
+        <p>Dengan Garansi Pasarin, dana pembayaran Anda terproteksi aman hingga barang pesanan diterima dengan baik. Dapatkan koleksi kamera aksi seperti DJI Osmo Action 4, smartphone bergaransi resmi, komputer canggih, dan produk UMKM lokal unggulan dari penjual terverifikasi di seluruh Nusantara.</p>
+      </section>
+    </main>
+
+    <!-- Footer Landing -->
+    <footer class="ft2">
+      <div class="w">
+        <div class="fg">
+          <div>
+            <h5>Layanan Pelanggan</h5>
+            <a href="#">Pusat Bantuan</a>
+            <a href="#">Metode Pembayaran</a>
+            <a href="#">Garansi Pasarin</a>
+            <a href="#">Pengembalian Barang</a>
+            <a href="#">Hubungi Layanan CS</a>
+          </div>
+          <div>
+            <h5>Jelajahi Pasarin</h5>
+            <a href="#">Tentang Kami</a>
+            <a href="#">Karir & Lowongan</a>
+            <a href="#">Kebijakan Privasi</a>
+            <a href="#">Flash Sale Harian</a>
+            <a href="#">Blog Komunitas</a>
+          </div>
+          <div>
+            <h5>Pembayaran Aman</h5>
+            <p>BCA • Mandiri • BRI • BNI</p>
+            <p>GoPay • DANA • OVO</p>
+            <p>Kartu Kredit & COD</p>
+          </div>
+          <div>
+            <h5>Jasa Pengiriman</h5>
+            <p>Pasarin Xpress • JNE • J&T</p>
+            <p>SiCepat • AnterAja • GoSend</p>
+          </div>
+          <div>
+            <h5>Ikuti Kami</h5>
+            <a href="#">Facebook</a>
+            <a href="#">Instagram</a>
+            <a href="#">Twitter (X)</a>
+            <a href="#">LinkedIn</a>
+          </div>
+        </div>
+        <div class="cp">© 2026 Pasarin Indonesia. Seluruh hak cipta dilindungi undang-undang.</div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ==================== VIEW 2: HASIL PENCARIAN (#/search) ==================== -->
+  <div id="view-search" class="view">
+    <div class="w main">
+      
+      <!-- Filter Sidebar Kiri -->
+      <aside class="side">
+        <h3>☰ FILTER PENCARIAN</h3>
+        
+        <h4>Kategori</h4>
+        <label onclick="PasarinApp.activeCategory='Semua'; PasarinApp.applySearchFilter()">Semua Kategori</label>
+        <label onclick="PasarinApp.activeCategory='Fotografi'; PasarinApp.applySearchFilter()">Fotografi</label>
+        <label onclick="PasarinApp.activeCategory='Elektronik'; PasarinApp.applySearchFilter()">Elektronik</label>
+        <label onclick="PasarinApp.activeCategory='HP & Aksesoris'; PasarinApp.applySearchFilter()">HP & Aksesoris</label>
+        <label onclick="PasarinApp.activeCategory='Komputer & Aksesoris'; PasarinApp.applySearchFilter()">Komputer & Laptop</label>
+        <label onclick="PasarinApp.activeCategory='Sepatu Pria'; PasarinApp.applySearchFilter()">Sepatu Pria</label>
+        <label onclick="PasarinApp.activeCategory='Perawatan & Kecantikan'; PasarinApp.applySearchFilter()">Perawatan Kulit</label>
+
+        <h4>Lokasi Pengiriman</h4>
+        <label onclick="PasarinApp.selectedLocation='Jakarta'; PasarinApp.applySearchFilter()">DKI Jakarta</label>
+        <label onclick="PasarinApp.selectedLocation='Surabaya'; PasarinApp.applySearchFilter()">Surabaya</label>
+        <label onclick="PasarinApp.selectedLocation='Bandung'; PasarinApp.applySearchFilter()">Bandung</label>
+        <label onclick="PasarinApp.selectedLocation='Tangerang'; PasarinApp.applySearchFilter()">Tangerang</label>
+
+        <h4>Rentang Harga (Rp)</h4>
+        <div class="pr">
+          <input type="number" id="price-min-input" placeholder="MIN" aria-label="Harga Minimum">
+          <span>—</span>
+          <input type="number" id="price-max-input" placeholder="MAX" aria-label="Harga Maksimum">
+        </div>
+        <div class="ap" onclick="
+          const min = document.getElementById('price-min-input').value;
+          const max = document.getElementById('price-max-input').value;
+          PasarinApp.priceRange = { min: min ? Number(min) : null, max: max ? Number(max) : null };
+          PasarinApp.applySearchFilter();
+        ">Terapkan Harga</div>
+
+        <h4>Batas Rating</h4>
+        <div class="st" onclick="PasarinApp.selectedRating=5; PasarinApp.applySearchFilter()">★★★★★ <span>(Bintang 5)</span></div>
+        <div class="st" onclick="PasarinApp.selectedRating=4.8; PasarinApp.applySearchFilter()">★★★★☆ <span>(4.8 ke atas)</span></div>
+        <div class="st" onclick="PasarinApp.selectedRating=4.5; PasarinApp.applySearchFilter()">★★★☆☆ <span>(4.5 ke atas)</span></div>
+
+        <div class="ap" style="margin-top:20px; background:#64748b;" onclick="PasarinApp.resetFilters()">Reset Filter</div>
+      </aside>
+
+      <!-- Area Hasil Pencarian Kanan -->
+      <section class="ct" style="flex:1;">
+        
+        <!-- Info Pencarian -->
+        <div class="rs">
+          💡 Hasil pencarian untuk: <strong id="search-query-text" style="color:var(--primary); font-size:15px;">'dji osmo action 4'</strong>
+        </div>
+
+        <!-- Toolbar Pengurutan -->
+        <div class="so">
+          <span>Urutkan:</span>
+          <a class="sort-btn on" onclick="
+            document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('on'));
+            this.classList.add('on');
+            PasarinApp.activeSort = 'relevance';
+            PasarinApp.applySearchFilter();
+          ">Terkait</a>
+          <a class="sort-btn" onclick="
+            document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('on'));
+            this.classList.add('on');
+            PasarinApp.activeSort = 'latest';
+            PasarinApp.applySearchFilter();
+          ">Terbaru</a>
+          <a class="sort-btn" onclick="
+            document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('on'));
+            this.classList.add('on');
+            PasarinApp.activeSort = 'top_sales';
+            PasarinApp.applySearchFilter();
+          ">Terlaris</a>
+          <a class="sort-btn" onclick="
+            document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('on'));
+            this.classList.add('on');
+            PasarinApp.activeSort = 'price_asc';
+            PasarinApp.applySearchFilter();
+          ">Harga: Rendah ke Tinggi</a>
+          <a class="sort-btn" onclick="
+            document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('on'));
+            this.classList.add('on');
+            PasarinApp.activeSort = 'price_desc';
+            PasarinApp.applySearchFilter();
+          ">Harga: Tinggi ke Rendah</a>
+        </div>
+
+        <!-- Grid Produk Hasil Pencarian -->
+        <div class="grid" id="search-results-grid">
+          <!-- Diisi otomatis oleh app.js -->
+        </div>
+
+      </section>
+    </div>
+
+    <!-- Footer Search -->
+    <footer class="ft2">
+      <div class="w">
+        <div class="cp">© 2026 Pasarin Indonesia. Solusi Belanja Cerdas, Mudah, dan Nyaman.</div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ==================== VIEW 3: KERANJANG BELANJA SHOPEE (#/cart) ==================== -->
+  <div id="view-cart" class="view">
+    <div class="cart-page-bg">
+      <div class="w cart-page-container">
+        
+        <!-- Cart Table Header -->
+        <div class="cart-table-head">
+          <div class="th-prod">
+            <label class="custom-chk-label">
+              <input type="checkbox" id="chk-cart-all-head" checked onchange="PasarinCart.toggleSelectAll(this.checked)">
+              <span class="custom-chk-box"></span>
+            </label>
+            <span>Produk</span>
+          </div>
+          <div class="th-col th-price">Harga Satuan</div>
+          <div class="th-col th-qty">Kuantitas</div>
+          <div class="th-col th-total">Total Harga</div>
+          <div class="th-col th-action">Aksi</div>
+        </div>
+
+        <!-- Store Groups Container (Rendered dynamically by cart.js) -->
+        <div id="cart-store-groups-list">
+          <!-- Diisi otomatis oleh renderCartPage() -->
+        </div>
+
+        <!-- Sticky Bottom Checkout Bar (Shopee Style) -->
+        <div class="cart-sticky-bar" id="cart-sticky-bar">
+          <!-- Row 1: Voucher & Koin -->
+          <div class="bar-row-vouchers">
+            <div class="bar-voucher-item" onclick="if(window.PasarinApp) window.PasarinApp.openPromoModal();">
+              <span class="v-icon">🎟️</span>
+              <span class="v-label">Voucher Pasarin</span>
+              <a href="javascript:void(0)" class="v-link">Gunakan / masukkan kode &rsaquo;</a>
+            </div>
+            <div class="bar-coin-item">
+              <div class="coin-left">
+                <span class="c-chk-disabled"></span>
+                <span class="c-icon">🪙</span>
+                <span class="c-label">Koin Pasarin</span>
+                <span class="c-note">Tidak ada produk yang dipilih</span>
+              </div>
+              <span class="coin-val">-Rp0</span>
+            </div>
+          </div>
+
+          <!-- Row 2: Select All, Actions, Totals, Checkout Button -->
+          <div class="bar-row-actions">
+            <div class="bar-actions-left">
+              <label class="custom-chk-label">
+                <input type="checkbox" id="chk-cart-all-footer" checked onchange="PasarinCart.toggleSelectAll(this.checked)">
+                <span class="custom-chk-box"></span>
+                <span class="chk-text">Pilih Semua (<span id="cart-selected-count">0</span>)</span>
+              </label>
+              <button class="btn-cart-action-link" onclick="PasarinCart.confirmRemoveSelectedItems()">Hapus</button>
+              <button class="btn-cart-action-link">Hapus produk dari Penjual tidak aktif</button>
+              <button class="btn-cart-action-link btn-fav">Tambahkan ke Favorit Saya</button>
+            </div>
+
+            <div class="bar-actions-right">
+              <div class="cart-total-info">
+                <div class="total-label-row">
+                  <span>Total (<span id="cart-total-qty">0</span> produk):</span>
+                  <span class="total-amount-val" id="cart-grand-total">Rp0</span>
+                </div>
+                <div class="total-savings-row" id="cart-savings-row" style="display: none;">
+                  <span>Hemat</span>
+                  <span id="cart-savings-amount">Rp0</span>
+                </div>
+              </div>
+
+              <button class="btn-shopee-checkout" id="btn-shopee-checkout" onclick="PasarinCart.handleCheckoutClick()">
+                Checkout
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Footer Keranjang -->
+    <footer class="ft2" style="background: #ffffff; border-top: 1px solid #e8e8e8; margin-top: 40px;">
+      <div class="w">
+        <div class="cp">© 2026 Pasarin Indonesia. Hak Cipta Dilindungi Undang-Undang.</div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ==================== VIEW 4: CHECKOUT PASARIN (#/checkout) ==================== -->
+  <div id="view-checkout" class="view">
+    <div class="checkout-page-bg">
+      <div class="w checkout-page-container">
+
+        <!-- 1. Alamat Pengiriman Card -->
+        <div class="checkout-card checkout-address-box">
+          <div class="checkout-address-stripe"></div>
+          <div class="checkout-address-inner">
+            <div class="addr-header">
+              <span class="addr-icon">📍</span>
+              <span class="addr-title">Alamat Pengiriman</span>
+            </div>
+            <div class="addr-content-row">
+              <div class="addr-user-details">
+                <strong class="user-name-phone" id="chk-display-recipient">Ferdinand (+62) 823 3549 3176</strong>
+                <span class="user-full-address" id="chk-display-address">
+                  Perumahan Gunung Anyar Mas, Jalan Raya Gunung Anyar Emas Blok R No. 8, RT.3/RW.8, Gunung Anyar Tambak (Blok R9) GUNUNGANYAR, KOTA SURABAYA, JAWA TIMUR, ID, 60294
+                </span>
+                <span class="badge-utama" id="chk-display-badge">Utama</span>
+              </div>
+              <div class="addr-actions">
+                <a href="javascript:void(0)" class="link-shopee-ubah" onclick="PasarinAddressBook.openModal()">Ubah</a>
+              </div>
+            </div>
+            <div class="addr-dropshipper-row">
+              <label class="shopee-dropshipper-label">
+                <input type="checkbox" id="chk-dropshipper">
+                <span class="custom-chk-box"></span>
+                <span>Kirim sebagai Dropshipper</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Produk Dipesan Table Card -->
+        <div class="checkout-card checkout-products-card">
+          <div class="chk-prod-table-head">
+            <div class="th-p-name">Produk Dipesan</div>
+            <div class="th-p-price">Harga Satuan</div>
+            <div class="th-p-qty">Jumlah</div>
+            <div class="th-p-sub">Subtotal Produk</div>
+          </div>
+          <div id="checkout-products-list">
+            <!-- Diisi otomatis oleh renderCheckoutPage() -->
+          </div>
+        </div>
+
+        <!-- 3. Voucher Pasarin & Koin Pasarin Card -->
+        <div class="checkout-card checkout-voucher-coin-box">
+          <!-- Voucher Pasarin Row -->
+          <div class="shopee-chk-row voucher-row">
+            <div class="chk-row-left" id="chk-voucher-left-container">
+              <span class="chk-ico-voucher">🎟️</span>
+              <span class="chk-label-bold">Voucher & Kode Promo</span>
+              <span id="chk-applied-voucher-tag" style="display:none; background:#ecfdf5; color:#059669; padding:2px 8px; border-radius:4px; font-weight:700; font-size:12px; margin-left:6px; border:1px solid #a7f3d0;"></span>
+            </div>
+            <div class="chk-row-right" id="chk-voucher-right-container">
+              <a href="javascript:void(0)" class="link-blue-pilih" id="chk-voucher-btn-select" onclick="PasarinApp.openPromoModal()">Pilih / Masukkan Kode Voucher</a>
+            </div>
+          </div>
+
+          <!-- Koin Pasarin Row -->
+          <div class="shopee-chk-row coin-row">
+            <div class="chk-row-left">
+              <span class="coin-s-badge" style="background:#1d3f0d; color:#fff;">P</span>
+              <span class="chk-label-bold">Koin Pasarin</span>
+              <span class="coin-note-muted" id="chk-coin-status-note">Saldo: <b id="chk-coin-balance-display">0</b> Poin (1 Poin tiap Rp1.000)</span>
+            </div>
+            <div class="chk-row-right">
+              <span class="coin-val-muted">[-Rp0]</span>
+              <span class="chk-box-disabled"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Metode Pembayaran & Perhitungan Card -->
+        <div class="checkout-card checkout-payment-summary-card">
+          <!-- Header Baris Metode Pembayaran -->
+          <div class="payment-method-row">
+            <div class="pm-left-label">
+              <span>Metode Pembayaran</span>
+            </div>
+            <div class="pm-right-pills" id="pm-pills-list">
+              <button type="button" class="pm-pill selected" onclick="PasarinCart.selectPaymentMethod(this, 'Debit Instan')">Debit Instan</button>
+              <button type="button" class="pm-pill" onclick="PasarinCart.selectPaymentMethod(this, 'COD')">COD</button>
+              <button type="button" class="pm-pill" onclick="PasarinCart.selectPaymentMethod(this, 'COD - Cek Dulu')">COD - Cek Dulu</button>
+              <button type="button" class="pm-pill" onclick="PasarinCart.selectPaymentMethod(this, 'QRIS')">QRIS</button>
+              <button type="button" class="pm-pill" onclick="PasarinCart.selectPaymentMethod(this, 'Transfer Bank')">Transfer Bank</button>
+              <button type="button" class="pm-pill" onclick="PasarinCart.selectPaymentMethod(this, 'Kartu Kredit/Debit')">Kartu Kredit/Debit</button>
+              <button type="button" class="pm-pill" onclick="PasarinCart.selectPaymentMethod(this, 'Cicilan Kartu Kredit')">Cicilan Kartu Kredit</button>
+              <button type="button" class="pm-pill" onclick="PasarinCart.selectPaymentMethod(this, 'Bayar Tunai di Mitra/Agen')">Bayar Tunai di Mitra/Agen</button>
+            </div>
+          </div>
+
+          <div class="checkout-divider-line"></div>
+
+          <!-- Rincian Perhitungan (Tepat Sesuai Screenshot) -->
+          <div class="calc-breakdown-container">
+            <div class="calc-table-wrap">
+              <div class="calc-row">
+                <span class="calc-label">Subtotal Pesanan</span>
+                <span class="calc-value" id="chk-calc-subtotal">Rp300.000</span>
+              </div>
+              <div class="calc-row">
+                <span class="calc-label">Total Proteksi Produk</span>
+                <span class="calc-value" id="chk-calc-proteksi">Rp1.700</span>
+              </div>
+              <div class="calc-row">
+                <span class="calc-label">Subtotal Pengiriman</span>
+                <span class="calc-value" id="chk-calc-ongkir">Rp5.000</span>
+              </div>
+              <div class="calc-row">
+                <span class="calc-label">Biaya Layanan <span class="calc-help-tooltip" title="Biaya pemeliharaan sistem & kenyamanan transaksi">?</span></span>
+                <span class="calc-value" id="chk-calc-layanan">Rp1.200</span>
+              </div>
+              <div class="calc-row">
+                <span class="calc-label">Diskon Produk</span>
+                <span class="calc-value val-red" id="chk-calc-diskon-produk">-Rp141.000</span>
+              </div>
+              <div class="calc-row">
+                <span class="calc-label">Voucher Diskon</span>
+                <span class="calc-value val-red" id="chk-calc-voucher-diskon">-Rp3.000</span>
+              </div>
+              <div class="calc-row calc-row-points">
+                <span class="calc-label label-points">
+                  <span class="ico-points">🪙</span>
+                  <span>Poin Belanja Didapat</span>
+                  <span class="badge-point-rule">(1 Poin / Rp1.000)</span>
+                </span>
+                <span class="calc-value val-points" id="chk-calc-earned-points">+163 Poin</span>
+              </div>
+              <div class="calc-row calc-row-total">
+                <span class="calc-label-total">Total Pembayaran</span>
+                <span class="calc-value-total" id="chk-calc-total-bayar">Rp163.900</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="checkout-divider-line"></div>
+
+          <!-- Bottom Action Bar (Persis Screenshot) -->
+          <div class="checkout-submit-bar">
+            <div class="submit-disclaimer">
+              Dengan klik "Buat Pesanan", saya telah menyetujui <a href="javascript:void(0)" class="link-blue">Syarat & Ketentuan Proteksi Produk</a>.
+            </div>
+            <button type="button" class="btn-shopee-buat-pesanan" id="btn-buat-pesanan" onclick="PasarinCart.submitCheckoutOrder()">
+              Buat Pesanan
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Footer Checkout -->
+    <footer class="ft2" style="background: #ffffff; border-top: 1px solid #e8e8e8; margin-top: 40px;">
+      <div class="w">
+        <div class="cp">© 2026 Pasarin Indonesia. Hak Cipta Dilindungi Undang-Undang.</div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ==================== POP UP PROMO KETIKA MASUK (WELCOME MODAL) ==================== -->
+  <div class="promo-modal-overlay" id="promo-modal-overlay">
+    <div class="promo-modal-card">
+      
+      <!-- Header Pesta Promo -->
+      <div class="promo-modal-header">
+        <div class="promo-header-top">
+          <span class="promo-tag-pill">🔥 PESTA DISKON SPESIAL</span>
+          <button class="promo-modal-close" onclick="PasarinApp.closePromoModal()" aria-label="Tutup Promo">&times;</button>
+        </div>
+        <h2>🎉 Sambut Promo Terbaik Pasarin!</h2>
+        <p>Klaim voucher belanja pengguna baru, gratis ongkir se-Indonesia, dan cashback kilat sekarang sebelum kuota habis!</p>
+      </div>
+
+      <!-- Input Kode Voucher / Promo Manual Sendiri -->
+      <div class="custom-promo-bar">
+        <div class="custom-promo-input-box">
+          <span class="input-icon">🎟️</span>
+          <input type="text" id="custom-promo-code-input" placeholder="Punya kode voucher / promo? Ketik di sini...">
+        </div>
+        <button type="button" class="btn-custom-claim" onclick="PasarinApp.claimCustomPromoInput()">
+          Gunakan Voucher
+        </button>
+      </div>
+
+      <!-- Filter Kategori Promo -->
+      <div class="promo-tabs-bar" id="promo-tabs-bar">
+        <button class="promo-tab-item active" onclick="PasarinApp.filterPromoTab('all', this)">Semua Promo (6)</button>
+        <button class="promo-tab-item" onclick="PasarinApp.filterPromoTab('ongkir', this)">🚚 Gratis Ongkir</button>
+        <button class="promo-tab-item" onclick="PasarinApp.filterPromoTab('diskon', this)">🏷️ Diskon Belanja</button>
+        <button class="promo-tab-item" onclick="PasarinApp.filterPromoTab('cashback', this)">💰 Cashback</button>
+        <button class="promo-tab-item" onclick="PasarinApp.filterPromoTab('lokal', this)">🏬 Brand Lokal</button>
+      </div>
+
+      <!-- Daftar Voucher Tiket -->
+      <div class="promo-body" id="promo-ticket-list">
+        <!-- Di-render dinamis oleh app.js -->
+      </div>
+
+      <!-- Footer Modal Promo -->
+      <div class="promo-modal-footer">
+        <label class="promo-dont-show">
+          <input type="checkbox" id="chk-dont-show-promo">
+          <span>Jangan tampilkan lagi hari ini</span>
+        </label>
+        <div class="promo-footer-actions">
+          <button class="btn-claim-all-promo" id="btn-claim-all" onclick="PasarinApp.claimAllPromos()">
+            ✨ Klaim Semua Promo
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== SHOPEE STYLE BOTTOM-RIGHT DOCKED ACTION BAR ==================== -->
+  <div class="pasarin-docked-bar" id="pasarin-docked-bar">
+    <!-- Tombol Promo Spesial -->
+    <button class="docked-action-btn dock-btn-promo" id="btn-fab-promo" onclick="PasarinApp.openPromoModal()" title="Buka Promo Spesial" aria-label="Buka Promo Spesial">
+      <span class="dock-icon">🎁</span>
+      <span class="dock-label">Promo Spesial</span>
+      <span class="dock-badge" id="fab-voucher-count">6</span>
+    </button>
+
+    <!-- Tombol Chat Shopee Style -->
+    <button class="docked-action-btn dock-btn-chat" id="btn-dock-chat" onclick="if(window.showToast) window.showToast('Fitur Chat Pasarin siap menghubungkan Anda dengan Penjual!', 'info');" title="Chat dengan Penjual" aria-label="Chat dengan Penjual">
+      <span class="dock-icon">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
+        </svg>
+      </span>
+      <span class="dock-label">Chat</span>
+      <span class="dock-badge" id="chat-badge-bubble" style="display: none;">0</span>
+    </button>
+  </div>
+
+  <!-- SCRIPT MODUL -->
+  <script src="js/icons.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/gmaps-picker.js"></script>
+  <script src="js/addresses.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/sensor.js"></script>
+</body>
+</html>

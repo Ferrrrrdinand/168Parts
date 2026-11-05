@@ -1,0 +1,701 @@
+/* =========================================================
+   Pasarin Indonesia - Responsive Display Sensor & Adapter
+   - Mobile Phone Optimization (< 640px)
+   - Tablet Adaptive Layout (641px - 1024px)
+   - Laptop Maximization (1025px - 1439px)
+   - Widescreen Monitor (> 1440px)
+   ========================================================= */
+
+/* =========================================================
+   1. LAPTOP & WIDESCREEN MAXIMIZATION (>= 1200px / >= 1440px)
+   ========================================================= */
+
+@media (min-width: 1200px) {
+  .w {
+    max-width: 1280px;
+    padding: 0 20px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+  }
+
+  .box.fs .row {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 14px;
+  }
+
+  .cats {
+    grid-template-columns: repeat(10, 1fr);
+    gap: 0;
+  }
+
+  .qk {
+    grid-template-columns: repeat(10, 1fr);
+    gap: 6px;
+  }
+
+  .hero .bn.a {
+    min-height: 230px;
+    padding: 32px 36px;
+  }
+
+  .hero .bn.a h1 {
+    font-size: 30px;
+    line-height: 1.25;
+  }
+}
+
+@media (min-width: 1440px) {
+  .w {
+    max-width: 1380px;
+    padding: 0 24px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 18px;
+  }
+
+  .cd .pic {
+    height: 195px;
+  }
+
+  .fc .pic {
+    height: 155px;
+  }
+}
+
+/* =========================================================
+   2. FLOATING DISPLAY RESOLUTION SENSOR BADGE
+   ========================================================= */
+
+.display-sensor-indicator {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 99999;
+  background: rgba(15, 23, 42, 0.88);
+  color: #ffffff;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+
+body.show-sensor-badge .display-sensor-indicator {
+  opacity: 1;
+}
+
+.sensor-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+}
+
+/* =========================================================
+   3. MOBILE BOTTOM APP BAR (SHOPEE / TOKOPEDIA STYLE)
+   ========================================================= */
+
+.mobile-bottom-appbar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+  z-index: 1500;
+  align-items: center;
+  justify-content: space-around;
+  padding: 4px 8px env(safe-area-inset-bottom, 4px) 8px;
+}
+
+.mobile-appbar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  color: #64748b;
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 700;
+  gap: 2px;
+  position: relative;
+  padding: 4px 0;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.mobile-appbar-item.active,
+.mobile-appbar-item:hover {
+  color: var(--primary);
+}
+
+.mobile-appbar-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.mobile-appbar-badge {
+  position: absolute;
+  top: 1px;
+  right: calc(50% - 18px);
+  background: #ee4d2d;
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 10px;
+  line-height: 1.1;
+  border: 1.5px solid #ffffff;
+}
+
+/* =========================================================
+   4. MOBILE PHONE OPTIMIZATION (< 640px)
+   ========================================================= */
+
+@media (max-width: 640px) {
+
+  /* Safe padding for bottom app bar */
+  body {
+    padding-bottom: 64px !important;
+  }
+
+  .mobile-bottom-appbar {
+    display: flex;
+  }
+
+  /* Mobile Bottom Dock Bar */
+  .pasarin-docked-bar {
+    bottom: 72px !important;
+    right: 14px !important;
+    left: auto !important;
+    gap: 0 !important;
+  }
+
+  .dock-btn-promo,
+  .fab-promo-btn {
+    display: none !important; /* Promo is in the bottom bar on mobile */
+  }
+
+  .dock-btn-chat,
+  .shopee-chat-fab {
+    border-radius: 30px !important;
+    border: none !important;
+    height: 36px !important;
+    padding: 0 14px !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+  }
+
+  /* Navbar Header Compact Mobile Mode */
+  .hd {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .hd .top {
+    display: none !important;
+  }
+
+  .hd .sr {
+    padding: 8px 12px;
+    gap: 10px;
+  }
+
+  .hd .logo {
+    gap: 5px;
+  }
+
+  .hd .logo span {
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  .hd .logo .pasarin-logo-icon,
+  .hd .logo i {
+    width: 28px;
+    height: 28px;
+    font-size: 15px;
+    border-radius: 6px;
+  }
+
+  .hd .sb {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .hd .sb form {
+    padding: 2px 2px 2px 8px;
+    border-radius: 4px;
+    height: 34px;
+  }
+
+  .hd .sb input {
+    padding: 4px 6px;
+    font-size: 12px;
+  }
+
+  .hd .sb input::placeholder {
+    font-size: 11px;
+  }
+
+  .btn-search-shopee,
+  .hd .sb button {
+    width: 36px !important;
+    min-width: 36px !important;
+    height: 30px !important;
+    border-radius: 3px !important;
+    padding: 0 !important;
+    font-size: 12px;
+  }
+
+  .hd .sb button span {
+    display: none; /* Hide text "Cari" on mobile, icon only */
+  }
+
+  .btn-search-shopee .i,
+  .hd .sb button .i {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  .hd .sg {
+    display: none !important; /* Hide crowded trending keywords on small screens */
+  }
+
+  .hd .cart {
+    padding: 6px;
+    background: transparent;
+  }
+
+  .hd .cart .i {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* Main Container */
+  .w {
+    padding: 0 12px;
+  }
+
+  main.w {
+    padding-top: 12px;
+    padding-bottom: 24px;
+  }
+
+  /* Hero Section: Shopee Style Split Banners Mobile Adaptation */
+  .hero-shopee-row {
+    grid-template-columns: 1fr !important;
+    min-height: auto !important;
+    gap: 10px !important;
+    margin-top: 8px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .hero-shopee-right {
+    display: none !important;
+  }
+
+  .hero-shopee-left {
+    padding: 14px 14px 10px 14px !important;
+    min-height: 155px !important;
+    border-radius: 8px !important;
+    justify-content: space-between !important;
+  }
+
+  .shopee-hero-content {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+  }
+
+  .shopee-hero-pills {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 7px !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+
+  .shopee-pill {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    padding: 5px 12px !important;
+    border-radius: 24px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+    background: rgba(255, 255, 255, 0.96) !important;
+    color: #1e293b !important;
+  }
+
+  .shopee-hero-models {
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .model-hero-img {
+    width: 95px !important;
+    height: 125px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+    border: 2px solid rgba(255, 255, 255, 0.9) !important;
+  }
+
+  .shopee-dots {
+    margin-top: 8px !important;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .hero .bn.a {
+    min-height: 140px;
+    padding: 16px 18px;
+    border-radius: 14px;
+  }
+
+  .hero-pill-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    margin-bottom: 6px;
+  }
+
+  .hero .bn.a h1 {
+    font-size: 18px;
+    line-height: 1.25;
+    margin-bottom: 6px;
+  }
+
+  .hero .bn.a p {
+    font-size: 11px;
+    line-height: 1.35;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .hero .bn.a .cta {
+    padding: 6px 14px;
+    font-size: 11px;
+  }
+
+  /* Side Banners on mobile: compact 2-column strip */
+  .hero .side {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .hero .bn.b, .hero .bn.c {
+    padding: 10px 12px;
+    border-radius: 12px;
+    min-height: unset;
+  }
+
+  .hero .bn.b h3, .hero .bn.c h3 {
+    font-size: 12px;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .hero .bn.b p, .hero .bn.c p {
+    display: none; /* Hide small paragraphs on mobile */
+  }
+
+  .hero-side-badge {
+    font-size: 9px;
+    padding: 1px 5px;
+    margin-bottom: 3px;
+  }
+
+  /* Quick Services (.qk): Smooth Horizontal Swipe Carousel */
+  .qk {
+    display: flex !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px 10px !important;
+    gap: 10px !important;
+    border-radius: 8px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .qk::-webkit-scrollbar {
+    display: none;
+  }
+
+  .qk a, .qk-item {
+    flex: 0 0 68px !important;
+    scroll-snap-align: start;
+    font-size: 10px;
+    padding: 4px 2px !important;
+  }
+
+  .qk-circle {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important;
+    margin-bottom: 5px !important;
+  }
+
+  .qk-circle .i {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .qk a span, .qk-label {
+    white-space: normal !important;
+    font-size: 10px !important;
+    line-height: 1.25 !important;
+    text-align: center !important;
+    max-width: 68px !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    word-break: break-word !important;
+  }
+
+  /* Kategori Pilihan (.cats): 2-Row Horizontal Scrollable Grid */
+  .cats-box {
+    border-radius: 8px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .cats {
+    display: grid !important;
+    grid-template-rows: repeat(2, auto) !important;
+    grid-auto-flow: column !important;
+    grid-auto-columns: 74px !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    gap: 6px !important;
+    padding: 10px 8px !important;
+  }
+
+  .cats::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cats a, .cat-tile {
+    scroll-snap-align: start;
+    padding: 6px 2px !important;
+    font-size: 10px;
+  }
+
+  .cat-img-wrap {
+    width: 52px !important;
+    height: 52px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .cat-img-wrap img, .cat-icon-fallback {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .cats a span, .cat-name {
+    white-space: normal !important;
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+    max-width: 68px !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    text-align: center !important;
+    word-break: break-word !important;
+  }
+
+  /* Flash Sale Section */
+  .box.fs {
+    border-radius: 14px;
+    margin-bottom: 14px;
+  }
+
+  .bh {
+    padding: 12px 14px;
+  }
+
+  .bh h2 {
+    font-size: 13px;
+  }
+
+  .box.fs .row {
+    display: flex !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .box.fs .row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .fc {
+    flex: 0 0 135px;
+    scroll-snap-align: start;
+    padding: 8px;
+  }
+
+  .fc .pic {
+    height: 110px;
+  }
+
+  .fc-title {
+    font-size: 11px;
+    height: 28px;
+  }
+
+  .fc .pr {
+    font-size: 13px;
+  }
+
+  .fc .bar {
+    height: 14px;
+  }
+
+  .fc .bar em {
+    font-size: 8.5px;
+    line-height: 14px;
+  }
+
+  /* Rekomendasi Produk Grid: 2 Columns with Perfect Aspect */
+  .grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .cd {
+    border-radius: 10px;
+  }
+
+  .cd .pic {
+    height: 150px;
+  }
+
+  .cd .in {
+    padding: 8px 10px 10px 10px;
+  }
+
+  .cd .in h4 {
+    font-size: 11.5px;
+    height: 32px;
+    line-height: 1.35;
+    margin-bottom: 4px;
+  }
+
+  .cd .in .pr {
+    font-size: 14px;
+  }
+
+  .cd .in .ft {
+    font-size: 9.5px;
+  }
+
+  .btn-quick-cart {
+    opacity: 1 !important;
+    transform: none !important;
+    width: 28px !important;
+    height: 28px !important;
+    bottom: 6px !important;
+    right: 6px !important;
+  }
+
+  .btn-quick-cart svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
+
+  .tabs {
+    font-size: 13px;
+    padding: 8px 14px;
+    margin-bottom: 12px;
+  }
+
+  /* SEO Section */
+  .seo {
+    padding: 14px;
+    border-radius: 12px;
+  }
+
+  .seo h3 {
+    font-size: 13px;
+  }
+
+  .seo p {
+    font-size: 11px;
+  }
+
+  /* Cart Drawer Mobile */
+  .cart-drawer {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 18px 18px 0 0;
+  }
+}
+
+/* =========================================================
+   EXPLICIT ADAPTIVE SENSOR BODY CLASS SAFEGUARDS
+   Ensures single column banner, clean docked bar and no overlap
+   regardless of simulator or browser frame scaling
+   ========================================================= */
+body.device-mobile .hero-shopee-row,
+body.device-tablet .hero-shopee-row {
+  grid-template-columns: 1fr !important;
+  min-height: auto !important;
+}
+
+body.device-mobile .hero-shopee-right,
+body.device-tablet .hero-shopee-right {
+  display: none !important;
+}
+
+body.device-mobile .pasarin-docked-bar,
+body.device-tablet .pasarin-docked-bar {
+  bottom: 72px !important;
+  right: 14px !important;
+  left: auto !important;
+}
+
+body.device-mobile .dock-btn-promo,
+body.device-tablet .dock-btn-promo {
+  display: none !important;
+}
+
+

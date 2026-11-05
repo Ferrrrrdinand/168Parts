@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Masuk & Daftar Akun | Pasarin Indonesia</title>
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/gmaps-picker.css">
+  <link rel="stylesheet" href="css/responsive-sensor.css">
+  <!-- Leaflet Map CSS & JS untuk Pemilihan Alamat GMaps -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+<body class="auth-page">
+
+  <!-- Header -->
+  <header class="auth-header">
+    <div class="auth-header-container">
+      <div style="display: flex; align-items: center;">
+        <a href="index.html" class="auth-logo">
+          <div class="auth-logo-badge">P</div>
+          <span class="auth-logo-text">Pasarin</span>
+        </a>
+        <span class="auth-page-title" id="page-title-label">Masuk</span>
+      </div>
+      <a href="index.html" class="auth-header-help">← Kembali ke Beranda</a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="auth-main">
+    <!-- Floating Animated Blobs -->
+    <div class="auth-blob auth-blob-1"></div>
+    <div class="auth-blob auth-blob-2"></div>
+    <div class="auth-blob auth-blob-3"></div>
+
+    <div class="auth-container">
+      
+      <!-- Promo Banner Kiri -->
+      <div class="auth-promo">
+        <h1>Belanja Nyaman & Aman Bersama Pasarin</h1>
+        <p>Jutaan produk lokal dan internasional terlengkap dengan jaminan 100% original, gratis ongkir tanpa batas, dan proteksi garansi pembeli terpercaya.</p>
+        
+        <div class="auth-promo-features">
+          <div class="auth-feature-item">
+            <span class="auth-feature-icon">✓</span>
+            <span>Garansi Uang Kembali 100% jika barang tidak sesuai</span>
+          </div>
+          <div class="auth-feature-item">
+            <span class="auth-feature-icon">✓</span>
+            <span>Gratis Ongkir Xtra ke seluruh pelosok Indonesia</span>
+          </div>
+          <div class="auth-feature-item">
+            <span class="auth-feature-icon">✓</span>
+            <span>Metode Pembayaran Lengkap: GoPay, DANA, Transfer & COD</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Auth Card Kanan -->
+      <div class="auth-card">
+        
+        <!-- Tab Switcher -->
+        <div class="auth-tabs">
+          <button class="auth-tab-btn active" id="tab-btn-login" type="button">Log In</button>
+          <button class="auth-tab-btn" id="tab-btn-register" type="button">Daftar Akun</button>
+        </div>
+
+        <!-- Alert Message -->
+        <div class="auth-alert" id="auth-alert"></div>
+
+        <!-- FORM LOGIN -->
+        <form class="auth-form active" id="form-login">
+          <div class="form-group">
+            <label class="form-label" for="login-email">Email / Nomor Handphone</label>
+            <input class="auth-input" type="email" id="login-email" placeholder="contoh: nama@email.com" required autocomplete="email">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="login-password">Password</label>
+            <div class="input-wrap">
+              <input class="auth-input" type="password" id="login-password" placeholder="Masukkan kata sandi..." required autocomplete="current-password">
+              <button class="btn-toggle-pwd" type="button" onclick="togglePasswordVisibility('login-password', this)">Lihat</button>
+            </div>
+          </div>
+
+          <button class="btn-auth-submit" type="submit" id="btn-login-submit">Masuk ke Akun</button>
+
+          <!-- 1-Click Demo Testing Credentials -->
+          <div class="demo-accounts-box">
+            <div class="demo-title">
+              <span>⚡</span> <span>Coba Cepat (Akun Demo Siap Pakai):</span>
+            </div>
+            <div class="demo-buttons-row">
+              <button class="btn-demo" type="button" onclick="fillDemo('demo@pasarin.com', 'demo123')">Akun Pembeli</button>
+              <button class="btn-demo" type="button" onclick="fillDemo('admin@pasarin.com', 'admin123')">Akun Admin</button>
+            </div>
+          </div>
+        </form>
+
+        <!-- FORM REGISTER -->
+        <form class="auth-form" id="form-register">
+          <div class="form-group">
+            <label class="form-label" for="reg-name">Nama Lengkap</label>
+            <input class="auth-input" type="text" id="reg-name" placeholder="Nama lengkap Anda" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-email">Alamat Email</label>
+            <input class="auth-input" type="email" id="reg-email" placeholder="contoh: user@email.com" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-phone">Nomor Handphone (WhatsApp)</label>
+            <input class="auth-input" type="tel" id="reg-phone" placeholder="0812xxxxxxxx" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-password">Password (Min. 6 Karakter)</label>
+            <div class="input-wrap">
+              <input class="auth-input" type="password" id="reg-password" placeholder="Buat kata sandi aman..." minlength="6" required>
+              <button class="btn-toggle-pwd" type="button" onclick="togglePasswordVisibility('reg-password', this)">Lihat</button>
+            </div>
+          </div>
+
+          <!-- Input Alamat Melalui GMaps -->
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label class="form-label" for="reg-address" style="margin-bottom: 0;">Alamat Lengkap Pengiriman</label>
+              <button type="button" class="btn-open-gmaps" id="btn-open-gmaps" onclick="openGmapsPicker()">
+                <span style="font-size: 13px;">📍</span> Pilih Lewat Peta (GMaps)
+              </button>
+            </div>
+            <div class="input-wrap">
+              <textarea class="auth-input" id="reg-address" rows="2" placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan, kecamatan, kota..." required style="resize: vertical; font-size: 13px; line-height: 1.4; padding: 10px 12px;"></textarea>
+            </div>
+            <div id="reg-coords-badge" style="display: none; font-size: 11px; color: #059669; margin-top: 5px; font-weight: 600;">
+              ✓ Titik GPS Terkunci: <span id="reg-coords-text"></span>
+            </div>
+          </div>
+
+          <button class="btn-auth-submit" type="submit" id="btn-register-submit">Daftar Sekarang</button>
+        </form>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Overlay Modal Sukses Login (Pop Up Animasi) -->
+  <div class="auth-success-modal" id="auth-success-modal">
+    <div class="auth-success-card">
+      <div class="success-checkmark-wrap">
+        <svg class="checkmark-svg" viewBox="0 0 52 52" width="76" height="76">
+          <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+          <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+        </svg>
+      </div>
+      <h3 class="auth-success-title" id="success-modal-title">Berhasil Masuk!</h3>
+      <p class="auth-success-desc" id="success-modal-desc">Selamat datang kembali di Pasarin Marketplace.</p>
+      
+      <div class="auth-success-user-tag" id="success-modal-user">
+        <span>👤</span> <span id="success-user-name">Member Pasarin</span>
+      </div>
+
+      <div class="success-progress-wrap">
+        <div class="success-progress-bar"></div>
+      </div>
+      <div class="success-redirect-note">Menyiapkan promo terbaik untuk Anda...</div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="auth-footer">
+    <div>© 2026 Pasarin Indonesia. Hak Cipta Dilindungi.</div>
+    <div style="margin-top: 6px; font-size: 12px;">
+      <a href="index.html">Ketentuan Layanan</a> • <a href="index.html">Kebijakan Privasi</a> • <a href="index.html">Pusat Bantuan</a>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/gmaps-picker.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // Tab Switching Logic
+    const tabLogin = document.getElementById('tab-btn-login');
+    const tabRegister = document.getElementById('tab-btn-register');
+    const formLogin = document.getElementById('form-login');
+    const formRegister = document.getElementById('form-register');
+    const pageTitleLabel = document.getElementById('page-title-label');
+    const alertBox = document.getElementById('auth-alert');
+
+    function showAlert(msg, isError = true) {
+      alertBox.textContent = msg;
+      alertBox.className = `auth-alert show ${isError ? 'auth-alert-error' : 'auth-alert-success'}`;
+    }
+
+    function hideAlert() {
+      alertBox.className = 'auth-alert';
+      alertBox.textContent = '';
+    }
+
+    function setTab(tab) {
+      hideAlert();
+      if (tab === 'register') {
+        tabRegister.classList.add('active');
+        tabLogin.classList.remove('active');
+        formRegister.classList.add('active');
+        formLogin.classList.remove('active');
+        pageTitleLabel.textContent = 'Daftar Akun Baru';
+        window.location.hash = '#register';
+      } else {
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
+        formLogin.classList.add('active');
+        formRegister.classList.remove('active');
+        pageTitleLabel.textContent = 'Masuk';
+        window.location.hash = '#login';
+      }
+    }
+
+    tabLogin.addEventListener('click', () => setTab('login'));
+    tabRegister.addEventListener('click', () => setTab('register'));
+
+    // Check hash on load
+    if (window.location.hash === '#register') {
+      setTab('register');
+    }
+
+    // Toggle Password
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = 'Sembunyi';
+      } else {
+        input.type = 'password';
+        btn.textContent = 'Lihat';
+      }
+    }
+
+    // Fill Demo
+    function fillDemo(email, pwd) {
+      setTab('login');
+      document.getElementById('login-email').value = email;
+      document.getElementById('login-password').value = pwd;
+      showAlert(`Akun demo terisi (${email}). Klik "Masuk ke Akun"`, false);
+    }
+
+    function triggerShake() {
+      const authCard = document.querySelector('.auth-card');
+      if (authCard) {
+        authCard.classList.remove('shake');
+        void authCard.offsetWidth; // trigger reflow
+        authCard.classList.add('shake');
+        setTimeout(() => authCard.classList.remove('shake'), 500);
+      }
+    }
+
+    function showSuccessModal(title, desc, userName, redirectUrl = 'index.html?login_success=1') {
+      const modal = document.getElementById('auth-success-modal');
+      const titleEl = document.getElementById('success-modal-title');
+      const descEl = document.getElementById('success-modal-desc');
+      const nameEl = document.getElementById('success-user-name');
+
+      if (titleEl) titleEl.textContent = title;
+      if (descEl) descEl.textContent = desc;
+      if (nameEl) nameEl.textContent = userName || 'Member Pasarin';
+
+      if (modal) {
+        modal.classList.add('show');
+      }
+
+      setTimeout(() => {
+        window.location.href = redirectUrl;
+      }, 1500);
+    }
+
+    // Handle Login Submit
+    formLogin.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideAlert();
+      const submitBtn = document.getElementById('btn-login-submit');
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="btn-spinner"></span> Memverifikasi...';
+
+      try {
+        const res = await PasarinAuth.login(email, password);
+        if (res.success) {
+          const userName = (res.user && res.user.name) ? res.user.name : 'Pengguna Pasarin';
+          showSuccessModal('Login Berhasil!', 'Selamat datang kembali di Pasarin.', userName);
+        } else {
+          triggerShake();
+          showAlert(res.message || 'Login gagal. Silakan periksa kembali email dan kata sandi.');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = 'Masuk ke Akun';
+        }
+      } catch (err) {
+        triggerShake();
+        showAlert('Terjadi gangguan jaringan saat login.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Masuk ke Akun';
+      }
+    });
+
+    // Handle Register Submit
+    formRegister.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideAlert();
+      const submitBtn = document.getElementById('btn-register-submit');
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const phone = document.getElementById('reg-phone').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const address = document.getElementById('reg-address').value.trim();
+
+      if (password.length < 6) {
+        triggerShake();
+        showAlert('Kata sandi minimal 6 karakter!');
+        return;
+      }
+
+      if (!address) {
+        triggerShake();
+        showAlert('Alamat pengiriman wajib diisi! Gunakan tombol "Pilih Lewat Peta (GMaps)" untuk memilih lokasi.');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="btn-spinner"></span> Mendaftarkan...';
+
+      try {
+        const res = await PasarinAuth.register(name, email, phone, password, address, currentPickedCoords);
+        if (res.success) {
+          showSuccessModal('Pendaftaran Berhasil!', 'Akun Anda berhasil dibuat dengan alamat pengiriman terverifikasi. Selamat berbelanja!', name);
+        } else {
+          triggerShake();
+          showAlert(res.message || 'Gagal mendaftar. Silakan coba kembali.');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = 'Daftar Sekarang';
+        }
+      } catch (err) {
+        triggerShake();
+        showAlert('Terjadi kesalahan jaringan saat registrasi.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Daftar Sekarang';
+      }
+    });
+
+    /* =========================================================
+       GMAPS INTERACTIVE LOCATION PICKER (PROPER COMPONENT)
+       ========================================================= */
+    function openGmapsPicker() {
+      if (window.PasarinGmapsPicker) {
+        const addrField = document.getElementById('reg-address');
+        window.PasarinGmapsPicker.open({
+          initialAddress: addrField ? addrField.value : '',
+          onConfirm: (fullAddress, details) => {
+            if (addrField) addrField.value = fullAddress;
+            const badge = document.getElementById('reg-coords-badge');
+            const coordsText = document.getElementById('reg-coords-text');
+            if (badge && coordsText && details) {
+              badge.style.display = 'block';
+              coordsText.textContent = `${details.lat.toFixed(5)}, ${details.lng.toFixed(5)}`;
+            }
+          }
+        });
+      }
+    }
+  </script>
+</body>
+</html>
+

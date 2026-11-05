@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light only">
+  <title>Admin Dashboard & Seller Centre | Pasarin Indonesia</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231d3f0d'><rect width='24' height='24' rx='6'/><text x='12' y='16' font-size='12' font-weight='900' fill='white' text-anchor='middle'>P</text></svg>">
+</head>
+<body>
+
+  <!-- =========================================================
+       1. SIDEBAR NAVIGATION
+       ========================================================= -->
+  <aside class="admin-sidebar" id="admin-sidebar">
+    <div class="admin-sidebar-brand">
+      <div class="brand-icon">P</div>
+      <div class="brand-info">
+        <span class="brand-title">Pasarin <span class="brand-badge">ADMIN</span></span>
+        <span class="brand-sub">Seller & Store Centre</span>
+      </div>
+    </div>
+
+    <nav class="admin-sidebar-menu">
+      <div class="menu-category-title">Menu Utama</div>
+      
+      <button class="sidebar-nav-item active" data-tab="overview">
+        <span class="nav-icon">📊</span>
+        <span>Ringkasan Bisnis</span>
+      </button>
+
+      <button class="sidebar-nav-item" data-tab="products">
+        <span class="nav-icon">📦</span>
+        <span>Katalog Produk</span>
+        <span class="nav-badge" id="badge-prod-count">0</span>
+      </button>
+
+      <button class="sidebar-nav-item" data-tab="orders">
+        <span class="nav-icon">📑</span>
+        <span>Pesanan Masuk</span>
+        <span class="nav-badge" id="badge-order-count">0</span>
+      </button>
+
+      <div class="menu-category-title">Pemasaran & Sistem</div>
+
+      <button class="sidebar-nav-item" data-tab="promos">
+        <span class="nav-icon">🎟️</span>
+        <span>Voucher & Kode Promo</span>
+        <span class="nav-badge" id="badge-promo-count">0</span>
+      </button>
+
+      <button class="sidebar-nav-item" data-tab="banners">
+        <span class="nav-icon">🎨</span>
+        <span>Kelola Banner</span>
+      </button>
+
+      <button class="sidebar-nav-item" data-tab="settings">
+        <span class="nav-icon">⚙️</span>
+        <span>Konfigurasi & DB</span>
+      </button>
+    </nav>
+
+    <div class="admin-sidebar-footer">
+      <a href="index.html#/" class="btn-back-to-store">
+        <span>🏬</span>
+        <span>Kembali ke Toko</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- =========================================================
+       2. MAIN CONTENT WRAPPER
+       ========================================================= -->
+  <div class="admin-main-wrap">
+    
+    <!-- Top Bar -->
+    <header class="admin-topbar">
+      <div class="topbar-left">
+        <button class="btn-toggle-sidebar" id="btn-toggle-sidebar" aria-label="Toggle Sidebar">
+          ☰
+        </button>
+        <h1 class="topbar-page-title" id="topbar-page-title">📊 Ringkasan & Analisis Penjualan</h1>
+      </div>
+
+      <div class="topbar-right">
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          <span>Server Active : 3000</span>
+        </div>
+
+        <div class="admin-profile-badge" title="Akun Administrator Pasarin">
+          <div class="admin-avatar">A</div>
+          <div class="admin-meta">
+            <span class="admin-name">Super Admin</span>
+            <span class="admin-role">Pasarin Store Master</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="admin-content">
+
+      <!-- =========================================================
+           TAB 1: OVERVIEW (RINGKASAN & ANALITIK)
+           ========================================================= -->
+      <section class="admin-tab-pane active" id="pane-overview">
+        <!-- KPI Metric Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-info">
+              <span class="kpi-label">Total Pendapatan</span>
+              <span class="kpi-value" id="stat-total-revenue">Rp0</span>
+              <span class="kpi-sub">▲ +14.2% bulan ini</span>
+            </div>
+            <div style="font-size:32px; background:rgba(29,63,13,0.08); width:54px; height:54px; border-radius:12px; display:flex; align-items:center; justify-content:center;">💰</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-info">
+              <span class="kpi-label">Total Pesanan</span>
+              <span class="kpi-value" id="stat-total-orders">0</span>
+              <span class="kpi-sub">Semua transaksi sukses</span>
+            </div>
+            <div style="font-size:32px; background:rgba(2,132,199,0.08); width:54px; height:54px; border-radius:12px; display:flex; align-items:center; justify-content:center;">📦</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-info">
+              <span class="kpi-label">Produk Aktif</span>
+              <span class="kpi-value" id="stat-total-products">0</span>
+              <span class="kpi-sub">Tersedia di etalase</span>
+            </div>
+            <div style="font-size:32px; background:rgba(217,119,6,0.08); width:54px; height:54px; border-radius:12px; display:flex; align-items:center; justify-content:center;">🏷️</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-info">
+              <span class="kpi-label">Flash Sale Aktif</span>
+              <span class="kpi-value" id="stat-total-flash">0</span>
+              <span class="kpi-sub">Promo kilat berjalan</span>
+            </div>
+            <div style="font-size:32px; background:rgba(220,38,38,0.08); width:54px; height:54px; border-radius:12px; display:flex; align-items:center; justify-content:center;">⚡</div>
+          </div>
+        </div>
+
+        <!-- Recent Orders & Fast Actions -->
+        <div style="background:#ffffff; border:1px solid var(--admin-border); border-radius:var(--radius-md); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:24px;">
+          <div style="padding:18px 24px; border-bottom:1px solid var(--admin-border); display:flex; align-items:center; justify-content:space-between;">
+            <div>
+              <h2 style="font-size:15px; font-weight:800; color:#0f172a;">Pesanan Masuk Terbaru</h2>
+              <p style="font-size:12px; color:#64748b; margin-top:2px;">5 pesanan pelanggan terkini yang perlu dipantau</p>
+            </div>
+            <button class="btn-primary" style="padding:7px 14px; font-size:12.5px;" onclick="AdminApp.switchTab('orders')">
+              Lihat Semua Pesanan →
+            </button>
+          </div>
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>No. Pesanan</th>
+                  <th>Nama Pembeli</th>
+                  <th>Ringkasan Barang</th>
+                  <th>Total Belanja</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="overview-recent-orders-tbody">
+                <tr><td colspan="5" style="text-align:center; padding:30px; color:#94a3b8;">Memuat data pesanan...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Quick Summary Info Banner -->
+        <div style="background:linear-gradient(135deg, #1d3f0d 0%, #285715 100%); color:#ffffff; border-radius:var(--radius-md); padding:24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+          <div>
+            <h3 style="font-size:17px; font-weight:800; margin-bottom:4px;">🌱 Pasarin Eco-Commerce & Point Rewards</h3>
+            <p style="font-size:13px; opacity:0.9; max-width:600px;">
+              Sistem pemberian poin otomatis aktif: Pembeli mendapatkan <b>1 Poin per kelipatan Rp1.000</b> transaksi yang dapat ditukarkan untuk potongan diskon di checkout.
+            </p>
+          </div>
+          <button class="btn-primary" style="background:#ffffff; color:#1d3f0d; border-color:#ffffff;" onclick="AdminApp.openAddModal()">
+            + Tambah Produk Baru
+          </button>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           TAB 2: PRODUCTS (MANAJEMEN PRODUK CRUD)
+           ========================================================= -->
+      <section class="admin-tab-pane" id="pane-products">
+        <div class="admin-card" style="background:#ffffff; border:1px solid var(--admin-border); border-radius:var(--radius-md); box-shadow:var(--shadow-sm); overflow:hidden;">
+          
+          <!-- Toolbar Filter & Search -->
+          <div style="padding:18px 24px; border-bottom:1px solid var(--admin-border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; flex:1; max-width:650px;">
+              <input type="text" id="admin-prod-search" class="form-input" placeholder="🔍 Cari nama atau ID produk..." style="max-width:320px;">
+              <select id="admin-prod-category" class="admin-select" style="max-width:200px;">
+                <option value="Semua">Semua Kategori</option>
+                <option value="Elektronik">Elektronik</option>
+                <option value="Komputer">Komputer & Aksesoris</option>
+                <option value="Handphone">Handphone & Aksesoris</option>
+                <option value="Pakaian Pria">Pakaian Pria</option>
+                <option value="Sepatu Pria">Sepatu Pria</option>
+                <option value="Fotografi">Fotografi</option>
+                <option value="Makanan & Minuman">Makanan & Minuman</option>
+              </select>
+            </div>
+
+            <button class="btn-primary" onclick="AdminApp.openAddModal()">
+              <span>+ Tambah Produk</span>
+            </button>
+          </div>
+
+          <!-- Products Table -->
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th style="min-width:260px;">Produk</th>
+                  <th>Kategori</th>
+                  <th>Harga Jual</th>
+                  <th>Diskon</th>
+                  <th>Stok</th>
+                  <th>Terjual</th>
+                  <th>Flash Sale</th>
+                  <th style="text-align:right;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="admin-products-tbody">
+                <tr><td colspan="8" style="text-align:center; padding:30px; color:#94a3b8;">Memuat daftar produk...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           TAB 3: ORDERS (DAFTAR PESANAN & STATUS PENGIRIMAN)
+           ========================================================= -->
+      <section class="admin-tab-pane" id="pane-orders">
+        <div class="admin-card" style="background:#ffffff; border:1px solid var(--admin-border); border-radius:var(--radius-md); box-shadow:var(--shadow-sm); overflow:hidden;">
+          
+          <!-- Orders Filter Toolbar -->
+          <div style="padding:18px 24px; border-bottom:1px solid var(--admin-border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h2 style="font-size:15px; font-weight:800; color:#0f172a;">Manajemen Pesanan</h2>
+              <p style="font-size:12px; color:#64748b; margin-top:2px;">Update status pesanan pelanggan secara realtime</p>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:10px;">
+              <label for="admin-order-status-filter" style="font-size:12.5px; font-weight:700; color:#475569;">Filter Status:</label>
+              <select id="admin-order-status-filter" class="admin-select" style="min-width:180px;">
+                <option value="Semua">Semua Status</option>
+                <option value="Sedang Diproses">Sedang Diproses</option>
+                <option value="Sedang Dikirim">Sedang Dikirim</option>
+                <option value="Selesai">Selesai</option>
+                <option value="Dibatalkan">Dibatalkan</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Orders Table -->
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>ID Pesanan / Waktu</th>
+                  <th>Nama Penerima</th>
+                  <th>Rincian Produk</th>
+                  <th>Total Biaya</th>
+                  <th>Poin Diperoleh</th>
+                  <th>Ubah Status</th>
+                  <th>Metode Bayar</th>
+                </tr>
+              </thead>
+              <tbody id="admin-orders-tbody">
+                <tr><td colspan="7" style="text-align:center; padding:30px; color:#94a3b8;">Memuat data pesanan...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           TAB 4: PROMOS (VOUCHER & PROMO MANAGEMENT)
+           ========================================================= -->
+      <section class="admin-tab-pane" id="pane-promos">
+        
+        <!-- Promo KPI Summary Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-info">
+              <span class="kpi-label">Total Voucher</span>
+              <span class="kpi-value" id="stat-total-vouchers">0</span>
+              <span class="kpi-sub">Terdaftar di sistem</span>
+            </div>
+            <div style="font-size:32px; background:rgba(29,63,13,0.08); width:54px; height:54px; border-radius:12px; display:flex; align-items:center; justify-content:center;">🎟️</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-info">
+              <span class="kpi-label">Voucher Aktif</span>
+              <span class="kpi-value" id="stat-active-vouchers">0</span>
+              <span class="kpi-sub">Bisa diklaim pembeli</span>
+            </div>
+            <div style="font-size:32px; background:rgba(5,150,105,0.08); width:54px; height:54px; border-radius:12px; display:flex; align-items:center; justify-content:center;">✅</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-info">
+              <span class="kpi-label">Voucher Nonaktif</span>
+              <span class="kpi-value" id="stat-inactive-vouchers">0</span>
+              <span class="kpi-sub">Ditangguhkan / habis</span>
+            </div>
+            <div style="font-size:32px; background:rgba(220,38,38,0.08); width:54px; height:54px; border-radius:12px; display:flex; align-items:center; justify-content:center;">⏸️</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-info">
+              <span class="kpi-label">Total Pemakaian</span>
+              <span class="kpi-value" id="stat-used-vouchers">0</span>
+              <span class="kpi-sub">Transaksi berhasil</span>
+            </div>
+            <div style="font-size:32px; background:rgba(2,132,199,0.08); width:54px; height:54px; border-radius:12px; display:flex; align-items:center; justify-content:center;">📈</div>
+          </div>
+        </div>
+
+        <!-- Penjelasan Kesetaraan Voucher & Kode Promo -->
+        <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:var(--radius-md); padding:14px 18px; margin-bottom:18px; display:flex; align-items:center; gap:12px;">
+          <span style="font-size:22px;">💡</span>
+          <div style="font-size:12.5px; color:#166534; line-height:1.4;">
+            <b>Kesetaraan Sistem:</b> Seluruh <b>Voucher</b> dan <b>Kode Promo</b> adalah satu kesatuan yang sama tanpa perbedaan. Setiap kode yang Anda kelola di sini otomatis berfungsi sebagai tiket voucher di katalog promo pembeli, dan dapat diketik/digunakan langsung di formulir checkout.
+          </div>
+        </div>
+
+        <!-- Promo Management Table Card -->
+        <div class="admin-card" style="background:#ffffff; border:1px solid var(--admin-border); border-radius:var(--radius-md); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:24px;">
+          
+          <!-- Promo Toolbar -->
+          <div style="padding:18px 24px; border-bottom:1px solid var(--admin-border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; flex:1; max-width:650px;">
+              <input type="text" id="admin-promo-search" class="form-input" placeholder="🔍 Cari kode promo atau nama..." style="max-width:320px;">
+              <select id="admin-promo-cat-filter" class="admin-select" style="max-width:200px;">
+                <option value="Semua">Semua Kategori</option>
+                <option value="diskon">Diskon Belanja</option>
+                <option value="ongkir">Gratis Ongkir</option>
+                <option value="cashback">Cashback Koin</option>
+                <option value="lokal">Brand Lokal UMKM</option>
+              </select>
+            </div>
+
+            <button class="btn-primary" onclick="AdminApp.openAddPromoModal()">
+              <span>+ Buat Voucher Baru</span>
+            </button>
+          </div>
+
+          <!-- Promo Table -->
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th style="min-width:160px;">Kode Voucher</th>
+                  <th style="min-width:220px;">Judul & Ketentuan</th>
+                  <th>Kategori</th>
+                  <th>Potongan Diskon</th>
+                  <th>Min. Belanja</th>
+                  <th>Kuota / Digunakan</th>
+                  <th>Status Aktif</th>
+                  <th style="text-align:right;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="admin-promos-tbody">
+                <tr><td colspan="8" style="text-align:center; padding:30px; color:#94a3b8;">Memuat data voucher promo...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Flash Sale Quick Section -->
+        <div style="background:#ffffff; border:1px solid var(--admin-border); border-radius:var(--radius-md); padding:20px; box-shadow:var(--shadow-sm); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+          <div style="display:flex; align-items:center; gap:14px;">
+            <div style="font-size:32px; background:rgba(234,88,12,0.1); width:50px; height:50px; border-radius:12px; display:flex; align-items:center; justify-content:center;">⚡</div>
+            <div>
+              <h3 style="font-size:15px; font-weight:800; color:#0f172a;">Jadwal & Item Flash Sale</h3>
+              <p style="font-size:12.5px; color:#64748b; margin-top:2px;">
+                Produk Flash Sale aktif akan langsung tampil di banner kilat toko. Nyalakan switch di Katalog Produk kapan saja.
+              </p>
+            </div>
+          </div>
+          <button class="btn-primary" style="font-size:12.5px; padding:8px 16px;" onclick="AdminApp.switchTab('products')">
+            Atur Item Flash Sale →
+          </button>
+        </div>
+
+      </section>
+
+      <!-- =========================================================
+           TAB 5: BANNERS (PENGATURAN & DESAIN BANNER BERANDA)
+           ========================================================= -->
+      <section class="admin-tab-pane" id="pane-banners">
+        
+        <!-- Header Info & Actions -->
+        <div style="background:#ffffff; border:1px solid var(--admin-border); border-radius:var(--radius-md); padding:20px 24px; box-shadow:var(--shadow-sm); margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;">
+          <div>
+            <h2 style="font-size:16px; font-weight:800; color:#0f172a;">🎨 Kustomisasi Banner Utama Toko</h2>
+            <p style="font-size:12.5px; color:#64748b; margin-top:2px;">Ubah teks promosi, gambar model, dan skema warna banner beranda secara langsung.</p>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <button class="btn-secondary" onclick="AdminApp.resetBanners()" title="Kembalikan ke tampilan awal">
+              🔄 Reset Default
+            </button>
+            <button class="btn-primary" onclick="AdminApp.saveBanners()">
+              💾 Simpan Banner
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Preview Box -->
+        <div style="background:#ffffff; border:1px solid var(--admin-border); border-radius:var(--radius-md); padding:20px 24px; box-shadow:var(--shadow-sm); margin-bottom:24px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+            <span style="font-size:12.5px; font-weight:800; color:#334155; text-transform:uppercase; letter-spacing:0.5px;">
+              👁️ Pratinjau Tampilan Beranda Pembeli (Live Preview)
+            </span>
+            <span style="font-size:11.5px; color:#059669; font-weight:700;">● Tampilan Otomatis Terupdate</span>
+          </div>
+
+          <!-- Preview Container mimicking hero-shopee-row -->
+          <div style="background:#f1f5f9; padding:16px; border-radius:10px; overflow-x:auto;">
+            <div style="display:grid; grid-template-columns: 2fr 1fr; gap:12px; min-width:720px;" id="admin-banner-preview-row">
+              
+              <!-- Preview Left -->
+              <div id="prev-left-box" style="background:linear-gradient(135deg, #1d3f0d 0%, #285715 100%); color:#fff; border-radius:10px; padding:22px; display:flex; justify-content:space-between; align-items:center; min-height:190px;">
+                <div style="display:flex; flex-direction:column; gap:10px; flex:1;">
+                  <span id="prev-left-badge" style="font-size:11px; font-weight:800; background:rgba(255,255,255,0.18); padding:3px 10px; border-radius:20px; align-self:flex-start;">✨ PASARIN PILIH LOKAL</span>
+                  <h3 id="prev-left-title" style="font-size:18px; font-weight:800; line-height:1.3; color:#fff;">Kreasi Unggulan & Inovasi Nusantara</h3>
+                  <div id="prev-left-pills" style="display:flex; flex-direction:column; gap:6px;">
+                    <span id="prev-left-p1" style="font-size:11.5px; background:rgba(255,255,255,0.95); color:#1d3f0d; font-weight:700; padding:4px 12px; border-radius:20px; align-self:flex-start;">🏷️ Produk Unik Asli Indonesia</span>
+                    <span id="prev-left-p2" style="font-size:11.5px; background:rgba(255,255,255,0.95); color:#1d3f0d; font-weight:700; padding:4px 12px; border-radius:20px; align-self:flex-start;">⚡ Inovasi Lokal Rasa Global</span>
+                    <span id="prev-left-p3" style="font-size:11.5px; background:rgba(255,255,255,0.95); color:#1d3f0d; font-weight:700; padding:4px 12px; border-radius:20px; align-self:flex-start;">⭐ Kualitas Unggulan Nusantara</span>
+                  </div>
+                </div>
+                <div>
+                  <img id="prev-left-img" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=320&auto=format&fit=crop&q=80" alt="Model" style="width:130px; height:150px; object-fit:cover; border-radius:8px; border:2px solid rgba(255,255,255,0.3); box-shadow:0 4px 12px rgba(0,0,0,0.2);">
+                </div>
+              </div>
+
+              <!-- Preview Right -->
+              <div id="prev-right-box" style="background:linear-gradient(135deg, #3b0764 0%, #581c87 50%, #4c1d95 100%); color:#fff; border-radius:10px; padding:18px 12px; display:flex; justify-content:space-around; align-items:center; min-height:190px;">
+                <img id="prev-right-img1" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=240&auto=format&fit=crop&q=80" alt="Model Kiri" style="width:58px; height:130px; object-fit:cover; border-radius:6px; border:1px solid rgba(255,255,255,0.2);">
+                <div style="display:flex; flex-direction:column; gap:10px; align-items:center;">
+                  <div style="background:#ffffff; border-radius:6px; padding:6px 12px; text-align:center; min-width:90px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+                    <div id="prev-right-p1-title" style="font-size:9.5px; font-weight:800; color:#1e293b;">DISKON S.D.</div>
+                    <div id="prev-right-p1-val" style="font-size:17px; font-weight:900; color:#2563eb;">80%</div>
+                  </div>
+                  <div style="background:#ffffff; border-radius:6px; padding:6px 12px; text-align:center; min-width:90px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+                    <div id="prev-right-p2-title" style="font-size:9.5px; font-weight:800; color:#1e293b;">VOUCHER</div>
+                    <div id="prev-right-p2-val" style="font-size:17px; font-weight:900; color:#059669;">100RB</div>
+                  </div>
+                </div>
+                <img id="prev-right-img2" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=240&auto=format&fit=crop&q=80" alt="Model Kanan" style="width:58px; height:130px; object-fit:cover; border-radius:6px; border:1px solid rgba(255,255,255,0.2);">
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings Form Panels -->
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:24px;">
+          
+          <!-- Pengaturan Banner Kiri -->
+          <div style="background:#ffffff; border:1px solid var(--admin-border); border-radius:var(--radius-md); padding:24px; box-shadow:var(--shadow-sm);">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:16px;">
+              <span style="font-size:22px;">🏞️</span>
+              <h3 style="font-size:15px; font-weight:800; color:#0f172a;">Banner Utama Kiri</h3>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="cfg-b-left-badge">Teks Tag Badge</label>
+              <input type="text" id="cfg-b-left-badge" class="form-input" oninput="AdminApp.updateBannerPreview()" placeholder="Cth: ✨ PASARIN PILIH LOKAL">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="cfg-b-left-title">Judul Utama Promosi</label>
+              <input type="text" id="cfg-b-left-title" class="form-input" oninput="AdminApp.updateBannerPreview()" placeholder="Cth: Kreasi Unggulan & Inovasi Nusantara">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Teks Keunggulan / Poin 1, 2, 3</label>
+              <input type="text" id="cfg-b-left-p1" class="form-input" style="margin-bottom:8px;" oninput="AdminApp.updateBannerPreview()" placeholder="Poin 1: 🏷️ Produk Unik Asli Indonesia">
+              <input type="text" id="cfg-b-left-p2" class="form-input" style="margin-bottom:8px;" oninput="AdminApp.updateBannerPreview()" placeholder="Poin 2: ⚡ Inovasi Lokal Rasa Global">
+              <input type="text" id="cfg-b-left-p3" class="form-input" oninput="AdminApp.updateBannerPreview()" placeholder="Poin 3: ⭐ Kualitas Unggulan Nusantara">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="cfg-b-left-img">URL Gambar Model / Produk</label>
+              <input type="url" id="cfg-b-left-img" class="form-input" oninput="AdminApp.updateBannerPreview()" placeholder="https://images.unsplash.com/...">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="cfg-b-left-color">Pilihan Skema Warna Latar</label>
+              <select id="cfg-b-left-color" class="form-input" onchange="AdminApp.onBannerLeftColorChange(this.value)">
+                <option value="linear-gradient(135deg, #1d3f0d 0%, #285715 100%)">🌲 Pasarin Forest Green (Bawaan)</option>
+                <option value="linear-gradient(135deg, #0f172a 0%, #1e293b 100%)">🖤 Dark Slate Luxury</option>
+                <option value="linear-gradient(135deg, #0369a1 0%, #0284c7 100%)">🌊 Ocean Blue Classic</option>
+                <option value="linear-gradient(135deg, #c2410c 0%, #ea580c 100%)">🔥 Sunset Orange Flash</option>
+                <option value="linear-gradient(135deg, #4c1d95 0%, #6d28d9 100%)">🔮 Deep Royal Violet</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Pengaturan Banner Kanan -->
+          <div style="background:#ffffff; border:1px solid var(--admin-border); border-radius:var(--radius-md); padding:24px; box-shadow:var(--shadow-sm);">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:16px;">
+              <span style="font-size:22px;">🏷️</span>
+              <h3 style="font-size:15px; font-weight:800; color:#0f172a;">Banner Promo Kanan</h3>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="cfg-b-right-p1-title">Judul Tag 1</label>
+                <input type="text" id="cfg-b-right-p1-title" class="form-input" oninput="AdminApp.updateBannerPreview()" placeholder="DISKON S.D.">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="cfg-b-right-p1-val">Nilai Tag 1</label>
+                <input type="text" id="cfg-b-right-p1-val" class="form-input" oninput="AdminApp.updateBannerPreview()" placeholder="80%">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="cfg-b-right-p2-title">Judul Tag 2</label>
+                <input type="text" id="cfg-b-right-p2-title" class="form-input" oninput="AdminApp.updateBannerPreview()" placeholder="VOUCHER">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="cfg-b-right-p2-val">Nilai Tag 2</label>
+                <input type="text" id="cfg-b-right-p2-val" class="form-input" oninput="AdminApp.updateBannerPreview()" placeholder="100RB">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="cfg-b-right-img1">URL Gambar Model Kiri</label>
+              <input type="url" id="cfg-b-right-img1" class="form-input" oninput="AdminApp.updateBannerPreview()" placeholder="https://images.unsplash.com/...">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="cfg-b-right-img2">URL Gambar Model Kanan</label>
+              <input type="url" id="cfg-b-right-img2" class="form-input" oninput="AdminApp.updateBannerPreview()" placeholder="https://images.unsplash.com/...">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="cfg-b-right-color">Pilihan Skema Warna Latar</label>
+              <select id="cfg-b-right-color" class="form-input" onchange="AdminApp.onBannerRightColorChange(this.value)">
+                <option value="linear-gradient(135deg, #3b0764 0%, #581c87 50%, #4c1d95 100%)">💜 Royal Purple (Bawaan)</option>
+                <option value="linear-gradient(135deg, #1d3f0d 0%, #285715 100%)">🌲 Pasarin Forest Green</option>
+                <option value="linear-gradient(135deg, #0f172a 0%, #1e293b 100%)">🖤 Dark Slate Night</option>
+                <option value="linear-gradient(135deg, #991b1b 0%, #dc2626 100%)">🔴 Crimson Ruby Sale</option>
+                <option value="linear-gradient(135deg, #0e7490 0%, #0891b2 100%)">💠 Cyan Neon Vibe</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- =========================================================
+           TAB 6: SETTINGS (KONFIGURASI & DB)
+           ========================================================= -->
+      <section class="admin-tab-pane" id="pane-settings">
+        <div style="background:#ffffff; border:1px solid var(--admin-border); border-radius:var(--radius-md); padding:24px; box-shadow:var(--shadow-sm); max-width:800px;">
+          <h2 style="font-size:16px; font-weight:800; color:#0f172a; margin-bottom:16px;">⚙️ Informasi Sistem & Penyimpanan</h2>
+          
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; border-bottom:1px solid #f1f5f9;">
+              <div>
+                <b>Mode Database Backend</b>
+                <div style="font-size:12px; color:#64748b;">Penyimpanan data produk & pesanan</div>
+              </div>
+              <span style="background:#e0f2fe; color:#0369a1; padding:4px 10px; border-radius:6px; font-weight:700; font-size:12px;">
+                JSON Persistence (backend/data/db.json)
+              </span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; border-bottom:1px solid #f1f5f9;">
+              <div>
+                <b>API Endpoint Server</b>
+                <div style="font-size:12px; color:#64748b;">Node.js / Express REST API</div>
+              </div>
+              <span style="background:#ecfdf5; color:#059669; padding:4px 10px; border-radius:6px; font-weight:700; font-size:12px;">
+                http://localhost:3000/api
+              </span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; border-bottom:1px solid #f1f5f9;">
+              <div>
+                <b>Identitas Toko</b>
+                <div style="font-size:12px; color:#64748b;">Nama platform & tema warna</div>
+              </div>
+              <span style="color:#1d3f0d; font-weight:800; font-size:12px;">
+                Pasarin Indonesia (#1d3f0d)
+              </span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; padding-top:6px;">
+              <div>
+                <b>Cadangkan Data (Backup)</b>
+                <div style="font-size:12px; color:#64748b;">Unduh salinan produk & pesanan</div>
+              </div>
+              <button class="btn-secondary" onclick="window.open('http://localhost:3000/api/products', '_blank')">
+                📥 Ekspor Produk JSON
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- =========================================================
+       3. MODAL DIALOG: TAMBAH & EDIT PRODUK
+       ========================================================= -->
+  <div class="admin-modal-overlay" id="admin-modal-product">
+    <div class="admin-modal-card">
+      <div class="admin-modal-header">
+        <h3 class="admin-modal-title" id="modal-product-title">Tambah Produk Baru</h3>
+        <button class="admin-modal-close" onclick="AdminApp.closeModal()" aria-label="Tutup">&times;</button>
+      </div>
+
+      <form id="form-product" onsubmit="AdminApp.handleSaveProduct(event)">
+        <div class="admin-modal-body">
+          <div class="form-group">
+            <label class="form-label" for="f-prod-name">Nama Produk *</label>
+            <input type="text" id="f-prod-name" class="form-input" placeholder="Cth: Sepatu Sneakers Running Sporty" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="f-prod-category">Kategori</label>
+              <select id="f-prod-category" class="form-input">
+                <option value="Elektronik">Elektronik</option>
+                <option value="Komputer">Komputer & Aksesoris</option>
+                <option value="Handphone">Handphone & Aksesoris</option>
+                <option value="Pakaian Pria">Pakaian Pria</option>
+                <option value="Sepatu Pria">Sepatu Pria</option>
+                <option value="Fotografi">Fotografi</option>
+                <option value="Makanan & Minuman">Makanan & Minuman</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="f-prod-stock">Jumlah Stok</label>
+              <input type="number" id="f-prod-stock" class="form-input" min="0" value="20" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="f-prod-price">Harga Pasarin (Rp) *</label>
+              <input type="number" id="f-prod-price" class="form-input" min="1000" placeholder="150000" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="f-prod-orig-price">Harga Coret Asli (Rp)</label>
+              <input type="number" id="f-prod-orig-price" class="form-input" min="0" placeholder="200000">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="f-prod-image">URL Gambar Produk</label>
+            <input type="url" id="f-prod-image" class="form-input" placeholder="https://..." oninput="document.getElementById('prod-img-preview').src = this.value || 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=200'">
+            <div style="display:flex; align-items:center; gap:12px; margin-top:8px;">
+              <img id="prod-img-preview" src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=200" alt="Preview" style="width:60px; height:60px; object-fit:cover; border-radius:6px; border:1px solid #e2e8f0;">
+              <span style="font-size:11.5px; color:#64748b;">Pratinjau gambar produk yang akan tampil di katalog</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="f-prod-shop">Nama Toko / Seller</label>
+              <input type="text" id="f-prod-shop" class="form-input" value="Pasarin Official">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="f-prod-location">Lokasi Pengiriman</label>
+              <input type="text" id="f-prod-location" class="form-input" value="Jakarta Barat">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top:8px; display:flex; align-items:center; gap:10px;">
+            <label class="toggle-switch">
+              <input type="checkbox" id="f-prod-flash">
+              <span class="toggle-slider"></span>
+            </label>
+            <label for="f-prod-flash" style="font-size:13px; font-weight:700; color:#1e293b; cursor:pointer;">
+              ⚡ Masukkan ke Banner & Jadwal Flash Sale
+            </label>
+          </div>
+        </div>
+
+        <div class="admin-modal-footer">
+          <button type="button" class="btn-secondary" onclick="AdminApp.closeModal()">Batal</button>
+          <button type="submit" class="btn-primary">💾 Simpan Produk</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       4. MODAL DIALOG: TAMBAH & EDIT VOUCHER PROMO
+       ========================================================= -->
+  <div class="admin-modal-overlay" id="admin-modal-promo">
+    <div class="admin-modal-card">
+      <div class="admin-modal-header">
+        <h3 class="admin-modal-title" id="modal-promo-title">Buat Voucher Promo Baru</h3>
+        <button class="admin-modal-close" onclick="AdminApp.closePromoModal()" aria-label="Tutup">&times;</button>
+      </div>
+
+      <form id="form-promo" onsubmit="AdminApp.handleSavePromo(event)">
+        <div class="admin-modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="f-promo-code">Kode Promo *</label>
+              <input type="text" id="f-promo-code" class="form-input" placeholder="Cth: GAJIAN20" style="text-transform:uppercase; font-weight:700;" required>
+              <small style="color:#64748b; font-size:11px;">Huruf kapital tanpa spasi</small>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="f-promo-category">Kategori Promo *</label>
+              <select id="f-promo-category" class="form-input" required>
+                <option value="diskon">Diskon Belanja (Katalog)</option>
+                <option value="ongkir">Gratis Ongkir (Logistik)</option>
+                <option value="cashback">Cashback Koin Pasarin</option>
+                <option value="lokal">Brand Lokal UMKM</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="f-promo-title">Judul Voucher *</label>
+            <input type="text" id="f-promo-title" class="form-input" placeholder="Cth: Promo Gajian Payday Diskon 20%" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="f-promo-type">Tipe Diskon *</label>
+              <select id="f-promo-type" class="form-input" onchange="AdminApp.onPromoTypeChange(this.value)">
+                <option value="percent">Persentase (%)</option>
+                <option value="fixed">Nominal Tetap (Rp)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="f-promo-value" id="lbl-promo-value">Nilai Diskon (%) *</label>
+              <input type="number" id="f-promo-value" class="form-input" min="1" placeholder="20" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="f-promo-min-spend">Minimum Belanja (Rp)</label>
+              <input type="number" id="f-promo-min-spend" class="form-input" min="0" placeholder="50000" value="0">
+              <small style="color:#64748b; font-size:11px;">Isi 0 jika tanpa minimal belanja</small>
+            </div>
+
+            <div class="form-group" id="group-promo-max-discount">
+              <label class="form-label" for="f-promo-max-discount">Maksimal Diskon (Rp)</label>
+              <input type="number" id="f-promo-max-discount" class="form-input" min="0" placeholder="100000">
+              <small style="color:#64748b; font-size:11px;">Batas potongan diskon persen</small>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="f-promo-quota">Total Kuota Voucher</label>
+              <input type="number" id="f-promo-quota" class="form-input" min="1" value="100" required>
+            </div>
+
+            <div class="form-group" style="display:flex; flex-direction:column; justify-content:center;">
+              <label class="form-label">Status Awal</label>
+              <div style="display:flex; align-items:center; gap:10px; margin-top:4px;">
+                <label class="toggle-switch">
+                  <input type="checkbox" id="f-promo-active" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+                <label for="f-promo-active" style="font-size:12.5px; font-weight:700; color:#1e293b; cursor:pointer;">
+                  Aktifkan Langsung
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="f-promo-desc">Deskripsi & Syarat Ketentuan</label>
+            <input type="text" id="f-promo-desc" class="form-input" placeholder="Cth: Potongan berlaku untuk semua metode pembayaran">
+          </div>
+        </div>
+
+        <div class="admin-modal-footer">
+          <button type="button" class="btn-secondary" onclick="AdminApp.closePromoModal()">Batal</button>
+          <button type="submit" class="btn-primary">💾 Simpan Voucher</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

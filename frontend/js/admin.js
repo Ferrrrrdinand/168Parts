@@ -1,0 +1,916 @@
+/* =========================================================
+   Pasarin Indonesia - Admin Dashboard Controller
+   Live CRUD, Realtime Analytics, Order & Stock Management
+   ========================================================= */
+
+const AdminApp = {
+  products: [],
+  orders: [],
+  promos: [],
+  banners: null,
+  currentTab: 'overview',
+  activeEditingId: null,
+  activeEditingPromoCode: null,
+
+  async init() {
+    this.bindEvents();
+    await this.fetchProducts();
+    await this.fetchOrders();
+    await this.fetchPromos();
+    await this.fetchBanners();
+    this.updateStats();
+    this.renderProductsTable();
+    this.renderOrdersTable();
+    this.renderPromosTable();
+    this.populateBannerForm();
+    this.renderOverviewRecent();
+  },
+
+  bindEvents() {
+    // Sidebar Navigation Tabs
+    const navItems = document.querySelectorAll('.sidebar-nav-item[data-tab]');
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const tab = item.getAttribute('data-tab');
+        this.switchTab(tab);
+      });
+    });
+
+    // Mobile Sidebar Toggle
+    const toggleBtn = document.getElementById('btn-toggle-sidebar');
+    const sidebar = document.getElementById('admin-sidebar');
+    if (toggleBtn && sidebar) {
+      toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+      });
+    }
+
+    // Product Search & Category Filter
+    const searchInput = document.getElementById('admin-prod-search');
+    const catSelect = document.getElementById('admin-prod-category');
+    if (searchInput) {
+      searchInput.addEventListener('input', () => this.renderProductsTable());
+    }
+    if (catSelect) {
+      catSelect.addEventListener('change', () => this.renderProductsTable());
+    }
+
+    // Order Status Filter
+    const orderFilter = document.getElementById('admin-order-status-filter');
+    if (orderFilter) {
+      orderFilter.addEventListener('change', () => this.renderOrdersTable());
+    }
+
+    // Promo Search & Category Filter
+    const promoSearch = document.getElementById('admin-promo-search');
+    const promoCat = document.getElementById('admin-promo-cat-filter');
+    if (promoSearch) {
+      promoSearch.addEventListener('input', () => this.renderPromosTable());
+    }
+    if (promoCat) {
+      promoCat.addEventListener('change', () => this.renderPromosTable());
+    }
+  },
+
+  switchTab(tabName) {
+    this.currentTab = tabName;
+
+    // Update Nav Item Active State
+    document.querySelectorAll('.sidebar-nav-item').forEach(el => {
+      el.classList.toggle('active', el.getAttribute('data-tab') === tabName);
+    });
+
+    // Update Panes
+    document.querySelectorAll('.admin-tab-pane').forEach(pane => {
+      pane.classList.remove('active');
+    });
+    const targetPane = document.getElementById(`pane-${tabName}`);
+    if (targetPane) targetPane.classList.add('active');
+
+    // Update Topbar Title
+    const titleEl = document.getElementById('topbar-page-title');
+    if (titleEl) {
+      const titles = {
+        overview: '📊 Ringkasan & Analisis Penjualan',
+        products: '📦 Manajemen & Katalog Produk',
+        orders: '📑 Daftar Pesanan & Pengiriman',
+        banners: '🎨 Pengaturan & Desain Banner Toko',
+        promos: '🎟️ Kelola Voucher & Kode Promo',
+        settings: '⚙️ Konfigurasi Sistem & Database'
+      };
+      titleEl.textContent = titles[tabName] || 'Dashboard Admin';
+    }
+
+    // Auto close sidebar on mobile
+    const sidebar = document.getElementById('admin-sidebar');
+    if (sidebar && window.innerWidth <= 768) {
+      sidebar.classList.remove('open');
+    }
+  },
+
+  async fetchProducts() {
+    try {
+      const res = await fetch(`${window.PasarinAPI.baseUrl}/products`);
+      const data = await res.json();
+      if (data && Array.isArray(data.data)) {
+        this.products = data.data;
+      }
+    } catch (e) {
+      console.warn('Gagal fetch /api/products, gunakan fallback', e);
+      if (!this.products.length) {
+        this.products = [
+          { id: 'prod-1', name: 'DJI Osmo Action 4 Standard Combo', category: 'Fotografi', price: 3940000, stock: 45, soldCount: 1420, isFlashSale: true, image: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=200' },
+          { id: 'prod-2', name: 'iPhone 12 256GB Garansi Resmi iBox', category: 'Handphone', price: 3599000, stock: 20, soldCount: 980, isFlashSale: true, image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=200' },
+          { id: 'prod-3', name: 'Insta360 X4 Kamera 360 8K Ultra', category: 'Fotografi', price: 6990000, stock: 15, soldCount: 650, isFlashSale: false, image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=200' },
+          { id: 'prod-4', name: 'Goojodoq Multipurpose Laptop Bag', category: 'Komputer', price: 156000, stock: 120, soldCount: 4200, isFlashSale: true, image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=200' }
+        ];
+      }
+    }
+  },
+
+  async fetchOrders() {
+    try {
+      const res = await fetch(`${window.PasarinAPI.baseUrl}/orders/all`);
+      const data = await res.json();
+      if (data && Array.isArray(data.data)) {
+        this.orders = data.data;
+      }
+    } catch (e) {
+      console.warn('Gagal fetch /api/orders/all', e);
+    }
+  },
+
+  async fetchPromos() {
+    try {
+      const res = await fetch(`${window.PasarinAPI.baseUrl}/promos/all`);
+      const data = await res.json();
+      if (data && Array.isArray(data.data)) {
+        this.promos = data.data;
+      }
+    } catch (e) {
+      console.warn('Gagal fetch /api/promos/all', e);
+    }
+  },
+
+  updateStats() {
+    const totalProdEl = document.getElementById('stat-total-products');
+    const totalOrdersEl = document.getElementById('stat-total-orders');
+    const totalRevEl = document.getElementById('stat-total-revenue');
+    const totalFlashEl = document.getElementById('stat-total-flash');
+
+    const totalRev = this.orders.reduce((acc, o) => acc + (o.totalAmount || 0), 0);
+    const flashCount = this.products.filter(p => p.isFlashSale).length;
+
+    if (totalProdEl) totalProdEl.textContent = this.products.length;
+    if (totalOrdersEl) totalOrdersEl.textContent = this.orders.length;
+    if (totalRevEl) totalRevEl.textContent = 'Rp' + totalRev.toLocaleString('id-ID');
+    if (totalFlashEl) totalFlashEl.textContent = flashCount;
+
+    // Promo Stats
+    const totalVouchersEl = document.getElementById('stat-total-vouchers');
+    const activeVouchersEl = document.getElementById('stat-active-vouchers');
+    const inactiveVouchersEl = document.getElementById('stat-inactive-vouchers');
+    const usedVouchersEl = document.getElementById('stat-used-vouchers');
+
+    const activeCount = this.promos.filter(p => p.isActive).length;
+    const inactiveCount = this.promos.filter(p => !p.isActive).length;
+    const totalUsed = this.promos.reduce((acc, p) => acc + (p.usedCount || 0), 0);
+
+    if (totalVouchersEl) totalVouchersEl.textContent = this.promos.length;
+    if (activeVouchersEl) activeVouchersEl.textContent = activeCount;
+    if (inactiveVouchersEl) inactiveVouchersEl.textContent = inactiveCount;
+    if (usedVouchersEl) usedVouchersEl.textContent = totalUsed;
+
+    // Badge di sidebar
+    const prodBadge = document.getElementById('badge-prod-count');
+    const orderBadge = document.getElementById('badge-order-count');
+    const promoBadge = document.getElementById('badge-promo-count');
+    if (prodBadge) prodBadge.textContent = this.products.length;
+    if (orderBadge) orderBadge.textContent = this.orders.length;
+    if (promoBadge) promoBadge.textContent = this.promos.length;
+  },
+
+  renderOverviewRecent() {
+    const tbody = document.getElementById('overview-recent-orders-tbody');
+    if (!tbody) return;
+
+    const recent = this.orders.slice(0, 5);
+    if (recent.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#94a3b8;">Belum ada pesanan masuk</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = recent.map(o => {
+      const itemsSummary = (o.items || []).map(i => `${i.name} (x${i.quantity})`).join(', ') || 'Item Pesanan';
+      const statusBadge = this.getStatusBadge(o.status);
+
+      return `
+        <tr>
+          <td><span style="font-weight:700; color:#1d3f0d;">${o.id}</span></td>
+          <td><b>${o.customerName || 'Pelanggan'}</b></td>
+          <td style="max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${itemsSummary}">${itemsSummary}</td>
+          <td><b>Rp${Number(o.totalAmount || 0).toLocaleString('id-ID')}</b></td>
+          <td>${statusBadge}</td>
+        </tr>
+      `;
+    }).join('');
+  },
+
+  renderProductsTable() {
+    const tbody = document.getElementById('admin-products-tbody');
+    if (!tbody) return;
+
+    const q = (document.getElementById('admin-prod-search')?.value || '').toLowerCase();
+    const cat = document.getElementById('admin-prod-category')?.value || 'Semua';
+
+    let list = this.products.filter(p => {
+      const matchQ = p.name.toLowerCase().includes(q) || (p.id && p.id.toLowerCase().includes(q));
+      const matchCat = cat === 'Semua' || (p.category && p.category.toLowerCase() === cat.toLowerCase());
+      return matchQ && matchCat;
+    });
+
+    if (list.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:30px; color:#94a3b8;">Tidak ada produk yang cocok dengan pencarian</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = list.map((p, idx) => {
+      const discount = p.discountPercent || (p.originalPrice && p.originalPrice > p.price ? Math.round((1 - p.price / p.originalPrice) * 100) : 0);
+      const stockBadge = p.stock > 10 
+        ? `<span class="badge-status badge-success">${p.stock} Tersedia</span>` 
+        : `<span class="badge-status badge-warning">${p.stock} Menipis</span>`;
+
+      return `
+        <tr>
+          <td>
+            <div class="prod-cell">
+              <img src="${p.image || 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=100'}" alt="${p.name}" class="prod-thumb" onerror="this.src='https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=100'">
+              <div class="prod-meta">
+                <span class="prod-name" title="${p.name}">${p.name}</span>
+                <span class="prod-id">${p.id}</span>
+              </div>
+            </div>
+          </td>
+          <td><span style="background:#f1f5f9; padding:2px 8px; border-radius:4px; font-weight:600;">${p.category || 'Umum'}</span></td>
+          <td><b>Rp${Number(p.price).toLocaleString('id-ID')}</b></td>
+          <td>${discount > 0 ? `<span style="color:#dc2626; font-weight:800;">-${discount}%</span>` : '-'}</td>
+          <td>${stockBadge}</td>
+          <td>${Number(p.soldCount || 0).toLocaleString('id-ID')}</td>
+          <td>
+            <label class="toggle-switch">
+              <input type="checkbox" ${p.isFlashSale ? 'checked' : ''} onchange="AdminApp.toggleFlashSale('${p.id}', this.checked)">
+              <span class="toggle-slider"></span>
+            </label>
+          </td>
+          <td>
+            <div class="action-btns">
+              <button class="btn-action-icon" title="Edit Produk" onclick="AdminApp.openEditModal('${p.id}')">✏️</button>
+              <button class="btn-action-icon btn-delete" title="Hapus Produk" onclick="AdminApp.deleteProduct('${p.id}')">🗑️</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  },
+
+  renderOrdersTable() {
+    const tbody = document.getElementById('admin-orders-tbody');
+    if (!tbody) return;
+
+    const filterStatus = document.getElementById('admin-order-status-filter')?.value || 'Semua';
+
+    let list = this.orders;
+    if (filterStatus !== 'Semua') {
+      list = list.filter(o => o.status === filterStatus);
+    }
+
+    if (list.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:#94a3b8;">Tidak ada pesanan pada status ini</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = list.map(o => {
+      const itemsText = (o.items || []).map(i => `${i.name} (x${i.quantity})`).join('<br>') || '-';
+      const dateFormatted = new Date(o.createdAt || Date.now()).toLocaleDateString('id-ID', {
+        day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+
+      return `
+        <tr>
+          <td><span style="font-weight:700; color:#1d3f0d;">${o.id}</span><br><small style="color:#94a3b8;">${dateFormatted}</small></td>
+          <td><b>${o.customerName || 'Pelanggan Pasarin'}</b></td>
+          <td style="font-size:12px; line-height:1.4;">${itemsText}</td>
+          <td><b>Rp${Number(o.totalAmount || 0).toLocaleString('id-ID')}</b></td>
+          <td><span style="color:#059669; font-weight:800;">+${o.earnedPoints || Math.floor((o.totalAmount||0)/1000)} Pts</span></td>
+          <td>
+            <select class="admin-select" style="font-size:11.5px; padding:4px 8px;" onchange="AdminApp.updateOrderStatus('${o.id}', this.value)">
+              <option value="Sedang Diproses" ${o.status === 'Sedang Diproses' ? 'selected' : ''}>⏳ Diproses</option>
+              <option value="Sedang Dikirim" ${o.status === 'Sedang Dikirim' ? 'selected' : ''}>🚚 Dikirim</option>
+              <option value="Selesai" ${o.status === 'Selesai' ? 'selected' : ''}>✅ Selesai</option>
+              <option value="Dibatalkan" ${o.status === 'Dibatalkan' ? 'selected' : ''}>❌ Dibatalkan</option>
+            </select>
+          </td>
+          <td>
+            <span style="font-size:12px; color:#64748b;">${o.paymentMethod || 'Transfer'}</span>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  },
+
+  getStatusBadge(status) {
+    if (status === 'Selesai') return `<span class="badge-status badge-success">✅ Selesai</span>`;
+    if (status === 'Sedang Dikirim') return `<span class="badge-status badge-info">🚚 Dikirim</span>`;
+    if (status === 'Sedang Diproses') return `<span class="badge-status badge-warning">⏳ Diproses</span>`;
+    return `<span class="badge-status badge-danger">❌ ${status || 'Pending'}</span>`;
+  },
+
+  async toggleFlashSale(prodId, isFlash) {
+    const p = this.products.find(x => x.id === prodId);
+    if (!p) return;
+    p.isFlashSale = isFlash;
+
+    try {
+      await fetch(`${window.PasarinAPI.baseUrl}/products/${prodId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isFlashSale: isFlash })
+      });
+      this.showToast(`Status Flash Sale produk "${p.name.slice(0, 20)}..." diperbarui!`);
+      this.updateStats();
+    } catch (e) {
+      console.error(e);
+    }
+  },
+
+  openAddModal() {
+    this.activeEditingId = null;
+    document.getElementById('modal-product-title').textContent = 'Tambah Produk Baru';
+    document.getElementById('form-product').reset();
+    document.getElementById('prod-img-preview').src = 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=200';
+    document.getElementById('admin-modal-product').classList.add('active');
+  },
+
+  openEditModal(prodId) {
+    const p = this.products.find(x => x.id === prodId);
+    if (!p) return;
+
+    this.activeEditingId = prodId;
+    document.getElementById('modal-product-title').textContent = 'Edit Informasi Produk';
+    document.getElementById('f-prod-name').value = p.name || '';
+    document.getElementById('f-prod-category').value = p.category || 'Elektronik';
+    document.getElementById('f-prod-price').value = p.price || '';
+    document.getElementById('f-prod-orig-price').value = p.originalPrice || '';
+    document.getElementById('f-prod-stock').value = p.stock || 20;
+    document.getElementById('f-prod-image').value = p.image || '';
+    document.getElementById('f-prod-shop').value = p.shopName || 'Pasarin Official';
+    document.getElementById('f-prod-location').value = p.location || 'Jakarta Barat';
+    document.getElementById('f-prod-flash').checked = !!p.isFlashSale;
+    document.getElementById('prod-img-preview').src = p.image || 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=200';
+
+    document.getElementById('admin-modal-product').classList.add('active');
+  },
+
+  closeModal() {
+    document.getElementById('admin-modal-product').classList.remove('active');
+  },
+
+  async handleSaveProduct(event) {
+    event.preventDefault();
+    const name = document.getElementById('f-prod-name').value.trim();
+    const category = document.getElementById('f-prod-category').value;
+    const price = Number(document.getElementById('f-prod-price').value);
+    const originalPrice = Number(document.getElementById('f-prod-orig-price').value) || null;
+    const stock = Number(document.getElementById('f-prod-stock').value) || 10;
+    const image = document.getElementById('f-prod-image').value.trim() || 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500';
+    const shopName = document.getElementById('f-prod-shop').value.trim() || 'Pasarin Official';
+    const location = document.getElementById('f-prod-location').value.trim() || 'Jakarta Barat';
+    const isFlashSale = document.getElementById('f-prod-flash').checked;
+
+    const discountPercent = originalPrice && originalPrice > price ? Math.round((1 - price / originalPrice) * 100) : 0;
+
+    const payload = {
+      name, category, price, originalPrice, discountPercent, stock, image, shopName, location, isFlashSale
+    };
+
+    try {
+      if (this.activeEditingId) {
+        // UPDATE (PUT)
+        const res = await fetch(`${window.PasarinAPI.baseUrl}/products/${this.activeEditingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          const idx = this.products.findIndex(x => x.id === this.activeEditingId);
+          if (idx !== -1) this.products[idx] = { ...this.products[idx], ...payload };
+          this.showToast('✅ Produk berhasil diperbarui!');
+        }
+      } else {
+        // CREATE (POST)
+        const res = await fetch(`${window.PasarinAPI.baseUrl}/products`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success && data.product) {
+          this.products.unshift(data.product);
+          this.showToast('🎉 Produk baru berhasil ditambahkan!');
+        }
+      }
+
+      this.closeModal();
+      this.updateStats();
+      this.renderProductsTable();
+    } catch (e) {
+      console.error(e);
+      alert('Gagal menyimpan produk ke server.');
+    }
+  },
+
+  async deleteProduct(prodId) {
+    const p = this.products.find(x => x.id === prodId);
+    if (!confirm(`Apakah Anda yakin ingin menghapus produk "${p ? p.name : prodId}"?`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`${window.PasarinAPI.baseUrl}/products/${prodId}`, {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      if (data.success) {
+        this.products = this.products.filter(x => x.id !== prodId);
+        this.showToast('🗑️ Produk berhasil dihapus dari database!');
+        this.updateStats();
+        this.renderProductsTable();
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Gagal menghapus produk.');
+    }
+  },
+
+  async updateOrderStatus(orderId, newStatus) {
+    try {
+      const res = await fetch(`${window.PasarinAPI.baseUrl}/orders/${orderId}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      const data = await res.json();
+      if (data.success) {
+        const o = this.orders.find(x => x.id === orderId);
+        if (o) o.status = newStatus;
+        this.showToast(`Status pesanan ${orderId} diubah ke: ${newStatus}`);
+        this.renderOverviewRecent();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  },
+
+  renderPromosTable() {
+    const tbody = document.getElementById('admin-promos-tbody');
+    if (!tbody) return;
+
+    const q = (document.getElementById('admin-promo-search')?.value || '').toLowerCase();
+    const cat = document.getElementById('admin-promo-cat-filter')?.value || 'Semua';
+
+    let list = this.promos.filter(p => {
+      const matchQ = (p.code && p.code.toLowerCase().includes(q)) || 
+                     (p.title && p.title.toLowerCase().includes(q)) ||
+                     (p.description && p.description.toLowerCase().includes(q));
+      const matchCat = cat === 'Semua' || (p.category && p.category.toLowerCase() === cat.toLowerCase());
+      return matchQ && matchCat;
+    });
+
+    if (list.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:30px; color:#94a3b8;">Tidak ada voucher promo yang cocok dengan pencarian</td></tr>`;
+      return;
+    }
+
+    const catLabels = {
+      diskon: { text: 'Diskon Belanja', cls: 'badge-promo-diskon' },
+      ongkir: { text: 'Gratis Ongkir', cls: 'badge-promo-ongkir' },
+      cashback: { text: 'Cashback Koin', cls: 'badge-promo-cashback' },
+      lokal: { text: 'Brand Lokal', cls: 'badge-promo-lokal' }
+    };
+
+    tbody.innerHTML = list.map(p => {
+      const catInfo = catLabels[p.category] || { text: p.category || 'Diskon', cls: 'badge-promo-diskon' };
+      const valDisplay = p.discountType === 'percent'
+        ? `<b style="color:#dc2626; font-size:14px;">${p.discountValue}% OFF</b>${p.maxDiscount ? `<br><small style="color:#64748b;">Maks. Rp${p.maxDiscount.toLocaleString('id-ID')}</small>` : ''}`
+        : `<b style="color:#059669; font-size:14px;">Rp${p.discountValue.toLocaleString('id-ID')}</b>`;
+
+      const minSpendText = p.minSpend > 0 ? `Rp${p.minSpend.toLocaleString('id-ID')}` : '<span style="color:#64748b;">Tanpa Min.</span>';
+      const quotaPct = Math.min(100, Math.round(((p.usedCount || 0) / (p.quota || 1)) * 100));
+
+      return `
+        <tr>
+          <td>
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <span style="font-weight:800; color:#1d3f0d; font-family:monospace; font-size:13.5px; letter-spacing:0.5px;">${p.code}</span>
+              <span style="font-size:10px; color:#64748b;">VOUCHER TOKO</span>
+            </div>
+          </td>
+          <td>
+            <b>${p.title}</b>
+            <div style="font-size:11.5px; color:#64748b; line-height:1.3; max-width:240px;">${p.description || '-'}</div>
+          </td>
+          <td>
+            <span class="badge-status ${catInfo.cls}" style="font-size:11px; font-weight:700;">${catInfo.text}</span>
+          </td>
+          <td>${valDisplay}</td>
+          <td>${minSpendText}</td>
+          <td>
+            <div class="promo-quota-wrap">
+              <span style="font-size:11.5px; font-weight:700;">${p.usedCount || 0} / ${p.quota || 0}</span>
+              <div class="promo-quota-bar">
+                <div class="promo-quota-fill" style="width: ${quotaPct}%;"></div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <label class="toggle-switch">
+              <input type="checkbox" ${p.isActive ? 'checked' : ''} onchange="AdminApp.togglePromoStatus('${p.code}', this.checked)">
+              <span class="toggle-slider"></span>
+            </label>
+          </td>
+          <td>
+            <div class="action-btns">
+              <button class="btn-action-icon" title="Edit Promo" onclick="AdminApp.openEditPromoModal('${p.code}')">✏️</button>
+              <button class="btn-action-icon btn-delete" title="Hapus Promo" onclick="AdminApp.deletePromo('${p.code}')">🗑️</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  },
+
+  async togglePromoStatus(code, isActive) {
+    const p = this.promos.find(x => x.code === code);
+    if (!p) return;
+    p.isActive = isActive;
+
+    try {
+      const res = await fetch(`${window.PasarinAPI.baseUrl}/promos/${code}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isActive })
+      });
+      const data = await res.json();
+      if (data.success) {
+        this.showToast(`Status voucher ${code} diubah: ${isActive ? 'Aktif' : 'Nonaktif'}`);
+        this.updateStats();
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Gagal mengubah status promo di server.');
+    }
+  },
+
+  onPromoTypeChange(type) {
+    const lblVal = document.getElementById('lbl-promo-value');
+    const groupMax = document.getElementById('group-promo-max-discount');
+    const inputVal = document.getElementById('f-promo-value');
+    if (type === 'percent') {
+      if (lblVal) lblVal.textContent = 'Nilai Diskon (%) *';
+      if (inputVal) { inputVal.placeholder = '20'; inputVal.max = '100'; }
+      if (groupMax) groupMax.style.display = 'block';
+    } else {
+      if (lblVal) lblVal.textContent = 'Nilai Potongan (Rp) *';
+      if (inputVal) { inputVal.placeholder = '25000'; inputVal.removeAttribute('max'); }
+      if (groupMax) groupMax.style.display = 'none';
+    }
+  },
+
+  openAddPromoModal() {
+    this.activeEditingPromoCode = null;
+    document.getElementById('modal-promo-title').textContent = 'Buat Voucher Promo Baru';
+    document.getElementById('form-promo').reset();
+    document.getElementById('f-promo-code').disabled = false;
+    this.onPromoTypeChange('percent');
+    document.getElementById('admin-modal-promo').classList.add('active');
+  },
+
+  openEditPromoModal(code) {
+    const p = this.promos.find(x => x.code === code);
+    if (!p) return;
+
+    this.activeEditingPromoCode = code;
+    document.getElementById('modal-promo-title').textContent = 'Edit Pengaturan Voucher Promo';
+    
+    const codeInput = document.getElementById('f-promo-code');
+    codeInput.value = p.code;
+    codeInput.disabled = true;
+
+    document.getElementById('f-promo-title').value = p.title || '';
+    document.getElementById('f-promo-category').value = p.category || 'diskon';
+    document.getElementById('f-promo-type').value = p.discountType || 'percent';
+    this.onPromoTypeChange(p.discountType || 'percent');
+    document.getElementById('f-promo-value').value = p.discountValue || '';
+    document.getElementById('f-promo-min-spend').value = p.minSpend || 0;
+    document.getElementById('f-promo-max-discount').value = p.maxDiscount || '';
+    document.getElementById('f-promo-quota').value = p.quota || 100;
+    document.getElementById('f-promo-desc').value = p.description || '';
+    document.getElementById('f-promo-active').checked = !!p.isActive;
+
+    document.getElementById('admin-modal-promo').classList.add('active');
+  },
+
+  closePromoModal() {
+    document.getElementById('admin-modal-promo').classList.remove('active');
+  },
+
+  async handleSavePromo(event) {
+    event.preventDefault();
+    const code = document.getElementById('f-promo-code').value.trim().toUpperCase();
+    const title = document.getElementById('f-promo-title').value.trim();
+    const category = document.getElementById('f-promo-category').value;
+    const discount_type = document.getElementById('f-promo-type').value;
+    const discount_value = Number(document.getElementById('f-promo-value').value);
+    const min_spend = Number(document.getElementById('f-promo-min-spend').value) || 0;
+    const max_discount = Number(document.getElementById('f-promo-max-discount').value) || null;
+    const quota = Number(document.getElementById('f-promo-quota').value) || 100;
+    const description = document.getElementById('f-promo-desc').value.trim();
+    const is_active = document.getElementById('f-promo-active').checked;
+
+    const payload = {
+      code,
+      title,
+      category,
+      discount_type,
+      discount_value,
+      min_spend,
+      max_discount,
+      quota,
+      description,
+      is_active
+    };
+
+    try {
+      if (this.activeEditingPromoCode) {
+        // UPDATE (PUT)
+        const res = await fetch(`${window.PasarinAPI.baseUrl}/promos/${this.activeEditingPromoCode}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          const idx = this.promos.findIndex(x => x.code === this.activeEditingPromoCode);
+          if (idx !== -1) this.promos[idx] = data.data;
+          this.showToast(`✅ Voucher ${code} berhasil diperbarui!`);
+        } else {
+          alert(data.message || 'Gagal memperbarui voucher.');
+          return;
+        }
+      } else {
+        // CREATE (POST)
+        const res = await fetch(`${window.PasarinAPI.baseUrl}/promos`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success && data.data) {
+          this.promos.unshift(data.data);
+          this.showToast(`🎉 Voucher baru "${code}" berhasil diterbitkan!`);
+        } else {
+          alert(data.message || 'Gagal membuat voucher baru.');
+          return;
+        }
+      }
+
+      this.closePromoModal();
+      this.updateStats();
+      this.renderPromosTable();
+    } catch (e) {
+      console.error(e);
+      alert('Gagal menyimpan voucher ke server.');
+    }
+  },
+
+  async deletePromo(code) {
+    if (!confirm(`Apakah Anda yakin ingin menghapus voucher "${code}" dari sistem?`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`${window.PasarinAPI.baseUrl}/promos/${code}`, {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      if (data.success) {
+        this.promos = this.promos.filter(x => x.code !== code);
+        this.showToast(`🗑️ Voucher "${code}" berhasil dihapus.`);
+        this.updateStats();
+        this.renderPromosTable();
+      } else {
+        alert(data.message || 'Gagal menghapus voucher.');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Gagal menghapus voucher.');
+    }
+  },
+
+  async fetchBanners() {
+    try {
+      const res = await fetch(`${window.PasarinAPI.baseUrl}/banners`);
+      const data = await res.json();
+      if (data && data.success && data.data) {
+        this.banners = data.data;
+      }
+    } catch (e) {
+      console.warn('Gagal fetch /api/banners', e);
+    }
+  },
+
+  populateBannerForm() {
+    if (!this.banners) return;
+    const { left, right } = this.banners;
+
+    if (left) {
+      const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+      setVal('cfg-b-left-badge', left.badge);
+      setVal('cfg-b-left-title', left.title);
+      setVal('cfg-b-left-p1', left.pills ? left.pills[0] : '');
+      setVal('cfg-b-left-p2', left.pills ? left.pills[1] : '');
+      setVal('cfg-b-left-p3', left.pills ? left.pills[2] : '');
+      setVal('cfg-b-left-img', left.modelImage);
+      setVal('cfg-b-left-color', left.bgGradient || 'linear-gradient(135deg, #1d3f0d 0%, #285715 100%)');
+    }
+
+    if (right) {
+      const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+      setVal('cfg-b-right-p1-title', right.pill1Title);
+      setVal('cfg-b-right-p1-val', right.pill1Val);
+      setVal('cfg-b-right-p2-title', right.pill2Title);
+      setVal('cfg-b-right-p2-val', right.pill2Val);
+      setVal('cfg-b-right-img1', right.modelImage1);
+      setVal('cfg-b-right-img2', right.modelImage2);
+      setVal('cfg-b-right-color', right.bgGradient || 'linear-gradient(135deg, #3b0764 0%, #581c87 50%, #4c1d95 100%)');
+    }
+
+    this.updateBannerPreview();
+  },
+
+  updateBannerPreview() {
+    // Left preview elements
+    const badgeVal = document.getElementById('cfg-b-left-badge')?.value || '✨ PASARIN PILIH LOKAL';
+    const titleVal = document.getElementById('cfg-b-left-title')?.value || 'Kreasi Unggulan & Inovasi Nusantara';
+    const p1Val = document.getElementById('cfg-b-left-p1')?.value || '🏷️ Produk Unik Asli Indonesia';
+    const p2Val = document.getElementById('cfg-b-left-p2')?.value || '⚡ Inovasi Lokal Rasa Global';
+    const p3Val = document.getElementById('cfg-b-left-p3')?.value || '⭐ Kualitas Unggulan Nusantara';
+    const imgVal = document.getElementById('cfg-b-left-img')?.value || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=320';
+    const colorVal = document.getElementById('cfg-b-left-color')?.value || 'linear-gradient(135deg, #1d3f0d 0%, #285715 100%)';
+
+    const prevLeftBox = document.getElementById('prev-left-box');
+    const prevLeftBadge = document.getElementById('prev-left-badge');
+    const prevLeftTitle = document.getElementById('prev-left-title');
+    const prevLeftP1 = document.getElementById('prev-left-p1');
+    const prevLeftP2 = document.getElementById('prev-left-p2');
+    const prevLeftP3 = document.getElementById('prev-left-p3');
+    const prevLeftImg = document.getElementById('prev-left-img');
+
+    if (prevLeftBox) prevLeftBox.style.background = colorVal;
+    if (prevLeftBadge) prevLeftBadge.textContent = badgeVal;
+    if (prevLeftTitle) prevLeftTitle.textContent = titleVal;
+    if (prevLeftP1) prevLeftP1.textContent = p1Val;
+    if (prevLeftP2) prevLeftP2.textContent = p2Val;
+    if (prevLeftP3) prevLeftP3.textContent = p3Val;
+    if (prevLeftImg) prevLeftImg.src = imgVal;
+
+    // Right preview elements
+    const rp1Title = document.getElementById('cfg-b-right-p1-title')?.value || 'DISKON S.D.';
+    const rp1Val = document.getElementById('cfg-b-right-p1-val')?.value || '80%';
+    const rp2Title = document.getElementById('cfg-b-right-p2-title')?.value || 'VOUCHER';
+    const rp2Val = document.getElementById('cfg-b-right-p2-val')?.value || '100RB';
+    const rImg1 = document.getElementById('cfg-b-right-img1')?.value || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=240';
+    const rImg2 = document.getElementById('cfg-b-right-img2')?.value || 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=240';
+    const rColor = document.getElementById('cfg-b-right-color')?.value || 'linear-gradient(135deg, #3b0764 0%, #581c87 50%, #4c1d95 100%)';
+
+    const prevRightBox = document.getElementById('prev-right-box');
+    const prevRightP1Title = document.getElementById('prev-right-p1-title');
+    const prevRightP1Val = document.getElementById('prev-right-p1-val');
+    const prevRightP2Title = document.getElementById('prev-right-p2-title');
+    const prevRightP2Val = document.getElementById('prev-right-p2-val');
+    const prevRightImg1 = document.getElementById('prev-right-img1');
+    const prevRightImg2 = document.getElementById('prev-right-img2');
+
+    if (prevRightBox) prevRightBox.style.background = rColor;
+    if (prevRightP1Title) prevRightP1Title.textContent = rp1Title;
+    if (prevRightP1Val) prevRightP1Val.textContent = rp1Val;
+    if (prevRightP2Title) prevRightP2Title.textContent = rp2Title;
+    if (prevRightP2Val) prevRightP2Val.textContent = rp2Val;
+    if (prevRightImg1) prevRightImg1.src = rImg1;
+    if (prevRightImg2) prevRightImg2.src = rImg2;
+  },
+
+  onBannerLeftColorChange(color) {
+    const prevLeftBox = document.getElementById('prev-left-box');
+    if (prevLeftBox) prevLeftBox.style.background = color;
+  },
+
+  onBannerRightColorChange(color) {
+    const prevRightBox = document.getElementById('prev-right-box');
+    if (prevRightBox) prevRightBox.style.background = color;
+  },
+
+  async saveBanners() {
+    const payload = {
+      left: {
+        badge: document.getElementById('cfg-b-left-badge')?.value || '✨ PASARIN PILIH LOKAL',
+        title: document.getElementById('cfg-b-left-title')?.value || 'Kreasi Unggulan & Inovasi Nusantara',
+        pills: [
+          document.getElementById('cfg-b-left-p1')?.value || '🏷️ Produk Unik Asli Indonesia',
+          document.getElementById('cfg-b-left-p2')?.value || '⚡ Inovasi Lokal Rasa Global',
+          document.getElementById('cfg-b-left-p3')?.value || '⭐ Kualitas Unggulan Nusantara'
+        ],
+        modelImage: document.getElementById('cfg-b-left-img')?.value || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=320',
+        bgGradient: document.getElementById('cfg-b-left-color')?.value || 'linear-gradient(135deg, #1d3f0d 0%, #285715 100%)',
+        targetUrl: '#/search?category=Pilih+Lokal'
+      },
+      right: {
+        pill1Title: document.getElementById('cfg-b-right-p1-title')?.value || 'DISKON S.D.',
+        pill1Val: document.getElementById('cfg-b-right-p1-val')?.value || '80%',
+        pill2Title: document.getElementById('cfg-b-right-p2-title')?.value || 'VOUCHER',
+        pill2Val: document.getElementById('cfg-b-right-p2-val')?.value || '100RB',
+        modelImage1: document.getElementById('cfg-b-right-img1')?.value || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=240',
+        modelImage2: document.getElementById('cfg-b-right-img2')?.value || 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=240',
+        bgGradient: document.getElementById('cfg-b-right-color')?.value || 'linear-gradient(135deg, #3b0764 0%, #581c87 50%, #4c1d95 100%)',
+        targetUrl: '#/search?q=promo'
+      }
+    };
+
+    try {
+      const res = await fetch(`${window.PasarinAPI.baseUrl}/banners`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data && data.success) {
+        this.banners = data.data;
+        this.showToast('✅ Pengaturan banner beranda berhasil disimpan!');
+      } else {
+        alert(data.message || 'Gagal menyimpan perubahan banner.');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Gagal menghubungi server untuk menyimpan banner.');
+    }
+  },
+
+  async resetBanners() {
+    if (!confirm('Apakah Anda yakin ingin mengembalikan semua banner ke desain bawaan awal?')) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`${window.PasarinAPI.baseUrl}/banners/reset`, { method: 'POST' });
+      const data = await res.json();
+      if (data && data.success) {
+        this.banners = data.data;
+        this.populateBannerForm();
+        this.showToast('🔄 Desain banner berhasil direset ke pengaturan default!');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Gagal mereset banner.');
+    }
+  },
+
+  showToast(message) {
+    let toast = document.getElementById('admin-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'admin-toast';
+      toast.style.cssText = `
+        position: fixed; top: 20px; right: 24px; z-index: 99999;
+        background: #1d3f0d; color: #ffffff; padding: 12px 20px;
+        border-radius: 8px; font-weight: 700; font-size: 13.5px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.25); transition: all 0.3s ease;
+      `;
+      document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.style.display = 'block';
+    toast.style.opacity = '1';
+
+    clearTimeout(this._toastTimer);
+    this._toastTimer = setTimeout(() => {
+      toast.style.opacity = '0';
+      setTimeout(() => toast.style.display = 'none', 300);
+    }, 2800);
+  }
+};
+
+// Auto init
+document.addEventListener('DOMContentLoaded', () => {
+  AdminApp.init();
+});
