@@ -146,9 +146,17 @@ const PasarinAuth = {
                 </div>
               </div>
               <hr class="user-menu-divider">
+              <a href="#/user/profile" class="user-menu-item" id="btn-nav-profile">
+                <span class="menu-icon">👤</span>
+                <span class="menu-text">Akun Saya (Profil)</span>
+              </a>
               <a href="#" class="user-menu-item" id="btn-nav-crud">
                 <span class="menu-icon">⚙️</span>
-                <span class="menu-text">Kelola Produk (CRUD)</span>
+                <span class="menu-text">Kanal Penjual (CRUD Produk)</span>
+              </a>
+              <a href="admin.html" class="user-menu-item" id="btn-nav-seller-admin">
+                <span class="menu-icon">👑</span>
+                <span class="menu-text">Seller & Admin Centre</span>
               </a>
               <a href="#/orders" class="user-menu-item" id="btn-nav-orders">
                 <span class="menu-icon">📦</span>

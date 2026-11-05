@@ -621,6 +621,201 @@
     </footer>
   </div>
 
+  <!-- ==================== VIEW 5: SHOPEE STYLE PROFIL SAYA (#/user/profile) ==================== -->
+  <div id="view-profile" class="view">
+    <div class="w" style="padding-top: 24px; padding-bottom: 50px;">
+      <div class="shopee-profile-container">
+        
+        <!-- SIDEBAR KIRI PROFIL (Persis Screenshot) -->
+        <aside class="shopee-profile-sidebar">
+          <!-- User Brief Header -->
+          <div class="user-brief-box">
+            <div class="user-brief-avatar-wrap">
+              <img id="sidebar-user-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120" alt="Avatar" class="user-brief-avatar">
+            </div>
+            <div class="user-brief-info">
+              <div class="user-brief-username" id="sidebar-user-username">ferdinand2341</div>
+              <a href="#/user/profile" class="user-brief-edit-link">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                Ubah Profil
+              </a>
+            </div>
+          </div>
+
+          <!-- Navigation Tree Menu -->
+          <nav class="profile-nav-tree">
+            <!-- Akun Saya Group -->
+            <div class="profile-nav-group">
+              <div class="profile-nav-title active">
+                <span class="nav-tree-icon">👤</span>
+                <span>Akun Saya</span>
+              </div>
+              <div class="profile-nav-sublist">
+                <a href="#/user/profile" class="profile-nav-subitem active">Profil</a>
+                <a href="javascript:void(0)" onclick="if(window.showToast) window.showToast('Fitur Bank & Rekening PasarinPay aktif.', 'info')" class="profile-nav-subitem">Bank & Kartu</a>
+                <a href="javascript:void(0)" onclick="if(window.PasarinApp) window.PasarinApp.openAddressModal()" class="profile-nav-subitem">Alamat</a>
+                <a href="javascript:void(0)" onclick="PasarinApp.openChangePasswordPrompt()" class="profile-nav-subitem">Ubah Password</a>
+                <a href="javascript:void(0)" onclick="if(window.showToast) window.showToast('Pengaturan Notifikasi aktif.', 'info')" class="profile-nav-subitem">Pengaturan Notifikasi</a>
+                <a href="javascript:void(0)" onclick="if(window.showToast) window.showToast('Pengaturan Privasi aktif.', 'info')" class="profile-nav-subitem">Pengaturan Privasi</a>
+              </div>
+            </div>
+
+            <!-- Pesanan Saya -->
+            <a href="javascript:void(0)" onclick="if(window.PasarinApp) window.PasarinApp.openOrdersModal()" class="profile-nav-item">
+              <span class="nav-tree-icon">📋</span>
+              <span>Pesanan Saya</span>
+            </a>
+
+            <!-- Notifikasi -->
+            <a href="javascript:void(0)" onclick="if(window.showToast) window.showToast('Tidak ada notifikasi baru.', 'info')" class="profile-nav-item">
+              <span class="nav-tree-icon">🔔</span>
+              <span>Notifikasi</span>
+            </a>
+
+            <!-- Voucher Saya -->
+            <a href="javascript:void(0)" onclick="if(window.PasarinApp) window.PasarinApp.openPromoModal()" class="profile-nav-item">
+              <span class="nav-tree-icon">🎟️</span>
+              <span>Voucher Saya</span>
+            </a>
+
+            <!-- Koin Pasarin Saya -->
+            <a href="javascript:void(0)" onclick="if(window.showToast) window.showToast(`Saldo Koin Anda: ${window.PasarinPoints ? window.PasarinPoints.getPoints().toLocaleString('id-ID') : 0} Koin`, 'info')" class="profile-nav-item">
+              <span class="nav-tree-icon">🪙</span>
+              <span>Koin Shopee Saya</span>
+            </a>
+
+            <!-- Kanal Penjual & CRUD Toko -->
+            <a href="javascript:void(0)" onclick="if(window.PasarinApp) window.PasarinApp.openProductCrudModal()" class="profile-nav-item" style="color: #1d3f0d; font-weight: 700; margin-top: 12px; border-top: 1px dashed #e2e8f0; padding-top: 10px;">
+              <span class="nav-tree-icon">⚙️</span>
+              <span>Kanal Penjual (CRUD)</span>
+            </a>
+          </nav>
+        </aside>
+
+        <!-- MAIN CARD PROFIL SAYA (Persis Screenshot) -->
+        <main class="shopee-profile-main-card">
+          <!-- Card Header -->
+          <div class="profile-card-header">
+            <h1 class="profile-card-title">Profil Saya</h1>
+            <p class="profile-card-subtitle">Kelola informasi profil Anda untuk mengontrol, melindungi dan mengamankan akun</p>
+          </div>
+
+          <div class="profile-card-body">
+            <!-- Kolom Kiri: Formulir Data Diri -->
+            <form id="form-user-profile" class="profile-edit-form" onsubmit="PasarinApp.handleSaveUserProfile(event)">
+              
+              <!-- Username -->
+              <div class="profile-form-row">
+                <label class="profile-form-label">Username</label>
+                <div class="profile-form-field">
+                  <span class="profile-text-val" id="prof-val-username" style="font-weight:600;">ferdinand2341</span>
+                  <input type="text" id="prof-input-username" class="profile-text-input" style="max-width:240px; display:none;" value="ferdinand2341">
+                </div>
+              </div>
+
+              <!-- Nama -->
+              <div class="profile-form-row">
+                <label class="profile-form-label" for="prof-input-name">Nama</label>
+                <div class="profile-form-field">
+                  <input type="text" id="prof-input-name" class="profile-text-input" placeholder="Nama lengkap Anda" required>
+                </div>
+              </div>
+
+              <!-- Email -->
+              <div class="profile-form-row">
+                <label class="profile-form-label">Email</label>
+                <div class="profile-form-field profile-field-inline">
+                  <span class="profile-text-val" id="prof-val-email">fe************@gmail.com</span>
+                  <button type="button" class="profile-link-btn" onclick="PasarinApp.promptChangeEmail()">Ubah</button>
+                  <input type="hidden" id="prof-hidden-email">
+                </div>
+              </div>
+
+              <!-- Nomor Telepon -->
+              <div class="profile-form-row">
+                <label class="profile-form-label">Nomor Telepon</label>
+                <div class="profile-form-field profile-field-inline">
+                  <span class="profile-text-val" id="prof-val-phone">**********76</span>
+                  <button type="button" class="profile-link-btn" onclick="PasarinApp.promptChangePhone()">Ubah</button>
+                  <input type="hidden" id="prof-hidden-phone">
+                </div>
+              </div>
+
+              <!-- Nama Toko -->
+              <div class="profile-form-row">
+                <label class="profile-form-label" for="prof-input-shop">
+                  Nama Toko
+                  <span class="profile-help-circle" title="Nama toko Anda di kanal penjual Pasarin Indonesia">?</span>
+                </label>
+                <div class="profile-form-field">
+                  <input type="text" id="prof-input-shop" class="profile-text-input" placeholder="Nama toko Anda (Cth: 168Parts Official)">
+                </div>
+              </div>
+
+              <!-- Jenis Kelamin -->
+              <div class="profile-form-row">
+                <label class="profile-form-label">Jenis Kelamin</label>
+                <div class="profile-form-field profile-radio-group">
+                  <label class="profile-radio-label">
+                    <input type="radio" name="prof-gender" value="Laki-laki" checked>
+                    <span>Laki-laki</span>
+                  </label>
+                  <label class="profile-radio-label">
+                    <input type="radio" name="prof-gender" value="Perempuan">
+                    <span>Perempuan</span>
+                  </label>
+                  <label class="profile-radio-label">
+                    <input type="radio" name="prof-gender" value="Lainnya">
+                    <span>Lainnya</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Tanggal Lahir -->
+              <div class="profile-form-row">
+                <label class="profile-form-label" for="prof-input-birthdate">
+                  Tanggal lahir
+                  <span class="profile-help-circle" title="Digunakan untuk kejutan diskon ulang tahun spesial">?</span>
+                </label>
+                <div class="profile-form-field">
+                  <input type="date" id="prof-input-birthdate" class="profile-text-input" style="max-width:240px;">
+                </div>
+              </div>
+
+              <!-- Tombol Simpan -->
+              <div class="profile-form-row profile-row-submit">
+                <div class="profile-form-label"></div>
+                <div class="profile-form-field">
+                  <button type="submit" class="btn-shopee-save-profile" id="btn-save-profile">
+                    Simpan
+                  </button>
+                </div>
+              </div>
+
+            </form>
+
+            <!-- Kolom Kanan: Foto Profil (Persis Screenshot) -->
+            <div class="profile-avatar-column">
+              <div class="profile-avatar-preview-wrap">
+                <img id="prof-avatar-big-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=240" alt="Foto Profil" class="profile-avatar-big">
+              </div>
+              <input type="file" id="prof-file-input" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="PasarinApp.handleAvatarFileSelect(this)">
+              <button type="button" class="btn-shopee-choose-image" onclick="document.getElementById('prof-file-input').click()">
+                Pilih Gambar
+              </button>
+              <div class="profile-avatar-notes">
+                <span>Ukuran gambar: maks. 1 MB</span>
+                <span>Format gambar: .JPEG, .PNG</span>
+              </div>
+            </div>
+
+          </div>
+        </main>
+
+      </div>
+    </div>
+  </div>
+
   <!-- ==================== POP UP PROMO KETIKA MASUK (WELCOME MODAL) ==================== -->
   <div class="promo-modal-overlay" id="promo-modal-overlay">
     <div class="promo-modal-card">

@@ -151,9 +151,15 @@ exports.getMe = (req, res) => {
       user: {
         id: user.id,
         name: user.name,
+        username: user.username || (user.email ? user.email.split('@')[0] : 'user') + (user.id.slice(-4)),
         email: user.email,
         phone: user.phone || '',
-        role: user.role,
+        shopName: user.shopName || (user.name ? user.name + ' Store' : '168Parts Official'),
+        gender: user.gender || 'Lainnya',
+        birthDate: user.birthDate || '',
+        avatar: user.avatar || '',
+        address: user.address || '',
+        role: user.role || 'buyer',
         points: user.points || 0,
         createdAt: user.createdAt
       }
@@ -162,6 +168,72 @@ exports.getMe = (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Gagal mengambil data profil pengguna.'
+    });
+  }
+};
+
+exports.updateProfile = (req, res) => {
+  try {
+    const userId = req.user.id;
+    const db = storage.read();
+    const user = db.users.find(u => u.id === userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Pengguna tidak ditemukan.'
+      });
+    }
+
+    const {
+      name,
+      username,
+      email,
+      phone,
+      shopName,
+      gender,
+      birthDate,
+      avatar,
+      address
+    } = req.body;
+
+    if (name && name.trim()) user.name = name.trim();
+    if (username !== undefined) user.username = username.trim();
+    if (email && email.trim()) user.email = email.trim().toLowerCase();
+    if (phone !== undefined) user.phone = phone.trim();
+    if (shopName !== undefined) user.shopName = shopName.trim();
+    if (gender !== undefined) user.gender = gender;
+    if (birthDate !== undefined) user.birthDate = birthDate;
+    if (avatar !== undefined) user.avatar = avatar;
+    if (address !== undefined) user.address = address;
+
+    storage.write(db);
+
+    const newToken = storage.generateToken(user);
+
+    return res.json({
+      success: true,
+      message: 'Profil berhasil diperbarui!',
+      token: newToken,
+      user: {
+        id: user.id,
+        name: user.name,
+        username: user.username || (user.email ? user.email.split('@')[0] : 'user'),
+        email: user.email,
+        phone: user.phone || '',
+        shopName: user.shopName || '',
+        gender: user.gender || 'Lainnya',
+        birthDate: user.birthDate || '',
+        avatar: user.avatar || '',
+        address: user.address || '',
+        role: user.role || 'buyer',
+        points: user.points || 0
+      }
+    });
+  } catch (error) {
+    console.error('Error updateProfile:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memperbarui profil pengguna.'
     });
   }
 };

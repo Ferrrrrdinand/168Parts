@@ -184,9 +184,7 @@
     handleAccountClick() {
       try {
         if (window.PasarinAuth && window.PasarinAuth.currentUser) {
-          if (window.PasarinApp && window.PasarinApp.openOrdersModal) {
-            window.PasarinApp.openOrdersModal();
-          }
+          window.location.hash = '#/user/profile';
         } else {
           window.location.href = 'login.html#login';
         }

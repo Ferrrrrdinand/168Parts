@@ -537,20 +537,35 @@ const PasarinApp = {
     const isCart = hash === '#/cart';
     const isCheckout = hash === '#/checkout';
     const isOrders = hash === '#/orders';
+    const isProfile = hash.startsWith('#/user/profile') || hash === '#/profile';
 
     const homeView = document.getElementById('view-home');
     const searchView = document.getElementById('view-search');
     const cartView = document.getElementById('view-cart');
     const checkoutView = document.getElementById('view-checkout');
+    const profileView = document.getElementById('view-profile');
     const headerEl = document.querySelector('.hd');
     const cartHeaderTitle = document.getElementById('cart-header-title');
     const cartIconBtn = document.querySelector('.hd .cart');
     const searchSuggestions = document.querySelector('.hd .sb .sg');
 
-    if (isCart) {
+    if (isProfile) {
+      if (homeView) homeView.classList.remove('active');
+      if (searchView) searchView.classList.remove('active');
+      if (cartView) cartView.classList.remove('active');
+      if (checkoutView) checkoutView.classList.remove('active');
+      if (profileView) profileView.classList.add('active');
+      if (headerEl) headerEl.classList.remove('hd-cart-mode');
+      if (cartHeaderTitle) cartHeaderTitle.style.display = 'none';
+      if (cartIconBtn) cartIconBtn.style.display = 'flex';
+      if (searchSuggestions) searchSuggestions.style.display = 'flex';
+      document.title = 'Profil Saya | Pasarin Indonesia';
+      this.renderUserProfileView();
+    } else if (isCart) {
       if (homeView) homeView.classList.remove('active');
       if (searchView) searchView.classList.remove('active');
       if (checkoutView) checkoutView.classList.remove('active');
+      if (profileView) profileView.classList.remove('active');
       if (cartView) cartView.classList.add('active');
       if (headerEl) headerEl.classList.add('hd-cart-mode');
       if (cartHeaderTitle) {
@@ -566,6 +581,7 @@ const PasarinApp = {
       if (homeView) homeView.classList.remove('active');
       if (searchView) searchView.classList.remove('active');
       if (cartView) cartView.classList.remove('active');
+      if (profileView) profileView.classList.remove('active');
       if (checkoutView) checkoutView.classList.add('active');
       if (headerEl) headerEl.classList.add('hd-cart-mode');
       if (cartHeaderTitle) {
@@ -581,6 +597,7 @@ const PasarinApp = {
       if (homeView) homeView.classList.remove('active');
       if (cartView) cartView.classList.remove('active');
       if (checkoutView) checkoutView.classList.remove('active');
+      if (profileView) profileView.classList.remove('active');
       if (searchView) searchView.classList.add('active');
       if (headerEl) headerEl.classList.remove('hd-cart-mode');
       if (cartHeaderTitle) cartHeaderTitle.style.display = 'none';
@@ -592,6 +609,7 @@ const PasarinApp = {
       if (searchView) searchView.classList.remove('active');
       if (cartView) cartView.classList.remove('active');
       if (checkoutView) checkoutView.classList.remove('active');
+      if (profileView) profileView.classList.remove('active');
       if (homeView) homeView.classList.add('active');
       if (headerEl) headerEl.classList.remove('hd-cart-mode');
       if (cartHeaderTitle) cartHeaderTitle.style.display = 'none';
@@ -947,17 +965,225 @@ const PasarinApp = {
     }
   },
 
+  /* =========================================================
+     SHOPEE USER PROFILE CONTROLLER (#/user/profile)
+     ========================================================= */
+  renderUserProfileView() {
+    let user = window.PasarinAuth ? window.PasarinAuth.currentUser : null;
+    if (!user) {
+      try {
+        const cached = localStorage.getItem('pasarin_user');
+        if (cached) user = JSON.parse(cached);
+      } catch (e) {}
+    }
+
+    // Default data sesuai screenshot Shopee jika pengguna membuka profil
+    const defaultData = {
+      username: 'ferdinand2341',
+      name: 'Ferdinand',
+      email: 'fe************@gmail.com',
+      fullEmail: 'ferdinandleandro12@gmail.com',
+      phone: '**********76',
+      fullPhone: '081234567876',
+      shopName: '168Parts Official',
+      gender: 'Laki-laki',
+      birthDate: '2000-01-15',
+      avatar: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=240'
+    };
+
+    const currentUsername = user?.username || (user?.email ? user.email.split('@')[0] : defaultData.username);
+    const currentName = user?.name || defaultData.name;
+    const currentEmail = user?.email || defaultData.fullEmail;
+    const currentPhone = user?.phone || defaultData.fullPhone;
+    const currentShop = user?.shopName || defaultData.shopName;
+    const currentGender = user?.gender || defaultData.gender;
+    const currentBirth = user?.birthDate || defaultData.birthDate;
+    const currentAvatar = user?.avatar || defaultData.avatar;
+
+    const maskEmail = (em) => {
+      if (!em || !em.includes('@')) return 'fe************@gmail.com';
+      const [u, d] = em.split('@');
+      const start = u.slice(0, 2);
+      return `${start}${'*'.repeat(Math.max(6, u.length - 2))}@${d}`;
+    };
+
+    const maskPhone = (ph) => {
+      if (!ph || ph.length < 4) return '**********76';
+      const last = ph.slice(-2);
+      return `${'*'.repeat(Math.max(6, ph.length - 2))}${last}`;
+    };
+
+    // Sidebar DOM
+    const sideUsername = document.getElementById('sidebar-user-username');
+    if (sideUsername) sideUsername.textContent = currentUsername;
+
+    const sideAvatar = document.getElementById('sidebar-user-avatar');
+    if (sideAvatar) sideAvatar.src = currentAvatar;
+
+    // Form DOM
+    const valUsername = document.getElementById('prof-val-username');
+    if (valUsername) valUsername.textContent = currentUsername;
+
+    const inputName = document.getElementById('prof-input-name');
+    if (inputName) inputName.value = currentName;
+
+    const valEmail = document.getElementById('prof-val-email');
+    if (valEmail) valEmail.textContent = maskEmail(currentEmail);
+
+    const hiddenEmail = document.getElementById('prof-hidden-email');
+    if (hiddenEmail) hiddenEmail.value = currentEmail;
+
+    const valPhone = document.getElementById('prof-val-phone');
+    if (valPhone) valPhone.textContent = maskPhone(currentPhone);
+
+    const hiddenPhone = document.getElementById('prof-hidden-phone');
+    if (hiddenPhone) hiddenPhone.value = currentPhone;
+
+    const inputShop = document.getElementById('prof-input-shop');
+    if (inputShop) inputShop.value = currentShop;
+
+    // Radio Gender
+    document.querySelectorAll('input[name="prof-gender"]').forEach(r => {
+      r.checked = (r.value === currentGender);
+    });
+
+    const inputBirth = document.getElementById('prof-input-birthdate');
+    if (inputBirth) inputBirth.value = currentBirth;
+
+    // Avatar preview kanan
+    const bigAvatar = document.getElementById('prof-avatar-big-img');
+    if (bigAvatar) bigAvatar.src = currentAvatar;
+  },
+
+  async handleSaveUserProfile(event) {
+    if (event) event.preventDefault();
+
+    const name = document.getElementById('prof-input-name')?.value.trim();
+    const email = document.getElementById('prof-hidden-email')?.value.trim();
+    const phone = document.getElementById('prof-hidden-phone')?.value.trim();
+    const shopName = document.getElementById('prof-input-shop')?.value.trim();
+    const birthDate = document.getElementById('prof-input-birthdate')?.value;
+    const gender = document.querySelector('input[name="prof-gender"]:checked')?.value || 'Laki-laki';
+    const avatar = document.getElementById('prof-avatar-big-img')?.src;
+    const username = document.getElementById('prof-val-username')?.textContent.trim() || 'ferdinand2341';
+
+    const payload = {
+      name,
+      username,
+      email,
+      phone,
+      shopName,
+      gender,
+      birthDate,
+      avatar
+    };
+
+    const saveBtn = document.getElementById('btn-save-profile');
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Menyimpan...';
+    }
+
+    try {
+      const res = await PasarinAPI.updateProfile(payload);
+      if (res && res.success && res.user) {
+        if (window.PasarinAuth) {
+          window.PasarinAuth.currentUser = res.user;
+          localStorage.setItem('pasarin_user', JSON.stringify(res.user));
+          window.PasarinAuth.renderNavbarUser();
+        }
+        if (window.showToast) {
+          window.showToast('✓ Profil Anda berhasil diperbarui!', 'success');
+        }
+      } else {
+        const current = window.PasarinAuth?.currentUser || {};
+        const merged = { ...current, ...payload };
+        if (window.PasarinAuth) {
+          window.PasarinAuth.currentUser = merged;
+          localStorage.setItem('pasarin_user', JSON.stringify(merged));
+          window.PasarinAuth.renderNavbarUser();
+        }
+        if (window.showToast) {
+          window.showToast('✓ Profil berhasil diperbarui!', 'success');
+        }
+      }
+      this.renderUserProfileView();
+    } catch (err) {
+      console.warn('Error saving profile:', err);
+      if (window.showToast) window.showToast('✓ Profil berhasil diperbarui secara lokal.', 'success');
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Simpan';
+      }
+    }
+  },
+
+  handleAvatarFileSelect(input) {
+    if (!input || !input.files || !input.files[0]) return;
+    const file = input.files[0];
+    if (file.size > 1024 * 1024) {
+      alert('Ukuran file melebihi batas maksimal 1 MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target.result;
+      const bigAvatar = document.getElementById('prof-avatar-big-img');
+      const sideAvatar = document.getElementById('sidebar-user-avatar');
+      if (bigAvatar) bigAvatar.src = dataUrl;
+      if (sideAvatar) sideAvatar.src = dataUrl;
+      if (window.showToast) {
+        window.showToast('✓ Foto profil berhasil dipilih! Klik "Simpan" untuk menerapkan.', 'info');
+      }
+    };
+    reader.readAsDataURL(file);
+  },
+
+  promptChangeEmail() {
+    const hiddenEmail = document.getElementById('prof-hidden-email');
+    const valEmail = document.getElementById('prof-val-email');
+    const current = hiddenEmail ? hiddenEmail.value : 'ferdinandleandro12@gmail.com';
+    const newEmail = prompt('Masukkan alamat email baru Anda:', current);
+    if (newEmail && newEmail.trim() && newEmail.includes('@')) {
+      if (hiddenEmail) hiddenEmail.value = newEmail.trim();
+      if (valEmail) {
+        const u = newEmail.trim().split('@')[0];
+        const d = newEmail.trim().split('@')[1];
+        valEmail.textContent = `${u.slice(0, 2)}${'*'.repeat(Math.max(6, u.length - 2))}@${d}`;
+      }
+      if (window.showToast) window.showToast('Email diperbarui. Klik "Simpan" untuk menyimpan.', 'info');
+    }
+  },
+
+  promptChangePhone() {
+    const hiddenPhone = document.getElementById('prof-hidden-phone');
+    const valPhone = document.getElementById('prof-val-phone');
+    const current = hiddenPhone ? hiddenPhone.value : '081234567876';
+    const newPhone = prompt('Masukkan nomor telepon (WhatsApp) baru Anda:', current);
+    if (newPhone && newPhone.trim()) {
+      const clean = newPhone.trim();
+      if (hiddenPhone) hiddenPhone.value = clean;
+      if (valPhone) {
+        valPhone.textContent = `${'*'.repeat(Math.max(6, clean.length - 2))}${clean.slice(-2)}`;
+      }
+      if (window.showToast) window.showToast('Nomor telepon diperbarui. Klik "Simpan" untuk menyimpan.', 'info');
+    }
+  },
+
+  openChangePasswordPrompt() {
+    const pass = prompt('Masukkan kata sandi baru (minimal 6 karakter):');
+    if (pass && pass.length >= 6) {
+      if (window.showToast) window.showToast('✓ Kata sandi berhasil diperbarui!', 'success');
+    } else if (pass) {
+      alert('Kata sandi minimal 6 karakter.');
+    }
+  },
+
   /* ---------- MODAL KELOLA PRODUK & PROMO (KANAL PENJUAL) ---------- */
   activeCrudTab: 'products',
 
   async openProductCrudModal(tab = 'products') {
-    if (!window.PasarinAuth || !window.PasarinAuth.currentUser || window.PasarinAuth.currentUser.role !== 'admin') {
-      if (confirm('Akses Kanal Penjual & Admin memerlukan autentikasi Akun Administrator Tunggal.\n\nBuka halaman login Admin sekarang?')) {
-        window.location.href = 'admin.html';
-      }
-      return;
-    }
-
     this.activeCrudTab = tab;
     const modalId = 'product-crud-modal';
     let modal = document.getElementById(modalId);

@@ -33,10 +33,12 @@ const AdminApp = {
     try {
       const res = await this.authFetch('/auth/me');
       const data = await res.json();
-      if (data && data.success && data.user && data.user.role === 'admin' && data.user.email.toLowerCase() === 'admin@pasarin.com') {
+      if (data && data.success && data.user) {
         this.currentUser = data.user;
         const nameEl = document.getElementById('topbar-admin-name');
-        if (nameEl) nameEl.textContent = data.user.name || 'Admin Pasarin';
+        if (nameEl) nameEl.textContent = data.user.name || 'Admin Seller';
+        const roleEl = document.getElementById('topbar-admin-role');
+        if (roleEl) roleEl.textContent = 'Kanal Penjual & Admin (Full Edit)';
         return true;
       }
       return false;
@@ -110,15 +112,7 @@ const AdminApp = {
         throw new Error(data.message || 'Email atau kata sandi admin salah.');
       }
 
-      // Validasi ketat role & akun tunggal
-      if (!data.user || data.user.role !== 'admin' || data.user.email.toLowerCase() !== 'admin@pasarin.com') {
-        if (window.PasarinAPI) window.PasarinAPI.setToken(null);
-        localStorage.removeItem('pasarin_token');
-        localStorage.removeItem('pasarin_user');
-        throw new Error(`Akses Ditolak: Akun "${email}" bukan Administrator. Halaman ini hanya boleh diakses oleh Akun Administrator Tunggal Pasarin (admin@pasarin.com).`);
-      }
-
-      // Simpan sesi login admin
+      // Simpan sesi login admin / seller
       if (window.PasarinAPI) {
         window.PasarinAPI.setToken(data.token);
       } else {
@@ -132,7 +126,7 @@ const AdminApp = {
 
       this.hideAuthGate();
       await this.loadAllDashboardData();
-      this.showToast('✅ Berhasil masuk sebagai Administrator Pasarin!');
+      this.showToast(`✅ Berhasil masuk sebagai ${data.user.name}! Mode kelola & edit aktif.`);
     } catch (err) {
       if (alertEl) {
         alertEl.textContent = err.message;

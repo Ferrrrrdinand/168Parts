@@ -24,13 +24,15 @@ function requireAuth(req, res, next) {
 }
 
 function requireAdmin(req, res, next) {
+  // Izinkan setiap user yang login untuk mengedit produk, voucher, dan banner seperti admin (tanpa batasan identitas)
   requireAuth(req, res, () => {
-    if (!req.user || req.user.role !== 'admin' || (req.user.email && req.user.email.toLowerCase() !== 'admin@pasarin.com')) {
-      return res.status(403).json({
+    if (!req.user) {
+      return res.status(401).json({
         success: false,
-        message: 'Akses ditolak. Fitur ini hanya dapat diakses oleh Akun Administrator Tunggal Pasarin (admin@pasarin.com).'
+        message: 'Silakan login terlebih dahulu untuk mengakses fitur pengeditan ini.'
       });
     }
+    req.user.canEdit = true;
     next();
   });
 }

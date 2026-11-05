@@ -85,6 +85,13 @@ const PasarinAPI = {
     return this.request('/auth/me', { method: 'GET' });
   },
 
+  async updateProfile(payload) {
+    return this.request('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    });
+  },
+
   async logout() {
     this.setToken(null);
     return this.request('/auth/logout', { method: 'POST' });
