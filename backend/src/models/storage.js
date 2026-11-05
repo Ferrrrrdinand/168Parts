@@ -129,7 +129,37 @@ class Storage {
     this.ensureDbExists();
     try {
       const content = fs.readFileSync(this.filePath, 'utf8');
-      return JSON.parse(content);
+      const data = JSON.parse(content);
+
+      // Proteksi Integritas: Hanya ada tepat 1 akun administrator tunggal di seluruh sistem
+      if (data && Array.isArray(data.users)) {
+        let adminFound = false;
+        data.users.forEach(u => {
+          if (u.email && u.email.toLowerCase() === 'admin@pasarin.com') {
+            u.role = 'admin';
+            adminFound = true;
+          } else if (u.role === 'admin') {
+            u.role = 'buyer'; // Turunkan jika ada akun liar yang diset sebagai admin
+          }
+        });
+
+        if (!adminFound) {
+          const userAdmin = this.hashPassword('admin123');
+          data.users.push({
+            id: 'user-admin-1',
+            email: 'admin@pasarin.com',
+            name: 'Admin Pasarin',
+            phone: '081122334455',
+            role: 'admin',
+            salt: userAdmin.salt,
+            hash: userAdmin.hash,
+            createdAt: new Date().toISOString()
+          });
+          this.write(data);
+        }
+      }
+
+      return data;
     } catch (e) {
       console.error('Error reading DB:', e);
       return { users: [], products: [], carts: {}, orders: [] };

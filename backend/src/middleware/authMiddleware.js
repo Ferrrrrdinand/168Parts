@@ -23,6 +23,18 @@ function requireAuth(req, res, next) {
   next();
 }
 
+function requireAdmin(req, res, next) {
+  requireAuth(req, res, () => {
+    if (!req.user || req.user.role !== 'admin' || (req.user.email && req.user.email.toLowerCase() !== 'admin@pasarin.com')) {
+      return res.status(403).json({
+        success: false,
+        message: 'Akses ditolak. Fitur ini hanya dapat diakses oleh Akun Administrator Tunggal Pasarin (admin@pasarin.com).'
+      });
+    }
+    next();
+  });
+}
+
 function optionalAuth(req, res, next) {
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -37,6 +49,7 @@ function optionalAuth(req, res, next) {
 
 module.exports = {
   requireAuth,
+  requireAdmin,
   optionalAuth
 };
 

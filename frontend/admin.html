@@ -11,6 +11,53 @@
 <body>
 
   <!-- =========================================================
+       0. ADMIN AUTHENTICATION GATE (LOGIN ADMIN TUNGGAL)
+       ========================================================= -->
+  <div class="admin-auth-gate" id="admin-auth-gate">
+    <div class="admin-gate-card">
+      <div class="admin-gate-icon-wrap">🛡️</div>
+      <h2 class="admin-gate-title">Login Administrator</h2>
+      <p class="admin-gate-sub">Portal Manajemen Seller Centre & Sistem 168Parts Pasarin</p>
+
+      <div class="admin-gate-notice">
+        <span>🔒</span>
+        <div>
+          <b>Akun Administrator Tunggal:</b> Sistem diproteksi hanya memiliki 1 akun admin resmi. Pendaftaran akun admin baru dibatasi secara sistem.
+        </div>
+      </div>
+
+      <div class="admin-gate-alert" id="admin-gate-alert"></div>
+
+      <form class="admin-gate-form" id="form-admin-login" onsubmit="AdminApp.handleGateLogin(event)">
+        <div class="form-group">
+          <label class="form-label" for="gate-admin-email">Email Administrator</label>
+          <input type="email" id="gate-admin-email" class="form-input" placeholder="admin@pasarin.com" required autocomplete="username">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="gate-admin-password">Kata Sandi</label>
+          <div style="position:relative;">
+            <input type="password" id="gate-admin-password" class="form-input" placeholder="Masukkan password admin..." required autocomplete="current-password">
+            <button type="button" onclick="AdminApp.toggleGatePassword()" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; color:#64748b; font-size:11.5px; font-weight:700; cursor:pointer;">
+              Lihat
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="admin-gate-submit" id="btn-gate-submit">
+          🔐 Masuk ke Dashboard
+        </button>
+
+        <button type="button" class="admin-gate-quickfill" onclick="AdminApp.fillAdminCredentials()">
+          ⚡ Isi Kredensial Admin Otomatis (admin@pasarin.com)
+        </button>
+      </form>
+
+      <a href="index.html#/" class="admin-gate-back">← Kembali ke Halaman Utama Toko</a>
+    </div>
+  </div>
+
+  <!-- =========================================================
        1. SIDEBAR NAVIGATION
        ========================================================= -->
   <aside class="admin-sidebar" id="admin-sidebar">
@@ -61,11 +108,15 @@
       </button>
     </nav>
 
-    <div class="admin-sidebar-footer">
+    <div class="admin-sidebar-footer" style="display:flex; flex-direction:column; gap:8px;">
       <a href="index.html#/" class="btn-back-to-store">
         <span>🏬</span>
         <span>Kembali ke Toko</span>
       </a>
+      <button type="button" onclick="AdminApp.handleAdminLogout()" style="width:100%; background:rgba(220,38,38,0.15); border:1px solid rgba(220,38,38,0.3); color:#f87171; border-radius:var(--radius-sm); padding:8px 12px; font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+        <span>🚪</span>
+        <span>Keluar dari Admin</span>
+      </button>
     </div>
   </aside>
 
@@ -92,10 +143,15 @@
         <div class="admin-profile-badge" title="Akun Administrator Pasarin">
           <div class="admin-avatar">A</div>
           <div class="admin-meta">
-            <span class="admin-name">Super Admin</span>
-            <span class="admin-role">Pasarin Store Master</span>
+            <span class="admin-name" id="topbar-admin-name">Admin Pasarin</span>
+            <span class="admin-role" id="topbar-admin-role">Super Admin (Tunggal)</span>
           </div>
         </div>
+
+        <button type="button" onclick="AdminApp.handleAdminLogout()" title="Keluar dari sesi administrator" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:6px 12px; border-radius:var(--radius-sm); font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px; margin-left:8px;">
+          <span>🚪</span>
+          <span>Logout</span>
+        </button>
       </div>
     </header>
 

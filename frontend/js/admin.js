@@ -11,9 +11,181 @@ const AdminApp = {
   currentTab: 'overview',
   activeEditingId: null,
   activeEditingPromoCode: null,
+  currentUser: null,
 
   async init() {
     this.bindEvents();
+
+    const isAuthed = await this.checkAdminAuth();
+    if (!isAuthed) {
+      this.showAuthGate();
+      return;
+    }
+
+    this.hideAuthGate();
+    await this.loadAllDashboardData();
+  },
+
+  async checkAdminAuth() {
+    const token = window.PasarinAPI ? window.PasarinAPI.getToken() : localStorage.getItem('pasarin_token');
+    if (!token) return false;
+
+    try {
+      const res = await this.authFetch('/auth/me');
+      const data = await res.json();
+      if (data && data.success && data.user && data.user.role === 'admin' && data.user.email.toLowerCase() === 'admin@pasarin.com') {
+        this.currentUser = data.user;
+        const nameEl = document.getElementById('topbar-admin-name');
+        if (nameEl) nameEl.textContent = data.user.name || 'Admin Pasarin';
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  },
+
+  showAuthGate(errorMessage = '') {
+    const gate = document.getElementById('admin-auth-gate');
+    const sidebar = document.getElementById('admin-sidebar');
+    const mainWrap = document.querySelector('.admin-main-wrap');
+
+    if (gate) gate.classList.remove('hidden');
+    if (sidebar) sidebar.style.display = 'none';
+    if (mainWrap) mainWrap.style.display = 'none';
+
+    const alertEl = document.getElementById('admin-gate-alert');
+    if (alertEl) {
+      if (errorMessage) {
+        alertEl.textContent = errorMessage;
+        alertEl.style.display = 'block';
+      } else {
+        alertEl.style.display = 'none';
+      }
+    }
+  },
+
+  hideAuthGate() {
+    const gate = document.getElementById('admin-auth-gate');
+    const sidebar = document.getElementById('admin-sidebar');
+    const mainWrap = document.querySelector('.admin-main-wrap');
+
+    if (gate) gate.classList.add('hidden');
+    if (sidebar) sidebar.style.display = '';
+    if (mainWrap) mainWrap.style.display = '';
+  },
+
+  async handleGateLogin(event) {
+    if (event) event.preventDefault();
+    const emailInput = document.getElementById('gate-admin-email');
+    const passInput = document.getElementById('gate-admin-password');
+    const alertEl = document.getElementById('admin-gate-alert');
+    const submitBtn = document.getElementById('btn-gate-submit');
+
+    const email = (emailInput?.value || '').trim();
+    const password = passInput?.value || '';
+
+    if (!email || !password) {
+      if (alertEl) {
+        alertEl.textContent = 'Harap masukkan email dan kata sandi admin.';
+        alertEl.style.display = 'block';
+      }
+      return;
+    }
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = '⏳ Memverifikasi akun admin...';
+    }
+
+    try {
+      const res = await fetch(`${window.PasarinAPI.baseUrl}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+
+      if (!data.success) {
+        throw new Error(data.message || 'Email atau kata sandi admin salah.');
+      }
+
+      // Validasi ketat role & akun tunggal
+      if (!data.user || data.user.role !== 'admin' || data.user.email.toLowerCase() !== 'admin@pasarin.com') {
+        if (window.PasarinAPI) window.PasarinAPI.setToken(null);
+        localStorage.removeItem('pasarin_token');
+        localStorage.removeItem('pasarin_user');
+        throw new Error(`Akses Ditolak: Akun "${email}" bukan Administrator. Halaman ini hanya boleh diakses oleh Akun Administrator Tunggal Pasarin (admin@pasarin.com).`);
+      }
+
+      // Simpan sesi login admin
+      if (window.PasarinAPI) {
+        window.PasarinAPI.setToken(data.token);
+      } else {
+        localStorage.setItem('pasarin_token', data.token);
+      }
+      localStorage.setItem('pasarin_user', JSON.stringify(data.user));
+      this.currentUser = data.user;
+
+      const nameEl = document.getElementById('topbar-admin-name');
+      if (nameEl) nameEl.textContent = data.user.name;
+
+      this.hideAuthGate();
+      await this.loadAllDashboardData();
+      this.showToast('✅ Berhasil masuk sebagai Administrator Pasarin!');
+    } catch (err) {
+      if (alertEl) {
+        alertEl.textContent = err.message;
+        alertEl.style.display = 'block';
+      }
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '🔐 Masuk ke Dashboard';
+      }
+    }
+  },
+
+  fillAdminCredentials() {
+    const emailInput = document.getElementById('gate-admin-email');
+    const passInput = document.getElementById('gate-admin-password');
+    if (emailInput) emailInput.value = 'admin@pasarin.com';
+    if (passInput) passInput.value = 'admin123';
+  },
+
+  toggleGatePassword() {
+    const passInput = document.getElementById('gate-admin-password');
+    if (passInput) {
+      passInput.type = passInput.type === 'password' ? 'text' : 'password';
+    }
+  },
+
+  handleAdminLogout() {
+    if (confirm('Apakah Anda yakin ingin keluar dari sesi Administrator?')) {
+      if (window.PasarinAPI) window.PasarinAPI.setToken(null);
+      localStorage.removeItem('pasarin_token');
+      localStorage.removeItem('pasarin_user');
+      this.currentUser = null;
+      this.showAuthGate();
+    }
+  },
+
+  async authFetch(endpoint, options = {}) {
+    const token = window.PasarinAPI ? window.PasarinAPI.getToken() : localStorage.getItem('pasarin_token');
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    return fetch(`${window.PasarinAPI.baseUrl}${endpoint}`, {
+      ...options,
+      headers
+    });
+  },
+
+  async loadAllDashboardData() {
     await this.fetchProducts();
     await this.fetchOrders();
     await this.fetchPromos();
@@ -110,7 +282,7 @@ const AdminApp = {
 
   async fetchProducts() {
     try {
-      const res = await fetch(`${window.PasarinAPI.baseUrl}/products`);
+      const res = await this.authFetch('/products');
       const data = await res.json();
       if (data && Array.isArray(data.data)) {
         this.products = data.data;
@@ -130,7 +302,7 @@ const AdminApp = {
 
   async fetchOrders() {
     try {
-      const res = await fetch(`${window.PasarinAPI.baseUrl}/orders/all`);
+      const res = await this.authFetch('/orders/all');
       const data = await res.json();
       if (data && Array.isArray(data.data)) {
         this.orders = data.data;
@@ -142,7 +314,7 @@ const AdminApp = {
 
   async fetchPromos() {
     try {
-      const res = await fetch(`${window.PasarinAPI.baseUrl}/promos/all`);
+      const res = await this.authFetch('/promos/all');
       const data = await res.json();
       if (data && Array.isArray(data.data)) {
         this.promos = data.data;
@@ -331,9 +503,8 @@ const AdminApp = {
     p.isFlashSale = isFlash;
 
     try {
-      await fetch(`${window.PasarinAPI.baseUrl}/products/${prodId}`, {
+      await this.authFetch(`/products/${prodId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isFlashSale: isFlash })
       });
       this.showToast(`Status Flash Sale produk "${p.name.slice(0, 20)}..." diperbarui!`);
@@ -396,9 +567,8 @@ const AdminApp = {
     try {
       if (this.activeEditingId) {
         // UPDATE (PUT)
-        const res = await fetch(`${window.PasarinAPI.baseUrl}/products/${this.activeEditingId}`, {
+        const res = await this.authFetch(`/products/${this.activeEditingId}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
         const data = await res.json();
@@ -406,18 +576,21 @@ const AdminApp = {
           const idx = this.products.findIndex(x => x.id === this.activeEditingId);
           if (idx !== -1) this.products[idx] = { ...this.products[idx], ...payload };
           this.showToast('✅ Produk berhasil diperbarui!');
+        } else {
+          alert(data.message || 'Gagal memperbarui produk.');
         }
       } else {
         // CREATE (POST)
-        const res = await fetch(`${window.PasarinAPI.baseUrl}/products`, {
+        const res = await this.authFetch('/products', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
         const data = await res.json();
-        if (data.success && data.product) {
-          this.products.unshift(data.product);
+        if (data.success && (data.data || data.product)) {
+          this.products.unshift(data.data || data.product);
           this.showToast('🎉 Produk baru berhasil ditambahkan!');
+        } else {
+          alert(data.message || 'Gagal menambahkan produk.');
         }
       }
 
@@ -437,7 +610,7 @@ const AdminApp = {
     }
 
     try {
-      const res = await fetch(`${window.PasarinAPI.baseUrl}/products/${prodId}`, {
+      const res = await this.authFetch(`/products/${prodId}`, {
         method: 'DELETE'
       });
       const data = await res.json();
@@ -446,6 +619,8 @@ const AdminApp = {
         this.showToast('🗑️ Produk berhasil dihapus dari database!');
         this.updateStats();
         this.renderProductsTable();
+      } else {
+        alert(data.message || 'Gagal menghapus produk.');
       }
     } catch (e) {
       console.error(e);
@@ -455,9 +630,8 @@ const AdminApp = {
 
   async updateOrderStatus(orderId, newStatus) {
     try {
-      const res = await fetch(`${window.PasarinAPI.baseUrl}/orders/${orderId}/status`, {
+      const res = await this.authFetch(`/orders/${orderId}/status`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
       });
       const data = await res.json();
@@ -556,15 +730,16 @@ const AdminApp = {
     p.isActive = isActive;
 
     try {
-      const res = await fetch(`${window.PasarinAPI.baseUrl}/promos/${code}/status`, {
+      const res = await this.authFetch(`/promos/${code}/status`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isActive })
       });
       const data = await res.json();
       if (data.success) {
         this.showToast(`Status voucher ${code} diubah: ${isActive ? 'Aktif' : 'Nonaktif'}`);
         this.updateStats();
+      } else {
+        alert(data.message || 'Gagal mengubah status promo.');
       }
     } catch (e) {
       console.error(e);
@@ -654,9 +829,8 @@ const AdminApp = {
     try {
       if (this.activeEditingPromoCode) {
         // UPDATE (PUT)
-        const res = await fetch(`${window.PasarinAPI.baseUrl}/promos/${this.activeEditingPromoCode}`, {
+        const res = await this.authFetch(`/promos/${this.activeEditingPromoCode}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
         const data = await res.json();
@@ -670,9 +844,8 @@ const AdminApp = {
         }
       } else {
         // CREATE (POST)
-        const res = await fetch(`${window.PasarinAPI.baseUrl}/promos`, {
+        const res = await this.authFetch('/promos', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
         const data = await res.json();
@@ -700,7 +873,7 @@ const AdminApp = {
     }
 
     try {
-      const res = await fetch(`${window.PasarinAPI.baseUrl}/promos/${code}`, {
+      const res = await this.authFetch(`/promos/${code}`, {
         method: 'DELETE'
       });
       const data = await res.json();
@@ -720,7 +893,7 @@ const AdminApp = {
 
   async fetchBanners() {
     try {
-      const res = await fetch(`${window.PasarinAPI.baseUrl}/banners`);
+      const res = await this.authFetch('/banners');
       const data = await res.json();
       if (data && data.success && data.data) {
         this.banners = data.data;
@@ -848,9 +1021,8 @@ const AdminApp = {
     };
 
     try {
-      const res = await fetch(`${window.PasarinAPI.baseUrl}/banners`, {
+      const res = await this.authFetch('/banners', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
       const data = await res.json();
@@ -872,12 +1044,14 @@ const AdminApp = {
     }
 
     try {
-      const res = await fetch(`${window.PasarinAPI.baseUrl}/banners/reset`, { method: 'POST' });
+      const res = await this.authFetch('/banners/reset', { method: 'POST' });
       const data = await res.json();
       if (data && data.success) {
         this.banners = data.data;
         this.populateBannerForm();
         this.showToast('🔄 Desain banner berhasil direset ke pengaturan default!');
+      } else {
+        alert(data.message || 'Gagal mereset banner.');
       }
     } catch (e) {
       console.error(e);

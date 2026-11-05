@@ -68,6 +68,19 @@ const PasarinApp = {
     await this.loadBanners();
     this.route();
     window.addEventListener('hashchange', () => this.route());
+    this.hideShoppingLoader();
+  },
+
+  hideShoppingLoader() {
+    const loader = document.getElementById('shopping-loader');
+    if (loader && !loader.classList.contains('fade-out')) {
+      setTimeout(() => {
+        loader.classList.add('fade-out');
+        setTimeout(() => {
+          if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
+        }, 500);
+      }, 700);
+    }
   },
 
   formatRupiah(num) {
@@ -938,6 +951,13 @@ const PasarinApp = {
   activeCrudTab: 'products',
 
   async openProductCrudModal(tab = 'products') {
+    if (!window.PasarinAuth || !window.PasarinAuth.currentUser || window.PasarinAuth.currentUser.role !== 'admin') {
+      if (confirm('Akses Kanal Penjual & Admin memerlukan autentikasi Akun Administrator Tunggal.\n\nBuka halaman login Admin sekarang?')) {
+        window.location.href = 'admin.html';
+      }
+      return;
+    }
+
     this.activeCrudTab = tab;
     const modalId = 'product-crud-modal';
     let modal = document.getElementById(modalId);
@@ -1597,7 +1617,7 @@ const PasarinApp = {
     if (dismissedDate !== today && !shownThisSession) {
       setTimeout(() => {
         this.openPromoModal();
-      }, 900);
+      }, 1400);
     }
   },
 
@@ -1652,14 +1672,17 @@ const PasarinApp = {
             <div class="ticket-meta">
               <span>${p.minSpend}</span>
               <span>•</span>
-              <span class="ticket-code-pill" onclick="PasarinApp.copyPromoCode('${p.code}')" title="Klik untuk salin kode voucher">
-                📋 ${p.code}
+              <span class="ticket-code-pill" onclick="PasarinApp.copyPromoCode('${p.code}', this)" title="Klik untuk salin kode voucher">
+                🎫 <b>${p.code}</b>
               </span>
               <span>•</span>
               <span style="color:#d97706; font-weight:700;">${p.quota}</span>
             </div>
           </div>
-          <div class="ticket-right">
+          <div class="ticket-right" style="display:flex; flex-direction:column; gap:6px; align-items:center;">
+            <button class="btn-copy-code-direct" onclick="PasarinApp.copyPromoCode('${p.code}', this)" style="background:#f1f5f9; color:#1e293b; border:1px solid #cbd5e1; border-radius:6px; padding:4px 8px; font-size:11.5px; font-weight:700; cursor:pointer; width:100%; transition:all 0.2s;">
+              📋 Salin Kode
+            </button>
             <button class="btn-claim-voucher ${isClaimed ? 'claimed' : ''}" onclick="PasarinApp.claimPromo('${p.code}', this)">
               ${isClaimed ? '✓ Tersimpan' : 'Klaim'}
             </button>
@@ -1758,11 +1781,24 @@ const PasarinApp = {
     }
   },
 
-  copyPromoCode(code) {
+  copyPromoCode(code, btnElement) {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(code).then(() => {
+        if (btnElement) {
+          const originalText = btnElement.innerHTML;
+          btnElement.innerHTML = '✓ Disalin!';
+          btnElement.style.background = '#10b981';
+          btnElement.style.color = '#ffffff';
+          btnElement.style.borderColor = '#10b981';
+          setTimeout(() => {
+            btnElement.innerHTML = originalText;
+            btnElement.style.background = '';
+            btnElement.style.color = '';
+            btnElement.style.borderColor = '';
+          }, 2000);
+        }
         if (window.showToast) {
-          window.showToast(`✓ Kode promo "${code}" disalin ke clipboard!`, 'info');
+          window.showToast(`✓ Kode promo "${code}" berhasil disalin ke clipboard!`, 'success');
         }
       }).catch(() => {
         if (window.showToast) window.showToast(`Kode promo: ${code}`, 'info');

@@ -290,7 +290,10 @@
         const res = await PasarinAuth.login(email, password);
         if (res.success) {
           const userName = (res.user && res.user.name) ? res.user.name : 'Pengguna Pasarin';
-          showSuccessModal('Login Berhasil!', 'Selamat datang kembali di Pasarin.', userName);
+          const isAdmin = res.user && res.user.role === 'admin';
+          const redirectUrl = isAdmin ? 'admin.html' : 'index.html?login_success=1';
+          const desc = isAdmin ? 'Akun Administrator diverifikasi. Mengalihkan ke Dashboard Admin...' : 'Selamat datang kembali di Pasarin.';
+          showSuccessModal('Login Berhasil!', desc, userName, redirectUrl);
         } else {
           triggerShake();
           showAlert(res.message || 'Login gagal. Silakan periksa kembali email dan kata sandi.');

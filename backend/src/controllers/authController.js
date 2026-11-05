@@ -19,6 +19,15 @@ exports.register = (req, res) => {
     }
 
     const emailNorm = email.trim().toLowerCase();
+
+    // Proteksi: Hanya ada 1 akun administrator tunggal di sistem (admin@pasarin.com)
+    if (emailNorm === 'admin@pasarin.com' || emailNorm.startsWith('admin@')) {
+      return res.status(403).json({
+        success: false,
+        message: 'Akses ditolak: Akun administrator bersifat privat & tunggal (admin@pasarin.com). Pendaftaran akun admin baru tidak diperbolehkan.'
+      });
+    }
+
     const db = storage.read();
 
     const existingUser = db.users.find(u => u.email.toLowerCase() === emailNorm);
@@ -37,7 +46,7 @@ exports.register = (req, res) => {
       phone: (phone || '').trim(),
       address: (address || '').trim(),
       coordinates: (latitude && longitude) ? { lat: Number(latitude), lng: Number(longitude) } : null,
-      role: 'buyer',
+      role: 'buyer', // Selalu buyer, akun admin tunggal tidak bisa digandakan
       points: 0,
       salt,
       hash,

@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const orderController = require('../controllers/orderController');
-const { requireAuth } = require('../middleware/authMiddleware');
+const { requireAuth, requireAdmin } = require('../middleware/authMiddleware');
 
-// Admin / Dashboard Endpoints
-router.get('/all', orderController.getAllOrders);
-router.put('/:id/status', orderController.updateOrderStatus);
+// Admin Endpoints - Khusus Akun Admin Tunggal
+router.get('/all', requireAdmin, orderController.getAllOrders);
+router.put('/:id/status', requireAdmin, orderController.updateOrderStatus);
 
 // Customer Authenticated Endpoints
 router.post('/checkout', requireAuth, orderController.checkout);
