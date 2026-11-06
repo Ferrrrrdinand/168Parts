@@ -47,32 +47,30 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Melayani Frontend Modern React Vite TSX & Legacy
+// Melayani Frontend Utama (Original Design dengan Tema Soft Red 168 Parts)
+// Serta menyediakan akses ke React Vite App di /react
 const fs = require('fs');
 const reactDistPath = path.resolve(__dirname, '../../frontend-react/dist');
 const legacyFrontendPath = path.resolve(__dirname, '../../frontend');
 
-// Support Legacy static files di /legacy
-app.use('/legacy', express.static(legacyFrontendPath));
-
+// Support React Vite di /react
 if (fs.existsSync(reactDistPath)) {
-  console.log('⚡ [Frontend] Melayani Modern React + Vite TSX App dari /frontend-react/dist');
-  app.use(express.static(reactDistPath));
-  app.use((req, res, next) => {
-    if (req.originalUrl.startsWith('/api') || req.originalUrl.startsWith('/legacy')) {
-      return next();
-    }
-    res.sendFile(path.join(reactDistPath, 'index.html'));
-  });
-} else {
-  app.use(express.static(legacyFrontendPath));
-  app.use((req, res, next) => {
-    if (req.originalUrl.startsWith('/api')) {
-      return next();
-    }
-    res.sendFile(path.join(legacyFrontendPath, 'index.html'));
-  });
+  app.use('/react', express.static(reactDistPath));
 }
+
+// Melayani Original Design sebagai frontend default
+app.use(express.static(legacyFrontendPath));
+
+// Fallback router untuk SPA & Static HTML
+app.use((req, res, next) => {
+  if (req.originalUrl.startsWith('/api')) {
+    return next();
+  }
+  if (req.originalUrl.startsWith('/react') && fs.existsSync(reactDistPath)) {
+    return res.sendFile(path.join(reactDistPath, 'index.html'));
+  }
+  res.sendFile(path.join(legacyFrontendPath, 'index.html'));
+});
 
 // Start Server & Database
 const PORT = config.port;

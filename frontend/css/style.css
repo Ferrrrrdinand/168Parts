@@ -6,10 +6,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --primary: #1d3f0d;
-  --primary-hover: #152e09;
-  --primary-light: #f2f8f0;
-  --primary-subtle: #e1f0dc;
+  --primary: #be123c;
+  --primary-hover: #9f1239;
+  --primary-light: #fff1f2;
+  --primary-subtle: #ffe4e6;
   --accent-orange: #ff5722;
   --accent-yellow: #ffb800;
   --accent-green: #00b14f;
@@ -23,7 +23,7 @@
   
   --border-subtle: #e2e8f0;
   --border-card: #eef2f6;
-  --border-focus: #1d3f0d;
+  --border-focus: #be123c;
   
   --radius-xs: 4px;
   --radius-sm: 8px;
@@ -35,7 +35,7 @@
   --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.07);
   --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.09);
-  --shadow-glow: 0 4px 16px rgba(29, 63, 13, 0.28);
+  --shadow-glow: 0 4px 16px rgba(190, 18, 60, 0.28);
   
   --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -122,12 +122,12 @@ main.w {
    HEADER & NAVBAR (COMPACT & MODERN)
    ========================================================= */
 .hd {
-  background: linear-gradient(135deg, #152e09 0%, #1d3f0d 50%, #285715 100%);
+  background: linear-gradient(135deg, #9f1239 0%, #be123c 50%, #e11d48 100%);
   color: #ffffff;
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 2px 12px rgba(29, 63, 13, 0.2);
+  box-shadow: 0 2px 12px rgba(190, 18, 60, 0.2);
 }
 
 /* Top bar mini */
@@ -491,7 +491,7 @@ main.w {
 
 .btn-search-shopee {
   flex-shrink: 0 !important;
-  background: #1d3f0d !important;
+  background: #be123c !important;
   color: #ffffff !important;
   width: 58px !important;
   min-width: 58px !important;
@@ -586,12 +586,12 @@ main.w {
   top: -4px;
   right: -8px;
   background: #ffffff;
-  color: #1d3f0d;
+  color: #be123c;
   font-size: 11px;
   font-weight: 800;
   padding: 1px 6px;
   border-radius: 40px;
-  border: 2px solid #1d3f0d;
+  border: 2px solid #be123c;
   line-height: 1.2;
 }
 
@@ -645,7 +645,7 @@ main.w {
 }
 
 .hero-shopee-left {
-  background: linear-gradient(135deg, #152e09 0%, #1d3f0d 55%, #2e6919 100%);
+  background: linear-gradient(135deg, #9f1239 0%, #be123c 55%, #2e6919 100%);
   border-radius: 4px;
   padding: 24px 26px 14px 26px;
   position: relative;
@@ -983,7 +983,7 @@ main.w {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #1d3f0d;
+  color: #be123c;
 }
 
 .cat-name {
@@ -1023,7 +1023,7 @@ main.w {
 
 .cats-scroll-btn:hover {
   background: #f8fafc;
-  color: #1d3f0d;
+  color: #be123c;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
 }
 
@@ -1048,7 +1048,7 @@ main.w {
 .fs-logo {
   font-size: 16px;
   font-weight: 900;
-  color: #1d3f0d;
+  color: #be123c;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1080,7 +1080,7 @@ main.w {
 }
 
 .fs-see-all {
-  color: #1d3f0d;
+  color: #be123c;
   font-size: 13px;
   font-weight: 700;
   text-decoration: none;
@@ -1125,20 +1125,20 @@ main.w {
 }
 
 .dock-btn-promo {
-  background: #285715;
+  background: #e11d48;
 }
 
 .dock-btn-promo:hover {
-  background: #1d3f0d;
+  background: #be123c;
   transform: translateY(-2px);
 }
 
 .dock-btn-chat {
-  background: #1d3f0d;
+  background: #be123c;
 }
 
 .dock-btn-chat:hover {
-  background: #152e09;
+  background: #9f1239;
   transform: translateY(-2px);
 }
 
@@ -1155,7 +1155,7 @@ main.w {
 
 .dock-badge {
   background: #ffffff;
-  color: #1d3f0d;
+  color: #be123c;
   font-size: 10.5px;
   font-weight: 800;
   padding: 1px 6px;
@@ -1165,7 +1165,7 @@ main.w {
 
 .chat-badge-bubble {
   background: #ffffff;
-  color: #1d3f0d;
+  color: #be123c;
   font-size: 10.5px;
   font-weight: 800;
   padding: 1px 6px;
@@ -1182,7 +1182,7 @@ main.w {
 }
 
 .box.fs .bh {
-  background: linear-gradient(90deg, #f2f8f0 0%, #ffffff 100%);
+  background: linear-gradient(90deg, #fff1f2 0%, #ffffff 100%);
   border-bottom: 1px solid #ffe8e0;
 }
 
@@ -1313,7 +1313,7 @@ main.w {
   top: 0;
   bottom: 0;
   width: var(--p, 50%);
-  background: linear-gradient(90deg, #2e6919, #1d3f0d);
+  background: linear-gradient(90deg, #2e6919, #be123c);
   border-radius: var(--radius-full);
 }
 
@@ -1375,7 +1375,7 @@ main.w {
 
 .cd:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 24px -4px rgba(29, 63, 13, 0.12), 0 4px 8px -2px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 12px 24px -4px rgba(190, 18, 60, 0.12), 0 4px 8px -2px rgba(0, 0, 0, 0.06);
   border-color: #ffd8cc;
 }
 
@@ -1461,7 +1461,7 @@ main.w {
   height: 34px;
   border-radius: 50%;
   background: #ffffff;
-  color: #1d3f0d;
+  color: #be123c;
   border: 1px solid #fee2e2;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
   display: flex;
@@ -1481,11 +1481,11 @@ main.w {
 }
 
 .btn-quick-cart:hover {
-  background: #1d3f0d;
+  background: #be123c;
   color: #ffffff;
   transform: scale(1.12);
   box-shadow: 0 4px 12px rgba(238, 77, 45, 0.35);
-  border-color: #1d3f0d;
+  border-color: #be123c;
 }
 
 .btn-quick-cart:active {
@@ -1569,8 +1569,8 @@ main.w {
 }
 
 .trust-tag.cod {
-  background: #f2f8f0;
-  color: #1d3f0d;
+  background: #fff1f2;
+  color: #be123c;
   border: 1px solid #c7e6bc;
 }
 
@@ -2482,7 +2482,7 @@ main.w {
 .toast-success { background: #059669; }
 .toast-error { background: #dc2626; }
 .toast-warning { background: #d97706; }
-.toast-info { background: #1d3f0d; }
+.toast-info { background: #be123c; }
 
 @keyframes toastIn {
   from { opacity: 0; transform: translateY(-20px); }
@@ -2601,7 +2601,7 @@ main.w {
   right: 140px;
   left: auto;
   z-index: 1499;
-  background: #285715;
+  background: #e11d48;
   color: #ffffff;
   padding: 9px 16px;
   border-radius: 6px 6px 0 0;
@@ -2619,13 +2619,13 @@ main.w {
 }
 
 .fab-promo-btn:hover {
-  background: #1d3f0d;
+  background: #be123c;
   transform: translateY(-2px);
 }
 
 .fab-promo-badge {
   background: #ffffff;
-  color: #1d3f0d;
+  color: #be123c;
   font-size: 11px;
   font-weight: 800;
   padding: 1px 6px;
@@ -2684,7 +2684,7 @@ main.w {
 
 /* Modal Header with Festive Theme */
 .promo-modal-header {
-  background: linear-gradient(135deg, #152e09 0%, #1d3f0d 50%, #2e6919 100%);
+  background: linear-gradient(135deg, #9f1239 0%, #be123c 50%, #2e6919 100%);
   color: #ffffff;
   padding: 22px 24px 18px 24px;
   position: relative;
@@ -2940,7 +2940,7 @@ main.w {
   min-width: 110px;
   max-width: 110px;
   flex-shrink: 0;
-  background: linear-gradient(135deg, #f2f8f0 0%, #e1f0dc 100%);
+  background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -3309,7 +3309,7 @@ main.w {
 
 .payment-option.selected {
   border-color: var(--primary);
-  background: #f2f8f0;
+  background: #fff1f2;
   box-shadow: 0 0 0 1px var(--primary);
 }
 
@@ -3517,7 +3517,7 @@ main.w {
 }
 
 .btn-checkout-submit {
-  background: linear-gradient(135deg, #1d3f0d 0%, #ff5722 100%);
+  background: linear-gradient(135deg, #be123c 0%, #ff5722 100%);
   color: #ffffff;
   border: none;
   padding: 12px 24px;
@@ -3564,7 +3564,7 @@ main.w {
 }
 
 .hd.hd-cart-mode .top {
-  background: #1d3f0d;
+  background: #be123c;
   border-bottom: none;
   padding: 6px 0;
   margin: 0 -9999px;
@@ -3582,11 +3582,11 @@ main.w {
 }
 
 .hd.hd-cart-mode .logo {
-  color: #1d3f0d;
+  color: #be123c;
 }
 
 .hd.hd-cart-mode .shopee-logo-icon {
-  color: #1d3f0d;
+  color: #be123c;
 }
 
 .hd.hd-cart-mode .cart-header-title-wrap {
@@ -3597,14 +3597,14 @@ main.w {
 
 .hd.hd-cart-mode .cart-header-sep {
   font-size: 24px;
-  color: #1d3f0d;
+  color: #be123c;
   font-weight: 300;
   margin-left: 6px;
 }
 
 .hd.hd-cart-mode .cart-header-text {
   font-size: 20px;
-  color: #1d3f0d;
+  color: #be123c;
   font-weight: 500;
   white-space: nowrap;
 }
@@ -3615,7 +3615,7 @@ main.w {
 }
 
 .hd.hd-cart-mode .sb form {
-  border: 2px solid #1d3f0d;
+  border: 2px solid #be123c;
   border-radius: 2px;
   box-shadow: none;
   padding: 2px;
@@ -3627,7 +3627,7 @@ main.w {
 }
 
 .hd.hd-cart-mode .sb button {
-  background: #1d3f0d;
+  background: #be123c;
   border-radius: 2px;
   width: 60px;
 }
@@ -3690,12 +3690,12 @@ main.w {
 }
 
 .custom-chk-label:hover .custom-chk-box {
-  border-color: #1d3f0d;
+  border-color: #be123c;
 }
 
 .custom-chk-label input[type="checkbox"]:checked + .custom-chk-box {
-  background: #1d3f0d;
-  border-color: #1d3f0d;
+  background: #be123c;
+  border-color: #be123c;
 }
 
 .custom-chk-label input[type="checkbox"]:checked + .custom-chk-box::after {
@@ -3778,7 +3778,7 @@ main.w {
 }
 
 .badge-mall-ori .bg-ori {
-  background: #1d3f0d;
+  background: #be123c;
   color: #ffffff;
   padding: 2.5px 5px;
 }
@@ -3793,7 +3793,7 @@ main.w {
   background: none;
   border: none;
   cursor: pointer;
-  color: #1d3f0d;
+  color: #be123c;
   font-size: 15px;
   display: flex;
   align-items: center;
@@ -3812,8 +3812,8 @@ main.w {
 }
 
 .store-combo-bar .combo-tag {
-  color: #1d3f0d;
-  border: 1px solid #1d3f0d;
+  color: #be123c;
+  border: 1px solid #be123c;
   border-radius: 2px;
   font-size: 11px;
   padding: 1px 6px;
@@ -3825,7 +3825,7 @@ main.w {
 }
 
 .store-combo-bar .combo-link {
-  color: #1d3f0d;
+  color: #be123c;
   text-decoration: none;
   font-weight: 500;
   cursor: pointer;
@@ -3883,7 +3883,7 @@ main.w {
 }
 
 .cart-prod-title:hover {
-  color: #1d3f0d;
+  color: #be123c;
 }
 
 .cart-prod-tags {
@@ -3893,8 +3893,8 @@ main.w {
 }
 
 .badge-cicilan {
-  border: 1px solid #1d3f0d;
-  color: #1d3f0d;
+  border: 1px solid #be123c;
+  color: #be123c;
   font-size: 10px;
   font-weight: 700;
   padding: 1px 4px;
@@ -3989,7 +3989,7 @@ main.w {
 }
 
 .cart-item-subtotal {
-  color: #1d3f0d;
+  color: #be123c;
   font-weight: 600;
   font-size: 14px;
 }
@@ -4013,11 +4013,11 @@ main.w {
 }
 
 .btn-delete-row:hover {
-  color: #1d3f0d;
+  color: #be123c;
 }
 
 .btn-similar-row {
-  color: #1d3f0d;
+  color: #be123c;
   font-size: 12.5px;
   text-decoration: none;
   cursor: pointer;
@@ -4135,7 +4135,7 @@ main.w {
 }
 
 .btn-cart-action-link:hover {
-  color: #1d3f0d;
+  color: #be123c;
 }
 
 .bar-actions-right {
@@ -4159,7 +4159,7 @@ main.w {
 }
 
 .total-amount-val {
-  color: #1d3f0d;
+  color: #be123c;
   font-size: 24px;
   font-weight: 700;
 }
@@ -4167,7 +4167,7 @@ main.w {
 .btn-shopee-checkout {
   min-width: 210px;
   height: 44px;
-  background: #1d3f0d;
+  background: #be123c;
   color: #ffffff;
   border: none;
   border-radius: 2px;
@@ -4181,7 +4181,7 @@ main.w {
 }
 
 .btn-shopee-checkout:hover {
-  background: #152e09;
+  background: #9f1239;
 }
 
 .btn-shopee-checkout:disabled {
@@ -4217,7 +4217,7 @@ main.w {
 }
 
 .cart-empty-page-state .btn-go-shop {
-  background: #1d3f0d;
+  background: #be123c;
   color: #fff;
   padding: 10px 32px;
   border-radius: 3px;
@@ -4296,7 +4296,7 @@ main.w {
   width: 100%;
   background-position-x: -30px;
   background-size: 116px 3px;
-  background-image: repeating-linear-gradient(45deg, #285715, #285715 33px, transparent 0, transparent 41px, #8cc779 0, #8cc779 74px, transparent 0, transparent 82px);
+  background-image: repeating-linear-gradient(45deg, #e11d48, #e11d48 33px, transparent 0, transparent 41px, #8cc779 0, #8cc779 74px, transparent 0, transparent 82px);
 }
 
 .checkout-address-inner {
@@ -4307,7 +4307,7 @@ main.w {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #1d3f0d;
+  color: #be123c;
   font-size: 17px;
   font-weight: 500;
   margin-bottom: 16px;
@@ -4334,8 +4334,8 @@ main.w {
 }
 
 .badge-utama {
-  border: 1px solid #1d3f0d;
-  color: #1d3f0d;
+  border: 1px solid #be123c;
+  color: #be123c;
   font-size: 11px;
   padding: 1px 6px;
   border-radius: 2px;
@@ -4511,7 +4511,7 @@ main.w {
 }
 
 .link-blue-pilih {
-  color: #1d3f0d;
+  color: #be123c;
   text-decoration: none;
   font-size: 14px;
   font-weight: 600;
@@ -4519,14 +4519,14 @@ main.w {
 
 .link-blue-pilih:hover {
   text-decoration: underline;
-  color: #152e09;
+  color: #9f1239;
 }
 
 .coin-s-badge {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #1d3f0d;
+  background: #be123c;
   color: #ffffff;
   font-size: 11px;
   font-weight: 800;
@@ -4599,13 +4599,13 @@ main.w {
 }
 
 .pm-pill:hover {
-  border-color: #1d3f0d;
-  color: #1d3f0d;
+  border-color: #be123c;
+  color: #be123c;
 }
 
 .pm-pill.selected {
-  border-color: #1d3f0d !important;
-  color: #1d3f0d !important;
+  border-color: #be123c !important;
+  color: #be123c !important;
   font-weight: 500;
 }
 
@@ -4618,7 +4618,7 @@ main.w {
   height: 0;
   border-style: solid;
   border-width: 0 0 14px 14px;
-  border-color: transparent transparent #1d3f0d transparent;
+  border-color: transparent transparent #be123c transparent;
 }
 
 .pm-pill.selected::before {
@@ -4688,11 +4688,11 @@ main.w {
 }
 
 .calc-value.val-red {
-  color: #1d3f0d !important;
+  color: #be123c !important;
 }
 
 .calc-row-points {
-  background: #f2f8f0;
+  background: #fff1f2;
   border: 1px dashed #8cc779;
   border-radius: 6px;
   padding: 6px 10px;
@@ -4710,15 +4710,15 @@ main.w {
 
 .calc-label.label-points .badge-point-rule {
   font-size: 11px;
-  color: #1d3f0d;
+  color: #be123c;
   font-weight: 500;
-  background: #e1f0dc;
+  background: #ffe4e6;
   padding: 1px 6px;
   border-radius: 4px;
 }
 
 .calc-value.val-points {
-  color: #152e09 !important;
+  color: #9f1239 !important;
   font-weight: 800 !important;
   font-size: 14.5px !important;
 }
@@ -4739,7 +4739,7 @@ main.w {
 .calc-value-total {
   font-size: 28px;
   font-weight: 700;
-  color: #1d3f0d;
+  color: #be123c;
 }
 
 /* Bottom Action Bar */
@@ -4757,18 +4757,18 @@ main.w {
 }
 
 .submit-disclaimer .link-blue {
-  color: #1d3f0d;
+  color: #be123c;
   text-decoration: none;
   font-weight: 500;
 }
 
 .submit-disclaimer .link-blue:hover {
   text-decoration: underline;
-  color: #152e09;
+  color: #9f1239;
 }
 
 .btn-shopee-buat-pesanan {
-  background: #1d3f0d;
+  background: #be123c;
   color: #ffffff;
   border: none;
   border-radius: 2px;
@@ -4781,7 +4781,7 @@ main.w {
 }
 
 .btn-shopee-buat-pesanan:hover {
-  background: #152e09;
+  background: #9f1239;
 }
 
 .btn-shopee-buat-pesanan:disabled {
@@ -4928,7 +4928,7 @@ main.w {
 }
 
 .meta-qty {
-  color: #1d3f0d;
+  color: #be123c;
   font-weight: 700;
 }
 
@@ -4977,7 +4977,7 @@ main.w {
 .btn-popup-cart {
   flex: 1.3;
   padding: 8px 12px;
-  background: #1d3f0d;
+  background: #be123c;
   color: #ffffff;
   border: none;
   border-radius: 3px;
@@ -4988,7 +4988,7 @@ main.w {
 }
 
 .btn-popup-cart:hover {
-  background: #152e09;
+  background: #9f1239;
 }
 
 /* Badge Bounce Animation */
@@ -5039,8 +5039,8 @@ main.w {
 }
 
 .btn-shopee-dialog-confirm {
-  background: #1d3f0d;
-  border: 1px solid #1d3f0d;
+  background: #be123c;
+  border: 1px solid #be123c;
   color: #ffffff;
   padding: 8px 26px;
   border-radius: 2px;
@@ -5052,7 +5052,7 @@ main.w {
 }
 
 .btn-shopee-dialog-confirm:hover {
-  background: #152e09;
+  background: #9f1239;
 }
 
 /* =========================================================
@@ -5160,7 +5160,7 @@ main.w {
 }
 
 .shopee-radio-circle.checked {
-  border-color: #1d3f0d;
+  border-color: #be123c;
 }
 
 .shopee-radio-circle.checked::after {
@@ -5171,7 +5171,7 @@ main.w {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #1d3f0d;
+  background: #be123c;
 }
 
 .item-content-col {
@@ -5202,7 +5202,7 @@ main.w {
 }
 
 .item-edit-btn {
-  color: #1d3f0d;
+  color: #be123c;
   font-size: 13.5px;
   font-weight: 600;
   text-decoration: none;
@@ -5211,7 +5211,7 @@ main.w {
 
 .item-edit-btn:hover {
   text-decoration: underline;
-  color: #152e09;
+  color: #9f1239;
 }
 
 .item-address-text {
@@ -5227,8 +5227,8 @@ main.w {
 
 .shopee-badge-utama {
   display: inline-block;
-  border: 1px solid #1d3f0d;
-  color: #1d3f0d;
+  border: 1px solid #be123c;
+  color: #be123c;
   font-size: 11px;
   padding: 1px 4px;
   border-radius: 2px;
@@ -5242,7 +5242,7 @@ main.w {
 }
 
 .btn-shopee-tambah-alamat {
-  background: #1d3f0d;
+  background: #be123c;
   color: #ffffff;
   border: none;
   padding: 9px 20px;
@@ -5257,7 +5257,7 @@ main.w {
 }
 
 .btn-shopee-tambah-alamat:hover {
-  background: #152e09;
+  background: #9f1239;
 }
 
 /* Modal Form Alamat Baru (Screenshot 2) */
@@ -5291,7 +5291,7 @@ main.w {
 }
 
 .shopee-input-box:focus {
-  border-color: #1d3f0d;
+  border-color: #be123c;
 }
 
 .shopee-dropdown-wrap {
@@ -5344,8 +5344,8 @@ main.w {
 
 .btn-shopee-tambah-lokasi:hover {
   background: #fbfbfb;
-  border-color: #1d3f0d;
-  color: #1d3f0d;
+  border-color: #be123c;
+  color: #be123c;
 }
 
 .map-indicator-text {
@@ -5384,8 +5384,8 @@ main.w {
 }
 
 .shopee-tag-btn.active {
-  border-color: #1d3f0d;
-  color: #1d3f0d;
+  border-color: #be123c;
+  color: #be123c;
   background: #f8fafc;
 }
 
@@ -5404,7 +5404,7 @@ main.w {
 }
 
 .shopee-checkbox-wrap input[type="checkbox"] {
-  accent-color: #1d3f0d;
+  accent-color: #be123c;
   width: 16px;
   height: 16px;
   cursor: pointer;
@@ -5436,7 +5436,7 @@ main.w {
 }
 
 .btn-shopee-ok-solid {
-  background: #1d3f0d;
+  background: #be123c;
   border: none;
   color: #ffffff;
   font-size: 14px;
@@ -5448,12 +5448,12 @@ main.w {
 }
 
 .btn-shopee-ok-solid:hover {
-  background: #152e09;
+  background: #9f1239;
 }
 
 /* Background Checkout Address Links & Dropshipper */
 .link-shopee-ubah {
-  color: #1d3f0d;
+  color: #be123c;
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
@@ -5462,7 +5462,7 @@ main.w {
 
 .link-shopee-ubah:hover {
   text-decoration: underline;
-  color: #152e09;
+  color: #9f1239;
 }
 
 .addr-dropshipper-row {
@@ -5479,7 +5479,7 @@ main.w {
 }
 
 .shopee-dropshipper-label input[type="checkbox"] {
-  accent-color: #1d3f0d;
+  accent-color: #be123c;
   width: 16px;
   height: 16px;
 }
@@ -5503,7 +5503,7 @@ textarea {
 }
 
 :focus-visible {
-  outline: 3px solid rgba(29, 63, 13, 0.65);
+  outline: 3px solid rgba(190, 18, 60, 0.65);
   outline-offset: 3px;
 }
 
@@ -5515,7 +5515,7 @@ button:disabled {
 .cd:focus-within,
 #view-search .c:focus-within {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(29, 63, 13, 0.12);
+  box-shadow: 0 0 0 3px rgba(190, 18, 60, 0.12);
 }
 
 #view-search .so {
