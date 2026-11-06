@@ -1,6 +1,7 @@
+const { Order } = require('../models');
 const storage = require('../models/storage');
 
-exports.checkout = (req, res) => {
+exports.checkout = async (req, res) => {
   try {
     const userId = req.user.id;
     const {
@@ -39,8 +40,6 @@ exports.checkout = (req, res) => {
     });
 
     const totalAmount = items.reduce((sum, it) => sum + it.itemTotal, 0);
-
-    // Hitung poin: 1 Poin tiap Rp 1.000 total checkout
     const earnedPoints = Math.floor(totalAmount / 1000);
 
     const dbUser = db.users.find(u => u.id === userId);
@@ -60,6 +59,21 @@ exports.checkout = (req, res) => {
       status: 'Sedang Diproses',
       createdAt: new Date().toISOString()
     };
+
+    try {
+      await Order.create({
+        id: newOrder.id,
+        userId: newOrder.userId,
+        items: newOrder.items,
+        shippingAddress: newOrder.shippingAddress,
+        paymentMethod: newOrder.paymentMethod,
+        notes: newOrder.notes,
+        totalAmount: newOrder.totalAmount,
+        status: newOrder.status
+      });
+    } catch (e) {
+      console.warn('Sequelize Order create warning:', e.message);
+    }
 
     if (!db.orders) {
       db.orders = [];
@@ -86,11 +100,24 @@ exports.checkout = (req, res) => {
   }
 };
 
-exports.getMyOrders = (req, res) => {
+exports.getMyOrders = async (req, res) => {
   try {
     const userId = req.user.id;
-    const db = storage.read();
-    const orders = (db.orders || []).filter(o => o.userId === userId);
+    let orders = [];
+    try {
+      const records = await Order.findAll({
+        where: { userId },
+        order: [['createdAt', 'DESC']]
+      });
+      if (records && records.length > 0) {
+        orders = records.map(r => r.toJSON());
+      }
+    } catch (e) {}
+
+    if (orders.length === 0) {
+      const db = storage.read();
+      orders = (db.orders || []).filter(o => o.userId === userId);
+    }
 
     return res.json({
       success: true,
@@ -104,10 +131,23 @@ exports.getMyOrders = (req, res) => {
   }
 };
 
-exports.getAllOrders = (req, res) => {
+exports.getAllOrders = async (req, res) => {
   try {
-    const db = storage.read();
-    const orders = db.orders || [];
+    let orders = [];
+    try {
+      const records = await Order.findAll({
+        order: [['createdAt', 'DESC']]
+      });
+      if (records && records.length > 0) {
+        orders = records.map(r => r.toJSON());
+      }
+    } catch (e) {}
+
+    if (orders.length === 0) {
+      const db = storage.read();
+      orders = db.orders || [];
+    }
+
     return res.json({
       success: true,
       data: orders
@@ -120,10 +160,18 @@ exports.getAllOrders = (req, res) => {
   }
 };
 
-exports.updateOrderStatus = (req, res) => {
+exports.updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
+
+    try {
+      const record = await Order.findByPk(id);
+      if (record) {
+        await record.update({ status: status || record.status });
+      }
+    } catch (e) {}
+
     const db = storage.read();
     const order = (db.orders || []).find(o => o.id === id);
     if (!order) {
@@ -131,9 +179,9 @@ exports.updateOrderStatus = (req, res) => {
     }
     order.status = status || order.status;
     storage.write(db);
+
     return res.json({ success: true, message: 'Status pesanan berhasil diperbarui', order });
   } catch (error) {
     return res.status(500).json({ success: false, message: 'Gagal memperbarui status pesanan' });
   }
 };
-

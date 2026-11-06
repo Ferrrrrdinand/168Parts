@@ -1,3 +1,4 @@
+const { Banner } = require('../models');
 const storage = require('../models/storage');
 
 const defaultBanners = {
@@ -27,16 +28,26 @@ const defaultBanners = {
   }
 };
 
-exports.getBanners = (req, res) => {
+exports.getBanners = async (req, res) => {
   try {
-    const db = storage.read();
-    if (!db.banners || !db.banners.left) {
-      db.banners = defaultBanners;
-      storage.write(db);
+    let bannerData = null;
+    try {
+      const bannerRecord = await Banner.findByPk('main_banner');
+      if (bannerRecord && bannerRecord.configJson) {
+        bannerData = bannerRecord.configJson;
+      }
+    } catch (e) {
+      console.warn('Sequelize banner read error, falling back to storage:', e.message);
     }
+
+    if (!bannerData) {
+      const db = storage.read();
+      bannerData = db.banners || defaultBanners;
+    }
+
     return res.json({
       success: true,
-      data: db.banners
+      data: bannerData
     });
   } catch (error) {
     console.error('Error getBanners:', error);
@@ -47,10 +58,20 @@ exports.getBanners = (req, res) => {
   }
 };
 
-exports.updateBanners = (req, res) => {
+exports.updateBanners = async (req, res) => {
   try {
-    const db = storage.read();
-    const current = db.banners || defaultBanners;
+    let current = null;
+    try {
+      const bannerRecord = await Banner.findByPk('main_banner');
+      if (bannerRecord && bannerRecord.configJson) {
+        current = bannerRecord.configJson;
+      }
+    } catch (e) {}
+
+    if (!current) {
+      const db = storage.read();
+      current = db.banners || defaultBanners;
+    }
 
     const updated = {
       left: {
@@ -63,39 +84,57 @@ exports.updateBanners = (req, res) => {
       }
     };
 
+    try {
+      const [record] = await Banner.upsert({
+        id: 'main_banner',
+        configJson: updated
+      });
+    } catch (e) {
+      console.warn('Sequelize banner upsert warning:', e.message);
+    }
+
+    // Mirror ke storage JSON
+    const db = storage.read();
     db.banners = updated;
     storage.write(db);
 
     return res.json({
       success: true,
-      message: 'Banner berhasil diperbarui!',
+      message: 'Pengaturan hero banner berhasil disimpan!',
       data: updated
     });
   } catch (error) {
     console.error('Error updateBanners:', error);
     return res.status(500).json({
       success: false,
-      message: 'Gagal memperbarui data banner.'
+      message: 'Gagal memperbarui pengaturan banner.'
     });
   }
 };
 
-exports.resetBanners = (req, res) => {
+exports.resetBanners = async (req, res) => {
   try {
+    try {
+      await Banner.upsert({
+        id: 'main_banner',
+        configJson: defaultBanners
+      });
+    } catch (e) {}
+
     const db = storage.read();
     db.banners = defaultBanners;
     storage.write(db);
+
     return res.json({
       success: true,
-      message: 'Banner berhasil dikembalikan ke pengaturan default!',
+      message: 'Hero banner berhasil dikembalikan ke pengaturan default!',
       data: defaultBanners
     });
   } catch (error) {
     console.error('Error resetBanners:', error);
     return res.status(500).json({
       success: false,
-      message: 'Gagal mereset banner.'
+      message: 'Gagal mereset pengaturan banner.'
     });
   }
 };
-

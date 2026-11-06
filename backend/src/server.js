@@ -47,17 +47,32 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Melayani file statis Frontend
-const frontendPath = path.resolve(__dirname, '../../frontend');
-app.use(express.static(frontendPath));
+// Melayani Frontend Modern React Vite TSX & Legacy
+const fs = require('fs');
+const reactDistPath = path.resolve(__dirname, '../../frontend-react/dist');
+const legacyFrontendPath = path.resolve(__dirname, '../../frontend');
 
-// Fallback untuk route non-API ke index.html
-app.use((req, res) => {
-  if (req.originalUrl.startsWith('/api')) {
-    return res.status(404).json({ success: false, message: 'Endpoint API tidak ditemukan' });
-  }
-  res.sendFile(path.join(frontendPath, 'index.html'));
-});
+// Support Legacy static files di /legacy
+app.use('/legacy', express.static(legacyFrontendPath));
+
+if (fs.existsSync(reactDistPath)) {
+  console.log('⚡ [Frontend] Melayani Modern React + Vite TSX App dari /frontend-react/dist');
+  app.use(express.static(reactDistPath));
+  app.use((req, res, next) => {
+    if (req.originalUrl.startsWith('/api') || req.originalUrl.startsWith('/legacy')) {
+      return next();
+    }
+    res.sendFile(path.join(reactDistPath, 'index.html'));
+  });
+} else {
+  app.use(express.static(legacyFrontendPath));
+  app.use((req, res, next) => {
+    if (req.originalUrl.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.join(legacyFrontendPath, 'index.html'));
+  });
+}
 
 // Start Server & Database
 const PORT = config.port;

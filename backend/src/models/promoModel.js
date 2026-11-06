@@ -1,4 +1,5 @@
 const dbManager = require('../config/database');
+const { Promo } = require('./index');
 
 class PromoModel {
   async findAll() {

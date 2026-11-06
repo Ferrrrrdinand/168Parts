@@ -1,5 +1,6 @@
 const dbManager = require('../config/database');
 const storage = require('./storage');
+const { Product } = require('./index');
 
 class ProductModel {
   // Helper memformat baris database menjadi objek produk frontend yang rapi

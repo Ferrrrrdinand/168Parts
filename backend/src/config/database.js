@@ -224,6 +224,104 @@ class DatabaseManager {
       }
       console.log('✅ [Database Lokal] Berhasil seeding 6 promo bawaan.');
     }
+
+    // 3. Tabel Users (Pengguna)
+    const createUsersTableSQL = `
+      CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL UNIQUE,
+        phone TEXT,
+        role TEXT DEFAULT 'buyer',
+        salt TEXT NOT NULL,
+        hash TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+    await this.run(createUsersTableSQL);
+
+    // Seeding demo user dan admin jika belum ada
+    const userCount = await this.get('SELECT COUNT(*) as cnt FROM users');
+    if (!userCount || userCount.cnt === 0) {
+      const crypto = require('crypto');
+      const hashPwd = (pwd) => {
+        const salt = crypto.randomBytes(16).toString('hex');
+        const hash = crypto.pbkdf2Sync(pwd, salt, 1000, 64, 'sha512').toString('hex');
+        return { salt, hash };
+      };
+      const demoUser = hashPwd('demo123');
+      const adminUser = hashPwd('admin123');
+
+      await this.run(`
+        INSERT INTO users (id, name, email, phone, role, salt, hash)
+        VALUES 
+          ('user-demo-1', 'Budi Santoso', 'demo@pasarin.com', '081234567890', 'buyer', ?, ?),
+          ('user-admin-1', 'Super Admin Pasarin', 'admin@pasarin.com', '081122334455', 'admin', ?, ?)
+      `, [demoUser.salt, demoUser.hash, adminUser.salt, adminUser.hash]);
+      console.log('✅ [Database Lokal] Berhasil seeding akun Demo & Super Admin.');
+    }
+
+    // 4. Tabel Orders (Pesanan Pelanggan)
+    const createOrdersTableSQL = `
+      CREATE TABLE IF NOT EXISTS orders (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        items TEXT NOT NULL,
+        shipping_address TEXT NOT NULL,
+        payment_method TEXT NOT NULL,
+        notes TEXT,
+        total_amount REAL NOT NULL,
+        status TEXT DEFAULT 'Sedang Diproses',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+    await this.run(createOrdersTableSQL);
+
+    // 5. Tabel Banners (Pengaturan Banner Hero)
+    const createBannersTableSQL = `
+      CREATE TABLE IF NOT EXISTS banners (
+        id TEXT PRIMARY KEY,
+        config_json TEXT NOT NULL,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+    await this.run(createBannersTableSQL);
+
+    // Seeding default banner jika belum ada
+    const bannerCount = await this.get('SELECT COUNT(*) as cnt FROM banners');
+    if (!bannerCount || bannerCount.cnt === 0) {
+      const defaultBanner = {
+        left: {
+          badge: "✨ PASARIN PILIH LOKAL",
+          title: "Kreasi Unggulan & Inovasi Nusantara",
+          subtitle: "Karya Terbaik Anak Bangsa",
+          pills: [
+            "🏷️ Produk Unik Asli Indonesia",
+            "⚡ Inovasi Lokal Rasa Global",
+            "⭐ Kualitas Unggulan Nusantara"
+          ],
+          modelImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=320&auto=format&fit=crop&q=80",
+          bgGradient: "linear-gradient(135deg, #1d3f0d 0%, #285715 100%)",
+          targetUrl: "#/search?category=Pilih+Lokal"
+        },
+        right: {
+          title: "Spesial Diskon & Voucher",
+          modelImage1: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=240&auto=format&fit=crop&q=80",
+          modelImage2: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=240&auto=format&fit=crop&q=80",
+          pill1Title: "DISKON S.D.",
+          pill1Val: "80%",
+          pill2Title: "VOUCHER",
+          pill2Val: "100RB",
+          bgGradient: "linear-gradient(135deg, #3b0764 0%, #581c87 50%, #4c1d95 100%)",
+          targetUrl: "#/search?q=promo"
+        }
+      };
+      await this.run(
+        `INSERT INTO banners (id, config_json) VALUES ('main_banner', ?)`,
+        [JSON.stringify(defaultBanner)]
+      );
+      console.log('✅ [Database Lokal] Berhasil seeding konfigurasi default banner.');
+    }
   }
 
   /* ---------------- 2. MYSQL (OPSIONAL) ---------------- */

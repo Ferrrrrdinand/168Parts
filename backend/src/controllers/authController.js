@@ -1,6 +1,7 @@
+const { User } = require('../models');
 const storage = require('../models/storage');
 
-exports.register = (req, res) => {
+exports.register = async (req, res) => {
   try {
     const { name, email, phone, password, address, latitude, longitude } = req.body;
 
@@ -55,6 +56,20 @@ exports.register = (req, res) => {
 
     db.users.push(newUser);
     storage.write(db);
+
+    try {
+      await User.create({
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        phone: newUser.phone,
+        role: newUser.role,
+        salt: newUser.salt,
+        hash: newUser.hash
+      });
+    } catch (e) {
+      console.warn('Sequelize User create warning:', e.message);
+    }
 
     const token = storage.generateToken(newUser);
 

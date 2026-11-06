@@ -11,6 +11,7 @@ router.get('/:id', productController.getProductById);
 
 // CREATE (CRUD - C) - Khusus Akun Admin Tunggal
 router.post('/', requireAdmin, productController.createProduct);
+router.post('/import-shopee', requireAdmin, productController.importShopee);
 
 // UPDATE (CRUD - U) - Khusus Akun Admin Tunggal
 router.put('/:id', requireAdmin, productController.updateProduct);

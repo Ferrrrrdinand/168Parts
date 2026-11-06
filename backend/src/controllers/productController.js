@@ -197,3 +197,51 @@ exports.getFlashSale = async (req, res) => {
     });
   }
 };
+
+// 8. IMPORT SHOPEE: Migrasi Massal Produk Shopee (Excel, JSON, atau Batch Items)
+exports.importShopee = async (req, res) => {
+  try {
+    const ShopeeImporter = require('../utils/shopeeImporter');
+    let { items, rawJson, fileBase64, replaceExisting } = req.body;
+    let productsToImport = [];
+
+    if (fileBase64) {
+      const buffer = Buffer.from(fileBase64, 'base64');
+      productsToImport = ShopeeImporter.parseFile(buffer);
+    } else if (rawJson) {
+      const parsed = typeof rawJson === 'string' ? JSON.parse(rawJson) : rawJson;
+      const list = Array.isArray(parsed) ? parsed : (parsed.items || parsed.products || parsed.data || []);
+      productsToImport = list.map((item, idx) => ShopeeImporter.normalizeProduct(item, idx));
+    } else if (Array.isArray(items)) {
+      productsToImport = items.map((item, idx) => ShopeeImporter.normalizeProduct(item, idx));
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: 'Mohon sertakan data produk (file Excel/CSV Base64, rawJson, atau items array).'
+      });
+    }
+
+    if (productsToImport.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tidak ada data produk valid yang berhasil diurai dari sumber yang diberikan.'
+      });
+    }
+
+    const result = await ShopeeImporter.saveBatchToDatabase(productsToImport, Boolean(replaceExisting));
+
+    return res.json({
+      success: true,
+      message: result.message,
+      count: result.count,
+      totalReceived: result.totalReceived
+    });
+  } catch (error) {
+    console.error('Error importShopee:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memproses migrasi produk Shopee: ' + error.message
+    });
+  }
+};
+
