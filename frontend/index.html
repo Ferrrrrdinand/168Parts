@@ -89,6 +89,21 @@
     </div>
   </div>
 
+  <script>
+    // Fail-safe auto dismiss: loader pasti tertutup dalam 1.5 detik
+    (function() {
+      function dismiss() {
+        var el = document.getElementById('shopping-loader');
+        if (el && !el.classList.contains('fade-out')) {
+          el.classList.add('fade-out');
+          setTimeout(function() { if (el && el.parentNode) el.parentNode.removeChild(el); }, 500);
+        }
+      }
+      window.addEventListener('load', function() { setTimeout(dismiss, 900); });
+      setTimeout(dismiss, 1600);
+    })();
+  </script>
+
   <!-- NAVBAR HEADER GLOBAL -->
   <header class="hd">
     <div class="w">

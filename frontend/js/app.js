@@ -60,15 +60,25 @@ const PasarinApp = {
   },
 
   async init() {
-    this.initTimer();
-    this.bindGlobalEvents();
-    if (window.PasarinSearchHistory) window.PasarinSearchHistory.init();
-    await this.loadInitialData();
-    this.initPromoSystem();
-    await this.loadBanners();
-    this.route();
-    window.addEventListener('hashchange', () => this.route());
-    this.hideShoppingLoader();
+    // Garansi keselamatan: loader belanja wajib tertutup maksimal 1.5 detik
+    setTimeout(() => {
+      this.hideShoppingLoader();
+    }, 1500);
+
+    try {
+      this.initTimer();
+      this.bindGlobalEvents();
+      if (window.PasarinSearchHistory) window.PasarinSearchHistory.init();
+      await this.loadInitialData();
+      this.initPromoSystem();
+      await this.loadBanners();
+      this.route();
+      window.addEventListener('hashchange', () => this.route());
+    } catch (e) {
+      console.warn('Init error, gracefully showing interface:', e);
+    } finally {
+      this.hideShoppingLoader();
+    }
   },
 
   hideShoppingLoader() {

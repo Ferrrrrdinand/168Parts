@@ -6,40 +6,59 @@ interface RealisticLoaderProps {
 }
 
 export const RealisticLoader: React.FC<RealisticLoaderProps> = ({ isLoading, onAnimationComplete }) => {
-  const [progress, setProgress] = useState(12);
+  const [progress, setProgress] = useState(25);
   const [isExiting, setIsExiting] = useState(false);
   const [shouldRender, setShouldRender] = useState(true);
 
-  // Dynamic progressive progress counter
+  // Progressive progress bar animation
   useEffect(() => {
-    const timer1 = setTimeout(() => setProgress(38), 250);
-    const timer2 = setTimeout(() => setProgress(65), 550);
-    const timer3 = setTimeout(() => setProgress(88), 850);
-    const timer4 = setTimeout(() => setProgress(100), 1150);
+    const t1 = setTimeout(() => setProgress(55), 200);
+    const t2 = setTimeout(() => setProgress(85), 450);
+    const t3 = setTimeout(() => setProgress(96), 700);
 
     return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
-      clearTimeout(timer4);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
     };
   }, []);
 
-  // Handle smooth fade out exit
+  // When isLoading becomes false OR when max safety duration (1.8s) expires
   useEffect(() => {
-    if (!isLoading && progress >= 88) {
+    let fadeTimer: any;
+    let removeTimer: any;
+
+    const dismissLoader = () => {
       setProgress(100);
-      const exitTimer = setTimeout(() => {
+      fadeTimer = setTimeout(() => {
         setIsExiting(true);
-        const removeTimer = setTimeout(() => {
+        removeTimer = setTimeout(() => {
           setShouldRender(false);
           if (onAnimationComplete) onAnimationComplete();
-        }, 500);
-        return () => clearTimeout(removeTimer);
-      }, 400);
-      return () => clearTimeout(exitTimer);
+        }, 400);
+      }, 250);
+    };
+
+    if (!isLoading) {
+      dismissLoader();
+    } else {
+      // Safety guarantee: under NO circumstance can loader be stuck longer than 1.8 seconds!
+      const safetyTimer = setTimeout(() => {
+        dismissLoader();
+      }, 1800);
+
+      return () => {
+        clearTimeout(safetyTimer);
+        clearTimeout(fadeTimer);
+        clearTimeout(removeTimer);
+      };
     }
-  }, [isLoading, progress, onAnimationComplete]);
+
+    return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(removeTimer);
+    };
+  }, [isLoading, onAnimationComplete]);
 
   if (!shouldRender) return null;
 

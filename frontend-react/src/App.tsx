@@ -88,6 +88,11 @@ export function App() {
 
   useEffect(() => {
     loadStoreData();
+    // Safety fallback: guaranteed to stop loading state within 1.5s
+    const fallback = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    return () => clearTimeout(fallback);
   }, []);
 
   // Save Cart to LocalStorage
