@@ -16,11 +16,12 @@ import { RealisticLoader } from './components/RealisticLoader';
 
 import { Product, Promo, BannerConfig, CartItem, User } from './types';
 import { fetchProducts, fetchBanners, fetchActivePromos } from './api';
+import { fallbackProducts, fallbackBanners, fallbackPromos } from './fallbackData';
 
 export function App() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [banners, setBanners] = useState<BannerConfig | null>(null);
-  const [promos, setPromos] = useState<Promo[]>([]);
+  const [products, setProducts] = useState<Product[]>(fallbackProducts);
+  const [banners, setBanners] = useState<BannerConfig | null>(fallbackBanners);
+  const [promos, setPromos] = useState<Promo[]>(fallbackPromos);
   const [selectedCategory, setSelectedCategory] = useState('Semua');
   const [isLoading, setIsLoading] = useState(true);
 

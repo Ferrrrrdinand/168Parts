@@ -1,7 +1,15 @@
 import { Product, Promo, BannerConfig, Order } from './types';
 import { fallbackProducts, fallbackBanners, fallbackPromos } from './fallbackData';
 
-const API_BASE = '/api';
+const API_BASE = (() => {
+  if (typeof window === 'undefined') return '/api';
+  const { protocol, hostname, port } = window.location;
+  const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
+  if (protocol === 'file:' || (isLocal && port !== '3000')) {
+    return 'http://localhost:3000/api';
+  }
+  return '/api';
+})();
 
 export async function fetchProducts(query = ''): Promise<Product[]> {
   try {

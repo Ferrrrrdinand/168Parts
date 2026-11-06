@@ -1335,7 +1335,8 @@ const PasarinApp = {
     description: 'LCD Touchscreen Xiaomi Poco X3 Pro & Poco X3 NFC kualitas Incell High Refresh Rate 120Hz. Layar tajam, bezel bawah tipis, lubang kamera punch hole pas di tengah.',
     specs: ['Kompatibilitas: Xiaomi Poco X3 NFC / Poco X3 Pro', 'Ukuran: 6.67 inch Full HD+ 120Hz', 'Garansi: Garansi Tes 7 Hari (Segel Utuh)']
   }
-];
+    ];
+  },
 
   renderHomeGrid() {
     const gridEl = document.getElementById('grid');
