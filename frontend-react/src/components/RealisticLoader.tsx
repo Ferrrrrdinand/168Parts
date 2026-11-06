@@ -214,3 +214,4 @@ export const RealisticLoader: React.FC<RealisticLoaderProps> = ({ isLoading, onA
     </div>
   );
 };
+

@@ -1,12 +1,21 @@
 import { Product, Promo, BannerConfig, Order } from './types';
+import { fallbackProducts, fallbackBanners, fallbackPromos } from './fallbackData';
 
 const API_BASE = '/api';
 
 export async function fetchProducts(query = ''): Promise<Product[]> {
-  const url = query ? `${API_BASE}/products${query}` : `${API_BASE}/products`;
-  const res = await fetch(url);
-  const data = await res.json();
-  return data.success && data.data ? data.data : [];
+  try {
+    const url = query ? `${API_BASE}/products${query}` : `${API_BASE}/products`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+      return data.data;
+    }
+    return fallbackProducts;
+  } catch (err) {
+    console.warn('[API] fetchProducts fallback to local 168 Parts products:', err);
+    return fallbackProducts;
+  }
 }
 
 export async function createProduct(payload: Partial<Product>, token?: string): Promise<any> {
@@ -59,9 +68,9 @@ export async function fetchBanners(): Promise<BannerConfig | null> {
   try {
     const res = await fetch(`${API_BASE}/banners`);
     const data = await res.json();
-    return data.success && data.data ? data.data : null;
+    return data.success && data.data ? data.data : fallbackBanners;
   } catch (e) {
-    return null;
+    return fallbackBanners;
   }
 }
 
@@ -83,9 +92,12 @@ export async function fetchActivePromos(): Promise<Promo[]> {
   try {
     const res = await fetch(`${API_BASE}/promos`);
     const data = await res.json();
-    return data.success && data.data ? data.data : [];
+    if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+      return data.data;
+    }
+    return fallbackPromos;
   } catch (e) {
-    return [];
+    return fallbackPromos;
   }
 }
 

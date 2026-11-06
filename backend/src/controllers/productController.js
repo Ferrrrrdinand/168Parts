@@ -143,30 +143,20 @@ exports.deleteProduct = async (req, res) => {
   }
 };
 
-// 6. READ CATEGORIES
+// 6. READ CATEGORIES (168 Parts Official Categories)
 exports.getCategories = (req, res) => {
   try {
     const categories = [
-      { id: "elektronik", name: "Elektronik", icon: "head", image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=160&auto=format&fit=crop&q=80" },
-      { id: "komputer", name: "Komputer & Aksesoris", icon: "laptop", image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=160&auto=format&fit=crop&q=80" },
-      { id: "hp", name: "Handphone & Aksesoris", icon: "phone", image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=160&auto=format&fit=crop&q=80" },
-      { id: "pakaian-pria", name: "Pakaian Pria", icon: "shirt", image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=160&auto=format&fit=crop&q=80" },
-      { id: "sepatu-pria", name: "Sepatu Pria", icon: "shoe", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=160&auto=format&fit=crop&q=80" },
-      { id: "tas-pria", name: "Tas Pria", icon: "bag2", image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=160&auto=format&fit=crop&q=80" },
-      { id: "aksesoris", name: "Aksesoris Fashion", icon: "ring", image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=160&auto=format&fit=crop&q=80" },
-      { id: "jam-tangan", name: "Jam Tangan", icon: "watch", image: "https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=160&auto=format&fit=crop&q=80" },
-      { id: "kesehatan", name: "Kesehatan", icon: "health", image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=160&auto=format&fit=crop&q=80" },
-      { id: "hobi", name: "Hobi & Koleksi", icon: "game", image: "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=160&auto=format&fit=crop&q=80" },
-      { id: "makanan", name: "Makanan & Minuman", icon: "food", image: "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=160&auto=format&fit=crop&q=80" },
-      { id: "kecantikan", name: "Perawatan & Kecantikan", icon: "beauty", image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=160&auto=format&fit=crop&q=80" },
-      { id: "rumah", name: "Perlengkapan Rumah", icon: "home", image: "https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?w=160&auto=format&fit=crop&q=80" },
-      { id: "pakaian-wanita", name: "Pakaian Wanita", icon: "dress", image: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=160&auto=format&fit=crop&q=80" },
-      { id: "fashion-muslim", name: "Fashion Muslim", icon: "moon", image: "https://images.unsplash.com/photo-1585728748178-577629505238?w=160&auto=format&fit=crop&q=80" },
-      { id: "fashion-bayi", name: "Fashion Bayi & Anak", icon: "baby", image: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=160&auto=format&fit=crop&q=80" },
-      { id: "ibu-bayi", name: "Ibu & Bayi", icon: "baby", image: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=160&auto=format&fit=crop&q=80" },
-      { id: "sepatu-wanita", name: "Sepatu Wanita", icon: "heel", image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=160&auto=format&fit=crop&q=80" },
-      { id: "tas-wanita", name: "Tas Wanita", icon: "handbag", image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=160&auto=format&fit=crop&q=80" },
-      { id: "otomotif", name: "Otomotif", icon: "moto", image: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=160&auto=format&fit=crop&q=80" }
+      { id: "lcd", name: "LCD & Layar", icon: "phone", image: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=160&auto=format&fit=crop&q=80" },
+      { id: "baterai", name: "Baterai HP", icon: "battery", image: "https://images.unsplash.com/photo-1619725002198-6a689b72f41d?w=160&auto=format&fit=crop&q=80" },
+      { id: "ic", name: "IC & Chipset", icon: "cpu", image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=160&auto=format&fit=crop&q=80" },
+      { id: "tools", name: "Alat Servis & Blower", icon: "tool", image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=160&auto=format&fit=crop&q=80" },
+      { id: "solder", name: "Solder & Timah", icon: "flame", image: "https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=160&auto=format&fit=crop&q=80" },
+      { id: "lem", name: "Lem & Perekat", icon: "bottle", image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=160&auto=format&fit=crop&q=80" },
+      { id: "backdoor", name: "Backdoor & Kaca", icon: "shield", image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=160&auto=format&fit=crop&q=80" },
+      { id: "tester", name: "Alat Ukur & Tester", icon: "gauge", image: "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=160&auto=format&fit=crop&q=80" },
+      { id: "pinset", name: "Pinset & Pembuka", icon: "scissors", image: "https://images.unsplash.com/photo-1530124566582-a618bc2615dc?w=160&auto=format&fit=crop&q=80" },
+      { id: "fleksibel", name: "Sparepart Fleksibel", icon: "zap", image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=160&auto=format&fit=crop&q=80" }
     ];
 
     return res.json({

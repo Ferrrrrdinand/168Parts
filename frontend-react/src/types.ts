@@ -1,7 +1,7 @@
 export interface Product {
   id: string;
   name: string;
-  slug: string;
+  slug?: string;
   category: string;
   price: number;
   originalPrice?: number | null;
@@ -22,6 +22,7 @@ export interface Product {
 }
 
 export interface Promo {
+  id?: string;
   code: string;
   title: string;
   description?: string;
@@ -37,6 +38,7 @@ export interface Promo {
   used_count?: number;
   usedCount?: number;
   category?: string;
+  icon?: string;
   is_active?: boolean | number;
   isActive?: boolean | number;
 }
