@@ -126,22 +126,22 @@
 }
 
 .track-dash {
-  animation: trackRun 0.45s linear infinite;
-  stroke: #cbd5e1;
+  animation: trackRun 0.38s linear infinite;
+  stroke: #f43f5e;
 }
 
 @keyframes trackRun {
   from { stroke-dashoffset: 0; }
-  to   { stroke-dashoffset: -22; }
+  to   { stroke-dashoffset: -30; }
 }
 
-/* Keranjang Belanja dengan Suspensi Halus & Nyata */
+/* Keranjang Belanja dengan Suspensi Halus & Nyata (Soft Red Theme) */
 .cart-chassis-wrap {
   position: relative;
   width: 106px;
   height: 88px;
   will-change: transform;
-  animation: cartMotionRide 1.25s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  animation: cartMotionRide 1.25s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -150,34 +150,46 @@
 .cart-svg-pro {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 6px 14px rgba(29, 63, 13, 0.18));
+  filter: drop-shadow(0 6px 14px rgba(190, 18, 60, 0.18));
   overflow: visible;
 }
 
-/* Suspensi Berkendara Keranjang yang Halus (Bounce & Tilt) */
+/* Suspensi Berkendara Keranjang Realistis (9-stage bounce, recoil dampening & micro-tilt) */
 @keyframes cartMotionRide {
   0% {
     transform: translate3d(0, 0, 0) rotate(0deg);
   }
-  20% {
-    transform: translate3d(2px, -3.5px, 0) rotate(1.2deg);
+  12% {
+    transform: translate3d(0.8px, -2.8px, 0) rotate(1.4deg);
   }
-  45% {
-    transform: translate3d(0.5px, 0.5px, 0) rotate(-0.8deg);
+  24% {
+    transform: translate3d(1.5px, 2.5px, 0) rotate(-1deg);
   }
-  70% {
-    transform: translate3d(-2px, -2px, 0) rotate(0.6deg);
+  36% {
+    transform: translate3d(-0.6px, -1.2px, 0) rotate(0.8deg);
+  }
+  48% {
+    transform: translate3d(1px, 2.8px, 0) rotate(-1.2deg);
+  }
+  60% {
+    transform: translate3d(-1.2px, -1.6px, 0) rotate(1deg);
+  }
+  72% {
+    transform: translate3d(1.4px, 2.2px, 0) rotate(-0.7deg);
+  }
+  86% {
+    transform: translate3d(-0.5px, -0.6px, 0) rotate(0.4deg);
   }
   100% {
     transform: translate3d(0, 0, 0) rotate(0deg);
   }
 }
 
-/* Roda Berputar 360 Derajat Sempurna Tanpa Wobble */
+/* Roda Berputar 360 Derajat Sempurna Non-Slip */
 .wheel-group {
   transform-box: fill-box;
   transform-origin: center center;
-  animation: wheelSpinSmooth 0.55s linear infinite;
+  animation: wheelSpinSmooth 0.42s linear infinite;
 }
 
 @keyframes wheelSpinSmooth {
@@ -189,25 +201,21 @@
 .cart-ground-shadow {
   transform-box: fill-box;
   transform-origin: center center;
-  animation: shadowPulseSmooth 1.25s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  animation: shadowPulseSmooth 1.25s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 @keyframes shadowPulseSmooth {
   0%, 100% {
     transform: scaleX(1) scaleY(1);
-    opacity: 0.14;
+    opacity: 0.16;
   }
-  20% {
-    transform: scaleX(0.88) scaleY(0.8);
-    opacity: 0.09;
+  12%, 36%, 60%, 86% {
+    transform: scaleX(0.88) scaleY(0.78);
+    opacity: 0.08;
   }
-  45% {
-    transform: scaleX(1.06) scaleY(1.1);
-    opacity: 0.18;
-  }
-  70% {
-    transform: scaleX(0.94) scaleY(0.9);
-    opacity: 0.12;
+  24%, 48%, 72% {
+    transform: scaleX(1.08) scaleY(1.12);
+    opacity: 0.22;
   }
 }
 
@@ -227,22 +235,22 @@
 }
 
 .item-1 {
-  animation: smoothJumpIntoCart 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  animation: smoothJumpIntoCart 2.4s cubic-bezier(0.25, 1, 0.5, 1) infinite;
   animation-delay: 0s;
 }
 
 .item-2 {
-  animation: smoothJumpIntoCart 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  animation: smoothJumpIntoCart 2.4s cubic-bezier(0.25, 1, 0.5, 1) infinite;
   animation-delay: 0.6s;
 }
 
 .item-3 {
-  animation: smoothJumpIntoCart 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  animation: smoothJumpIntoCart 2.4s cubic-bezier(0.25, 1, 0.5, 1) infinite;
   animation-delay: 1.2s;
 }
 
 .item-4 {
-  animation: smoothJumpIntoCart 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  animation: smoothJumpIntoCart 2.4s cubic-bezier(0.25, 1, 0.5, 1) infinite;
   animation-delay: 1.8s;
 }
 

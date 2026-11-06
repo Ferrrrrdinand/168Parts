@@ -12,6 +12,7 @@ import { DockedActionBar } from './components/DockedActionBar';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { AdminDashboard } from './components/AdminDashboard';
 import { AuthModal } from './components/AuthModal';
+import { RealisticLoader } from './components/RealisticLoader';
 
 import { Product, Promo, BannerConfig, CartItem, User } from './types';
 import { fetchProducts, fetchBanners, fetchActivePromos } from './api';
@@ -21,6 +22,7 @@ export function App() {
   const [banners, setBanners] = useState<BannerConfig | null>(null);
   const [promos, setPromos] = useState<Promo[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('Semua');
+  const [isLoading, setIsLoading] = useState(true);
 
   // Cart & Orders State
   const [cart, setCart] = useState<CartItem[]>(() => {
@@ -65,14 +67,23 @@ export function App() {
 
   // Load initial data from Backend API
   const loadStoreData = async () => {
-    const [pList, bData, prList] = await Promise.all([
-      fetchProducts(),
-      fetchBanners(),
-      fetchActivePromos()
-    ]);
-    setProducts(pList);
-    setBanners(bData);
-    setPromos(prList);
+    try {
+      const [pList, bData, prList] = await Promise.all([
+        fetchProducts(),
+        fetchBanners(),
+        fetchActivePromos()
+      ]);
+      setProducts(pList);
+      setBanners(bData);
+      setPromos(prList);
+    } catch (err) {
+      console.error('Error fetching initial data:', err);
+    } finally {
+      // Natural pacing for smooth physics animation experience
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 650);
+    }
   };
 
   useEffect(() => {
@@ -204,6 +215,9 @@ export function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f5f5f5] pb-16 sm:pb-8">
+      {/* Realistis Physics Shopping Cart Loader */}
+      <RealisticLoader isLoading={isLoading} />
+
       {/* Global Header */}
       <Header
         cartCount={cartCount}

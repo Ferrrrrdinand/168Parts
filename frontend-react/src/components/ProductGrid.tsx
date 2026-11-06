@@ -47,12 +47,17 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
               key={p.id}
               className="group bg-white border border-slate-100 rounded-lg overflow-hidden hover:border-rose-500 hover:shadow-lg transition flex flex-col justify-between relative"
             >
-              {/* Product Image Box */}
-              <div className="relative aspect-square bg-slate-50 overflow-hidden">
+              {/* Product Image Box - Optimized for Mobile HP & Laptop Displays */}
+              <div className="relative aspect-square bg-white border-b border-slate-100 overflow-hidden flex items-center justify-center p-1 sm:p-2">
                 <img
-                  src={p.image || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&auto=format&fit=crop&q=80'}
+                  src={p.image || 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=500&auto=format&fit=crop&q=85'}
                   alt={p.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                  loading="lazy"
+                  decoding="async"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=500&auto=format&fit=crop&q=80';
+                  }}
+                  className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                 />
 
                 {/* Badge Toko Shopee / Star */}

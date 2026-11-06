@@ -65,11 +65,16 @@ export const FlashSale: React.FC<FlashSaleProps> = ({ products, onAddToCart }) =
             const soldPercent = Math.min(100, Math.max(20, Math.round(((p.flashSaleSold || 15) / (p.stock || 50)) * 100)));
             return (
               <div key={p.id} className="p-3 flex flex-col justify-between hover:shadow-md transition group bg-white">
-                <div className="relative mb-2 aspect-square rounded overflow-hidden bg-slate-50">
+                <div className="relative mb-2 aspect-square rounded-lg overflow-hidden bg-white border border-slate-100 flex items-center justify-center p-1 sm:p-1.5">
                   <img
-                    src={p.image || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&auto=format&fit=crop&q=80'}
+                    src={p.image || 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=400&auto=format&fit=crop&q=85'}
                     alt={p.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition"
+                    loading="lazy"
+                    decoding="async"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=400&auto=format&fit=crop&q=80';
+                    }}
+                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                   />
                   {p.discountPercent && p.discountPercent > 0 && (
                     <span className="absolute top-1 right-1 bg-yellow-400 text-yellow-950 text-[10px] font-black px-1.5 py-0.5 rounded shadow">

@@ -14,14 +14,14 @@ export const HeroBanners: React.FC<HeroBannersProps> = ({ banners }) => {
       '📦 Ready Stock Surabaya Langsung Kirim',
       '⭐ Garansi Tes & Harga Grosir Teknisi'
     ],
-    modelImage: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=400&auto=format&fit=crop&q=80',
+    modelImage: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&auto=format&fit=crop&q=85',
     bgGradient: 'linear-gradient(135deg, #be123c 0%, #e11d48 50%, #f43f5e 100%)'
   };
 
   const right = banners?.right || {
     title: 'Diskon Teknisi & Voucher',
-    modelImage1: 'https://images.unsplash.com/photo-1597733336794-12d05021d510?w=240&auto=format&fit=crop&q=80',
-    modelImage2: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=240&auto=format&fit=crop&q=80',
+    modelImage1: 'https://images.unsplash.com/photo-1597733336794-12d05021d510?w=500&auto=format&fit=crop&q=85',
+    modelImage2: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=500&auto=format&fit=crop&q=85',
     pill1Title: 'DISKON TEKNISI',
     pill1Val: '70%',
     pill2Title: 'VOUCHER TOKO',
@@ -57,12 +57,14 @@ export const HeroBanners: React.FC<HeroBannersProps> = ({ banners }) => {
               </div>
             </div>
 
-            {/* Model Foto Kiri */}
+            {/* Model Foto Kiri - Responsive Retina untuk HP & Laptop */}
             <div className="flex-shrink-0">
               <img
                 src={left.modelImage}
-                alt="Model Fashion"
-                className="w-24 sm:w-32 h-32 sm:h-40 object-cover rounded-lg border-2 border-white/90 shadow-md"
+                alt="Teknisi 168 Parts"
+                loading="eager"
+                decoding="async"
+                className="w-20 sm:w-28 md:w-36 h-28 sm:h-36 md:h-44 object-cover rounded-lg border-2 border-white/90 shadow-md aspect-[3/4]"
               />
             </div>
           </div>
