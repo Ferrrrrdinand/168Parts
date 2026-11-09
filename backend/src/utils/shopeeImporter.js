@@ -8,7 +8,7 @@ class ShopeeImporter {
    * Mengubah image ID / hash Shopee menjadi URL gambar CDN lengkap
    */
   static formatShopeeImage(img) {
-    if (!img) return 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=500&auto=format&fit=crop&q=80';
+    if (!img) return 'images/product-placeholder.svg';
     if (typeof img === 'string' && (img.startsWith('http://') || img.startsWith('https://'))) {
       return img;
     }

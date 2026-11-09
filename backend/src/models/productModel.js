@@ -63,7 +63,7 @@ class ProductModel {
       shopName: data.shopName || 'Pasarin Partner',
       shopType: data.shopType || 'Star+',
       icon: data.icon || 'bag',
-      image: data.image || 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500&auto=format&fit=crop&q=80',
+      image: data.image || 'images/product-placeholder.svg',
       bgPattern: data.bgPattern || '#f8fafc',
       isFlashSale: Boolean(data.isFlashSale),
       flashSaleSold: Number(data.flashSaleSold || 0),

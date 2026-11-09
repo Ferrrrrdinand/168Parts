@@ -412,7 +412,7 @@ const PasarinCart = {
       const safeStoreName = store.shopName.replace(/'/g, "\\'");
 
       const itemsHtml = store.items.map(it => {
-        const itemImg = it.image || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&auto=format&fit=crop&q=80';
+        const itemImg = (it.image && !it.image.includes('unsplash.com')) ? it.image : 'images/product-placeholder.svg';
         return `
           <div class="cart-item-row" data-product-id="${it.productId}">
             <div class="cart-item-prod">
@@ -420,7 +420,7 @@ const PasarinCart = {
                 <input type="checkbox" ${it.selected ? 'checked' : ''} onchange="PasarinCart.toggleItemSelect('${it.productId}', this.checked)">
                 <span class="custom-chk-box"></span>
               </label>
-              <img src="${itemImg}" alt="${it.name}" class="cart-prod-thumb" onerror="this.src='https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&auto=format&fit=crop&q=80'">
+              <img src="${itemImg}" alt="${it.name}" class="cart-prod-thumb" onerror="this.src='images/product-placeholder.svg'">
               <div class="cart-prod-info">
                 <a href="#/search?q=${encodeURIComponent(it.name)}" class="cart-prod-title">${it.name}</a>
                 <div class="cart-prod-tags">
@@ -660,9 +660,8 @@ const PasarinCart = {
     if (footer) footer.style.display = 'block';
 
     body.innerHTML = this.items.map(it => {
-      const imgHtml = it.image 
-        ? `<img src="${it.image}" alt="${it.name}" class="prod-real-img" style="border-radius:6px;" onerror="this.style.display='none';">`
-        : (window.PasarinIcons ? window.PasarinIcons.get(it.icon || 'bag', 'i lg') : '🛒');
+      const imgUrl = (it.image && !it.image.includes('unsplash.com')) ? it.image : 'images/product-placeholder.svg';
+      const imgHtml = `<img src="${imgUrl}" alt="${it.name}" class="prod-real-img" style="border-radius:6px;" onerror="this.src='images/product-placeholder.svg';">`;
       return `
         <div class="cart-item-card" data-id="${it.productId}">
           <div class="cart-item-pic">
@@ -751,11 +750,11 @@ const PasarinCart = {
     const prodListEl = document.getElementById('checkout-products-list');
     if (prodListEl) {
       prodListEl.innerHTML = activeItems.map(it => {
-        const img = it.image || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&auto=format&fit=crop&q=80';
+        const img = (it.image && !it.image.includes('unsplash.com')) ? it.image : 'images/product-placeholder.svg';
         return `
           <div class="chk-prod-row">
             <div class="chk-prod-col th-p-name">
-              <img src="${img}" alt="${it.name}" class="chk-thumb" onerror="this.src='https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&auto=format&fit=crop&q=80'">
+              <img src="${img}" alt="${it.name}" class="chk-thumb" onerror="this.src='images/product-placeholder.svg'">
               <div class="chk-details">
                 <div class="chk-p-title">${it.name}</div>
                 <div class="chk-p-var">Variasi: ${it.variation || 'Standar'}</div>

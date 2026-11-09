@@ -290,10 +290,10 @@ const AdminApp = {
       console.warn('Gagal fetch /api/products, gunakan fallback', e);
       if (!this.products.length) {
         this.products = [
-          { id: 'prod-1', name: 'DJI Osmo Action 4 Standard Combo', category: 'Fotografi', price: 3940000, stock: 45, soldCount: 1420, isFlashSale: true, image: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=200' },
-          { id: 'prod-2', name: 'iPhone 12 256GB Garansi Resmi iBox', category: 'Handphone', price: 3599000, stock: 20, soldCount: 980, isFlashSale: true, image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=200' },
-          { id: 'prod-3', name: 'Insta360 X4 Kamera 360 8K Ultra', category: 'Fotografi', price: 6990000, stock: 15, soldCount: 650, isFlashSale: false, image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=200' },
-          { id: 'prod-4', name: 'Goojodoq Multipurpose Laptop Bag', category: 'Komputer', price: 156000, stock: 120, soldCount: 4200, isFlashSale: true, image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=200' }
+          { id: 'prod-1', name: 'DJI Osmo Action 4 Standard Combo', category: 'Fotografi', price: 3940000, stock: 45, soldCount: 1420, isFlashSale: true, image: 'images/product-placeholder.svg' },
+          { id: 'prod-2', name: 'iPhone 12 256GB Garansi Resmi iBox', category: 'Handphone', price: 3599000, stock: 20, soldCount: 980, isFlashSale: true, image: 'images/product-placeholder.svg' },
+          { id: 'prod-3', name: 'Insta360 X4 Kamera 360 8K Ultra', category: 'Fotografi', price: 6990000, stock: 15, soldCount: 650, isFlashSale: false, image: 'images/product-placeholder.svg' },
+          { id: 'prod-4', name: 'Goojodoq Multipurpose Laptop Bag', category: 'Komputer', price: 156000, stock: 120, soldCount: 4200, isFlashSale: true, image: 'images/product-placeholder.svg' }
         ];
       }
     }
@@ -415,7 +415,7 @@ const AdminApp = {
         <tr>
           <td>
             <div class="prod-cell">
-              <img src="${p.image || 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=100'}" alt="${p.name}" class="prod-thumb" onerror="this.src='https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=100'">
+              <img src="${(p.image && !p.image.includes('unsplash.com')) ? p.image : 'images/product-placeholder.svg'}" alt="${p.name}" class="prod-thumb" onerror="this.src='images/product-placeholder.svg'">
               <div class="prod-meta">
                 <span class="prod-name" title="${p.name}">${p.name}</span>
                 <span class="prod-id">${p.id}</span>
@@ -517,7 +517,7 @@ const AdminApp = {
     this.activeEditingId = null;
     document.getElementById('modal-product-title').textContent = 'Tambah Produk Baru';
     document.getElementById('form-product').reset();
-    document.getElementById('prod-img-preview').src = 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=200';
+    document.getElementById('prod-img-preview').src = 'images/product-placeholder.svg';
     document.getElementById('admin-modal-product').classList.add('active');
   },
 
@@ -536,7 +536,7 @@ const AdminApp = {
     document.getElementById('f-prod-shop').value = p.shopName || 'Pasarin Official';
     document.getElementById('f-prod-location').value = p.location || 'Jakarta Barat';
     document.getElementById('f-prod-flash').checked = !!p.isFlashSale;
-    document.getElementById('prod-img-preview').src = p.image || 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=200';
+    document.getElementById('prod-img-preview').src = (p.image && !p.image.includes('unsplash.com')) ? p.image : 'images/product-placeholder.svg';
 
     document.getElementById('admin-modal-product').classList.add('active');
   },
