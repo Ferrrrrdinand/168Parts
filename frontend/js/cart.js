@@ -758,6 +758,7 @@ const PasarinCart = {
     if (prodListEl) {
       prodListEl.innerHTML = activeItems.map(it => {
         const img = (it.image && !it.image.includes('unsplash.com')) ? it.image : 'images/product-placeholder.svg';
+        const hasDiscount = it.originalPrice && Number(it.originalPrice) > Number(it.price);
         return `
           <div class="chk-prod-row">
             <div class="chk-prod-col th-p-name">
@@ -767,7 +768,10 @@ const PasarinCart = {
                 <div class="chk-p-var">Variasi: ${it.variation || 'Standar'}</div>
               </div>
             </div>
-            <div class="chk-prod-col th-p-price">${this.formatRupiah(it.price)}</div>
+            <div class="chk-prod-col th-p-price">
+              ${hasDiscount ? `<span style="text-decoration:line-through; color:#94a3b8; font-size:11px; margin-right:4px;">${this.formatRupiah(it.originalPrice)}</span>` : ''}
+              <span>${this.formatRupiah(it.price)}</span>
+            </div>
             <div class="chk-prod-col th-p-qty">${it.quantity || 1}</div>
             <div class="chk-prod-col th-p-sub">${this.formatRupiah(it.price * (it.quantity || 1))}</div>
           </div>
@@ -836,10 +840,12 @@ const PasarinCart = {
     const elProteksi = document.getElementById('chk-calc-proteksi');
     const elOngkir = document.getElementById('chk-calc-ongkir');
     const elLayanan = document.getElementById('chk-calc-layanan');
-    const elDiskonProd = document.getElementById('chk-calc-diskon-produk');
+    const elVoucherRow = document.getElementById('chk-calc-voucher-row');
     const elVoucherDiskon = document.getElementById('chk-calc-voucher-diskon');
     const elCoinsRow = document.getElementById('chk-calc-coins-row');
     const elCoinsRedeemed = document.getElementById('chk-calc-coins-redeemed');
+    const elSavingsRow = document.getElementById('chk-calc-savings-row');
+    const elSavingsVal = document.getElementById('chk-calc-total-savings');
     const elEarnedPoints = document.getElementById('chk-calc-earned-points');
     const elCoinBalance = document.getElementById('chk-coin-balance-display');
     const elCoinDiscountVal = document.getElementById('chk-coin-discount-val');
@@ -852,8 +858,24 @@ const PasarinCart = {
     if (elProteksi) elProteksi.textContent = this.formatRupiah(proteksiProduk);
     if (elOngkir) elOngkir.textContent = this.formatRupiah(subtotalPengiriman);
     if (elLayanan) elLayanan.textContent = this.formatRupiah(biayaLayanan);
-    if (elDiskonProd) elDiskonProd.textContent = diskonProduk < 0 ? '-' + this.formatRupiah(Math.abs(diskonProduk)) : 'Rp0';
-    if (elVoucherDiskon) elVoucherDiskon.textContent = voucherDiskon < 0 ? '-' + this.formatRupiah(Math.abs(voucherDiskon)) : 'Rp0';
+
+    // Voucher diskon: hanya tampilkan baris jika voucher terpasang
+    if (elVoucherRow) {
+      elVoucherRow.style.display = voucherDiskon < 0 ? 'flex' : 'none';
+    }
+    if (elVoucherDiskon) {
+      elVoucherDiskon.textContent = voucherDiskon < 0 ? '-' + this.formatRupiah(Math.abs(voucherDiskon)) : 'Rp0';
+    }
+
+    // Baris info hemat belanja (selisih harga coret normal dengan harga promo riil)
+    const totalSavings = Math.max(0, totalOriginal - subtotalPesanan);
+    if (elSavingsRow) {
+      elSavingsRow.style.display = totalSavings > 0 ? 'flex' : 'none';
+    }
+    if (elSavingsVal) {
+      elSavingsVal.textContent = this.formatRupiah(totalSavings);
+    }
+
     if (elEarnedPoints) elEarnedPoints.textContent = `+${earnedPoints.toLocaleString('id-ID')} Poin`;
     if (elCoinBalance) elCoinBalance.textContent = userPoints.toLocaleString('id-ID');
 
