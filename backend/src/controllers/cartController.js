@@ -1,4 +1,4 @@
-const storage = require('../models/storage');
+const cartModel = require('../models/cartModel');
 
 function getCartOwnerKey(req) {
   if (req.user && req.user.id) {
@@ -7,39 +7,18 @@ function getCartOwnerKey(req) {
   return req.headers['x-session-id'] || 'guest-default';
 }
 
-exports.getCart = (req, res) => {
+exports.getCart = async (req, res) => {
   try {
     const ownerKey = getCartOwnerKey(req);
-    const db = storage.read();
-    const cartItems = db.carts[ownerKey] || [];
+    const items = await cartModel.getCart(ownerKey);
 
-    // Map item dengan data produk terkini
-    const enrichedItems = cartItems.map(item => {
-      const product = db.products.find(p => p.id === item.productId);
-      if (!product) return null;
-      return {
-        productId: product.id,
-        name: product.name,
-        price: product.price,
-        originalPrice: product.originalPrice,
-        discountPercent: product.discountPercent,
-        icon: product.icon,
-        image: product.image,
-        bgPattern: product.bgPattern,
-        shopName: product.shopName,
-        stock: product.stock,
-        quantity: item.quantity,
-        itemTotal: product.price * item.quantity
-      };
-    }).filter(Boolean);
-
-    const totalQuantity = enrichedItems.reduce((acc, curr) => acc + curr.quantity, 0);
-    const subtotal = enrichedItems.reduce((acc, curr) => acc + curr.itemTotal, 0);
+    const totalQuantity = items.reduce((acc, curr) => acc + curr.quantity, 0);
+    const subtotal = items.reduce((acc, curr) => acc + curr.itemTotal, 0);
 
     return res.json({
       success: true,
       data: {
-        items: enrichedItems,
+        items,
         totalQuantity,
         subtotal
       }
@@ -48,12 +27,12 @@ exports.getCart = (req, res) => {
     console.error('Error getCart:', error);
     return res.status(500).json({
       success: false,
-      message: 'Gagal mengambil data keranjang belanja.'
+      message: 'Gagal mengambil data keranjang belanja dari database.'
     });
   }
 };
 
-exports.addToCart = (req, res) => {
+exports.addToCart = async (req, res) => {
   try {
     const ownerKey = getCartOwnerKey(req);
     const { productId, quantity = 1 } = req.body;
@@ -66,41 +45,19 @@ exports.addToCart = (req, res) => {
     }
 
     const qty = Math.max(1, parseInt(quantity, 10) || 1);
-    const db = storage.read();
+    const items = await cartModel.addItem(ownerKey, productId, qty);
 
-    let product = db.products.find(p => p.id === productId);
-    if (!product) {
-      product = {
-        id: productId,
-        name: req.body.name || 'Produk Pilihan',
-        price: Number(req.body.price) || 150000,
-        originalPrice: Number(req.body.originalPrice) || 200000,
-        image: req.body.image || null,
-        shopName: req.body.shopName || 'Pasarin Store'
-      };
-    }
+    const totalQuantity = items.reduce((acc, curr) => acc + curr.quantity, 0);
+    const subtotal = items.reduce((acc, curr) => acc + curr.itemTotal, 0);
 
-    if (!db.carts[ownerKey]) {
-      db.carts[ownerKey] = [];
-    }
-
-    const existingIndex = db.carts[ownerKey].findIndex(i => i.productId === productId);
-    if (existingIndex > -1) {
-      db.carts[ownerKey][existingIndex].quantity += qty;
-    } else {
-      db.carts[ownerKey].push({
-        productId,
-        quantity: qty,
-        addedAt: new Date().toISOString()
-      });
-    }
-
-    storage.write(db);
-
-    return res.json({
+    return res.status(201).json({
       success: true,
-      message: `Berhasil menambahkan "${product.name}" ke keranjang!`,
-      cartCount: db.carts[ownerKey].reduce((sum, it) => sum + it.quantity, 0)
+      message: 'Produk berhasil ditambahkan ke keranjang!',
+      data: {
+        items,
+        totalQuantity,
+        subtotal
+      }
     });
   } catch (error) {
     console.error('Error addToCart:', error);
@@ -111,58 +68,68 @@ exports.addToCart = (req, res) => {
   }
 };
 
-exports.updateQuantity = (req, res) => {
+exports.updateQuantity = async (req, res) => {
   try {
     const ownerKey = getCartOwnerKey(req);
     const { productId } = req.params;
     const { quantity } = req.body;
 
-    const qty = parseInt(quantity, 10);
-    const db = storage.read();
-
-    if (!db.carts[ownerKey]) {
-      db.carts[ownerKey] = [];
+    if (!productId || quantity === undefined) {
+      return res.status(400).json({
+        success: false,
+        message: 'Parameter productId dan quantity wajib diisi.'
+      });
     }
 
-    if (qty <= 0) {
-      db.carts[ownerKey] = db.carts[ownerKey].filter(i => i.productId !== productId);
-    } else {
-      const item = db.carts[ownerKey].find(i => i.productId === productId);
-      if (item) {
-        item.quantity = qty;
-      }
-    }
-
-    storage.write(db);
+    const items = await cartModel.updateQuantity(ownerKey, productId, quantity);
+    const totalQuantity = items.reduce((acc, curr) => acc + curr.quantity, 0);
+    const subtotal = items.reduce((acc, curr) => acc + curr.itemTotal, 0);
 
     return res.json({
       success: true,
-      message: 'Jumlah produk berhasil diperbarui.'
+      message: 'Jumlah produk di keranjang berhasil diperbarui!',
+      data: {
+        items,
+        totalQuantity,
+        subtotal
+      }
     });
   } catch (error) {
+    console.error('Error updateQuantity:', error);
     return res.status(500).json({
       success: false,
-      message: 'Gagal memperbarui kuantitas produk.'
+      message: 'Gagal memperbarui jumlah produk di keranjang.'
     });
   }
 };
 
-exports.removeFromCart = (req, res) => {
+exports.removeFromCart = exports.removeItem = async (req, res) => {
   try {
     const ownerKey = getCartOwnerKey(req);
     const { productId } = req.params;
-    const db = storage.read();
 
-    if (db.carts[ownerKey]) {
-      db.carts[ownerKey] = db.carts[ownerKey].filter(i => i.productId !== productId);
-      storage.write(db);
+    if (!productId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Parameter productId wajib disertakan.'
+      });
     }
+
+    const items = await cartModel.removeItem(ownerKey, productId);
+    const totalQuantity = items.reduce((acc, curr) => acc + curr.quantity, 0);
+    const subtotal = items.reduce((acc, curr) => acc + curr.itemTotal, 0);
 
     return res.json({
       success: true,
-      message: 'Produk berhasil dihapus dari keranjang.'
+      message: 'Produk berhasil dihapus dari keranjang belanja.',
+      data: {
+        items,
+        totalQuantity,
+        subtotal
+      }
     });
   } catch (error) {
+    console.error('Error removeItem:', error);
     return res.status(500).json({
       success: false,
       message: 'Gagal menghapus produk dari keranjang.'
@@ -170,22 +137,25 @@ exports.removeFromCart = (req, res) => {
   }
 };
 
-exports.clearCart = (req, res) => {
+exports.clearCart = async (req, res) => {
   try {
     const ownerKey = getCartOwnerKey(req);
-    const db = storage.read();
-    db.carts[ownerKey] = [];
-    storage.write(db);
+    await cartModel.clearCart(ownerKey);
 
     return res.json({
       success: true,
-      message: 'Keranjang berhasil dikosongkan.'
+      message: 'Seluruh isi keranjang berhasil dikosongkan.',
+      data: {
+        items: [],
+        totalQuantity: 0,
+        subtotal: 0
+      }
     });
   } catch (error) {
+    console.error('Error clearCart:', error);
     return res.status(500).json({
       success: false,
-      message: 'Gagal mengosongkan keranjang.'
+      message: 'Gagal mengosongkan keranjang belanja.'
     });
   }
 };
-

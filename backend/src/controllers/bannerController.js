@@ -1,140 +1,51 @@
-const { Banner } = require('../models');
-const storage = require('../models/storage');
-
-const defaultBanners = {
-  left: {
-    badge: '✨ PASARIN PILIH LOKAL',
-    title: 'Kreasi Unggulan & Inovasi Nusantara',
-    subtitle: 'Karya Terbaik Anak Bangsa',
-    pills: [
-      '🏷️ Produk Unik Asli Indonesia',
-      '⚡ Inovasi Lokal Rasa Global',
-      '⭐ Kualitas Unggulan Nusantara'
-    ],
-    modelImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=320&auto=format&fit=crop&q=80',
-    bgGradient: 'linear-gradient(135deg, #1d3f0d 0%, #285715 100%)',
-    targetUrl: '#/search?category=Pilih+Lokal'
-  },
-  right: {
-    title: 'Spesial Diskon & Voucher',
-    modelImage1: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=240&auto=format&fit=crop&q=80',
-    modelImage2: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=240&auto=format&fit=crop&q=80',
-    pill1Title: 'DISKON S.D.',
-    pill1Val: '80%',
-    pill2Title: 'VOUCHER',
-    pill2Val: '100RB',
-    bgGradient: 'linear-gradient(135deg, #3b0764 0%, #581c87 50%, #4c1d95 100%)',
-    targetUrl: '#/search?q=promo'
-  }
-};
+const bannerModel = require('../models/bannerModel');
 
 exports.getBanners = async (req, res) => {
   try {
-    let bannerData = null;
-    try {
-      const bannerRecord = await Banner.findByPk('main_banner');
-      if (bannerRecord && bannerRecord.configJson) {
-        bannerData = bannerRecord.configJson;
-      }
-    } catch (e) {
-      console.warn('Sequelize banner read error, falling back to storage:', e.message);
-    }
-
-    if (!bannerData) {
-      const db = storage.read();
-      bannerData = db.banners || defaultBanners;
-    }
-
+    const banners = await bannerModel.getBanner();
     return res.json({
       success: true,
-      data: bannerData
+      data: banners
     });
   } catch (error) {
     console.error('Error getBanners:', error);
     return res.status(500).json({
       success: false,
-      message: 'Gagal mengambil data banner.'
+      message: 'Gagal mengambil data banner dari database.'
     });
   }
 };
 
 exports.updateBanners = async (req, res) => {
   try {
-    let current = null;
-    try {
-      const bannerRecord = await Banner.findByPk('main_banner');
-      if (bannerRecord && bannerRecord.configJson) {
-        current = bannerRecord.configJson;
-      }
-    } catch (e) {}
-
-    if (!current) {
-      const db = storage.read();
-      current = db.banners || defaultBanners;
-    }
-
-    const updated = {
-      left: {
-        ...(current.left || defaultBanners.left),
-        ...(req.body.left || {})
-      },
-      right: {
-        ...(current.right || defaultBanners.right),
-        ...(req.body.right || {})
-      }
-    };
-
-    try {
-      const [record] = await Banner.upsert({
-        id: 'main_banner',
-        configJson: updated
-      });
-    } catch (e) {
-      console.warn('Sequelize banner upsert warning:', e.message);
-    }
-
-    // Mirror ke storage JSON
-    const db = storage.read();
-    db.banners = updated;
-    storage.write(db);
-
+    const updated = await bannerModel.updateBanner(req.body);
     return res.json({
       success: true,
-      message: 'Pengaturan hero banner berhasil disimpan!',
+      message: 'Konfigurasi banner berhasil diperbarui di database!',
       data: updated
     });
   } catch (error) {
     console.error('Error updateBanners:', error);
     return res.status(500).json({
       success: false,
-      message: 'Gagal memperbarui pengaturan banner.'
+      message: 'Gagal memperbarui konfigurasi banner di database.'
     });
   }
 };
 
 exports.resetBanners = async (req, res) => {
   try {
-    try {
-      await Banner.upsert({
-        id: 'main_banner',
-        configJson: defaultBanners
-      });
-    } catch (e) {}
-
-    const db = storage.read();
-    db.banners = defaultBanners;
-    storage.write(db);
-
+    const reset = await bannerModel.updateBanner({});
     return res.json({
       success: true,
-      message: 'Hero banner berhasil dikembalikan ke pengaturan default!',
-      data: defaultBanners
+      message: 'Banner berhasil direset ke pengaturan default 168 Parts!',
+      data: reset
     });
   } catch (error) {
     console.error('Error resetBanners:', error);
     return res.status(500).json({
       success: false,
-      message: 'Gagal mereset pengaturan banner.'
+      message: 'Gagal mereset konfigurasi banner.'
     });
   }
 };

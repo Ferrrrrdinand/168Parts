@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const config = require('./config/config');
 const dbManager = require('./config/database');
+const userModel = require('./models/userModel');
 
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
@@ -76,10 +77,11 @@ app.use((req, res, next) => {
 const PORT = config.port;
 app.listen(PORT, async () => {
   console.log('====================================================');
-  console.log(`🚀 Pasarin Backend Server berjalan di port ${PORT}`);
+  console.log(`🚀 168 Parts Backend Server berjalan di port ${PORT}`);
   console.log(`🌐 Website Frontend: http://localhost:${PORT}`);
   console.log(`🔐 Halaman Login:    http://localhost:${PORT}/login.html`);
   console.log(`📡 API Base URL:     http://localhost:${PORT}/api`);
   console.log('====================================================');
   await dbManager.init();
+  await userModel.ensureDefaultUsers();
 });

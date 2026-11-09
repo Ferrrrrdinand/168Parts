@@ -3063,13 +3063,13 @@ const PasarinSearchHistory = {
   STORAGE_KEY: 'pasarin_frequent_searches',
 
   DEFAULT_SUGGESTIONS: [
-    { term: 'Sepatu Pria', count: 16 },
-    { term: 'Tas Ransel', count: 12 },
-    { term: 'Kaos Polos', count: 10 },
-    { term: 'Jaket Hoodie', count: 8 },
-    { term: 'Kemeja Casual', count: 7 },
-    { term: 'Headphone Bluetooth', count: 6 },
-    { term: 'Jam Tangan Pria', count: 5 }
+    { term: 'LCD iPhone 11', count: 28 },
+    { term: 'Baterai Original', count: 24 },
+    { term: 'Lem LANRUI I9', count: 20 },
+    { term: 'IC Power & Charger', count: 18 },
+    { term: 'Solder & Blower', count: 15 },
+    { term: 'Backdoor Glass', count: 12 },
+    { term: 'Multitester Digital', count: 10 }
   ],
 
   init() {

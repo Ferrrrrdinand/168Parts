@@ -1,5 +1,6 @@
-const { Order } = require('../models');
-const storage = require('../models/storage');
+const orderModel = require('../models/orderModel');
+const cartModel = require('../models/cartModel');
+const userModel = require('../models/userModel');
 
 exports.checkout = async (req, res) => {
   try {
@@ -7,7 +8,9 @@ exports.checkout = async (req, res) => {
     const {
       shippingAddress,
       paymentMethod = 'GoPay',
-      notes = ''
+      notes = '',
+      promoCode = null,
+      discountAmount = 0
     } = req.body;
 
     if (!shippingAddress || !shippingAddress.trim()) {
@@ -17,37 +20,30 @@ exports.checkout = async (req, res) => {
       });
     }
 
-    const db = storage.read();
-    const userCart = db.carts[userId] || [];
-
-    if (userCart.length === 0) {
+    const cartItems = await cartModel.getCart(userId);
+    if (!cartItems || cartItems.length === 0) {
       return res.status(400).json({
         success: false,
         message: 'Keranjang belanja Anda masih kosong.'
       });
     }
 
-    const items = userCart.map(it => {
-      const p = db.products.find(x => x.id === it.productId);
-      return {
-        id: p ? p.id : it.productId,
-        name: p ? p.name : 'Produk',
-        price: p ? p.price : 0,
-        quantity: it.quantity,
-        icon: p ? p.icon : 'bag',
-        itemTotal: (p ? p.price : 0) * it.quantity
-      };
-    });
+    const items = cartItems.map(it => ({
+      id: it.productId,
+      name: it.name,
+      price: it.price,
+      quantity: it.quantity,
+      icon: it.icon || 'bag',
+      image: it.image || null,
+      itemTotal: it.itemTotal
+    }));
 
-    const totalAmount = items.reduce((sum, it) => sum + it.itemTotal, 0);
+    const subtotal = items.reduce((sum, it) => sum + it.itemTotal, 0);
+    const disc = Number(discountAmount || 0);
+    const totalAmount = Math.max(0, subtotal - disc);
     const earnedPoints = Math.floor(totalAmount / 1000);
 
-    const dbUser = db.users.find(u => u.id === userId);
-    if (dbUser) {
-      dbUser.points = (dbUser.points || 0) + earnedPoints;
-    }
-
-    const newOrder = {
+    const newOrder = await orderModel.create({
       id: 'ORD-' + Date.now().toString(36).toUpperCase(),
       userId,
       items,
@@ -55,47 +51,31 @@ exports.checkout = async (req, res) => {
       paymentMethod,
       notes: notes.trim(),
       totalAmount,
+      subtotal,
+      promoCode,
+      discountAmount: disc,
       earnedPoints,
-      status: 'Sedang Diproses',
-      createdAt: new Date().toISOString()
-    };
+      status: 'Sedang Diproses'
+    });
 
-    try {
-      await Order.create({
-        id: newOrder.id,
-        userId: newOrder.userId,
-        items: newOrder.items,
-        shippingAddress: newOrder.shippingAddress,
-        paymentMethod: newOrder.paymentMethod,
-        notes: newOrder.notes,
-        totalAmount: newOrder.totalAmount,
-        status: newOrder.status
-      });
-    } catch (e) {
-      console.warn('Sequelize Order create warning:', e.message);
-    }
+    // Update poin user di Supabase
+    const userPoints = await userModel.addPoints(userId, earnedPoints);
 
-    if (!db.orders) {
-      db.orders = [];
-    }
-    db.orders.unshift(newOrder);
-
-    // Kosongkan keranjang setelah checkout sukses
-    db.carts[userId] = [];
-    storage.write(db);
+    // Bersihkan keranjang belanja di database
+    await cartModel.clearCart(userId);
 
     return res.status(201).json({
       success: true,
-      message: 'Pesanan berhasil dibuat! Terima kasih telah berbelanja di Pasarin.',
+      message: 'Pesanan berhasil dibuat! Terima kasih telah berbelanja di 168 Parts Surabaya.',
       order: newOrder,
       earnedPoints,
-      userPoints: dbUser ? dbUser.points : earnedPoints
+      userPoints
     });
   } catch (error) {
     console.error('Error checkout:', error);
     return res.status(500).json({
       success: false,
-      message: 'Gagal memproses checkout pesanan.'
+      message: 'Gagal memproses checkout pesanan ke database.'
     });
   }
 };
@@ -103,59 +83,34 @@ exports.checkout = async (req, res) => {
 exports.getMyOrders = async (req, res) => {
   try {
     const userId = req.user.id;
-    let orders = [];
-    try {
-      const records = await Order.findAll({
-        where: { userId },
-        order: [['createdAt', 'DESC']]
-      });
-      if (records && records.length > 0) {
-        orders = records.map(r => r.toJSON());
-      }
-    } catch (e) {}
-
-    if (orders.length === 0) {
-      const db = storage.read();
-      orders = (db.orders || []).filter(o => o.userId === userId);
-    }
-
+    const orders = await orderModel.findByUserId(userId);
     return res.json({
       success: true,
+      total: orders.length,
       data: orders
     });
   } catch (error) {
+    console.error('Error getMyOrders:', error);
     return res.status(500).json({
       success: false,
-      message: 'Gagal mengambil riwayat pesanan.'
+      message: 'Gagal mengambil riwayat pesanan dari database.'
     });
   }
 };
 
 exports.getAllOrders = async (req, res) => {
   try {
-    let orders = [];
-    try {
-      const records = await Order.findAll({
-        order: [['createdAt', 'DESC']]
-      });
-      if (records && records.length > 0) {
-        orders = records.map(r => r.toJSON());
-      }
-    } catch (e) {}
-
-    if (orders.length === 0) {
-      const db = storage.read();
-      orders = db.orders || [];
-    }
-
+    const orders = await orderModel.findAll();
     return res.json({
       success: true,
+      total: orders.length,
       data: orders
     });
   } catch (error) {
+    console.error('Error getAllOrders:', error);
     return res.status(500).json({
       success: false,
-      message: 'Gagal mengambil data semua pesanan.'
+      message: 'Gagal mengambil data seluruh pesanan dari database.'
     });
   }
 };
@@ -165,23 +120,31 @@ exports.updateOrderStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    try {
-      const record = await Order.findByPk(id);
-      if (record) {
-        await record.update({ status: status || record.status });
-      }
-    } catch (e) {}
-
-    const db = storage.read();
-    const order = (db.orders || []).find(o => o.id === id);
-    if (!order) {
-      return res.status(404).json({ success: false, message: 'Pesanan tidak ditemukan' });
+    if (!status) {
+      return res.status(400).json({
+        success: false,
+        message: 'Status pesanan wajib disertakan.'
+      });
     }
-    order.status = status || order.status;
-    storage.write(db);
 
-    return res.json({ success: true, message: 'Status pesanan berhasil diperbarui', order });
+    const updated = await orderModel.updateStatus(id, status);
+    if (!updated) {
+      return res.status(404).json({
+        success: false,
+        message: 'Pesanan tidak ditemukan di database.'
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: 'Status pesanan berhasil diperbarui di database.',
+      order: updated
+    });
   } catch (error) {
-    return res.status(500).json({ success: false, message: 'Gagal memperbarui status pesanan' });
+    console.error('Error updateOrderStatus:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memperbarui status pesanan.'
+    });
   }
 };

@@ -29,8 +29,7 @@ fs
       file.slice(-3) === '.js' &&
       file.indexOf('.test.js') === -1 &&
       file !== 'storage.js' &&
-      file !== 'productModel.js' &&
-      file !== 'promoModel.js'
+      !file.endsWith('Model.js')
     );
   })
   .forEach(file => {

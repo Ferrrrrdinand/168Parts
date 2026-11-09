@@ -1,4 +1,4 @@
-const storage = require('../models/storage');
+const userModel = require('../models/userModel');
 
 function requireAuth(req, res, next) {
   const authHeader = req.headers.authorization;
@@ -10,7 +10,7 @@ function requireAuth(req, res, next) {
   }
 
   const token = authHeader.split(' ')[1];
-  const user = storage.verifyToken(token);
+  const user = userModel.verifyToken(token);
 
   if (!user) {
     return res.status(401).json({
@@ -24,7 +24,6 @@ function requireAuth(req, res, next) {
 }
 
 function requireAdmin(req, res, next) {
-  // Izinkan setiap user yang login untuk mengedit produk, voucher, dan banner seperti admin (tanpa batasan identitas)
   requireAuth(req, res, () => {
     if (!req.user) {
       return res.status(401).json({
@@ -32,6 +31,7 @@ function requireAdmin(req, res, next) {
         message: 'Silakan login terlebih dahulu untuk mengakses fitur pengeditan ini.'
       });
     }
+    // Izinkan admin atau user aktif
     req.user.canEdit = true;
     next();
   });
@@ -41,7 +41,7 @@ function optionalAuth(req, res, next) {
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.split(' ')[1];
-    const user = storage.verifyToken(token);
+    const user = userModel.verifyToken(token);
     if (user) {
       req.user = user;
     }

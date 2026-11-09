@@ -1,5 +1,4 @@
-const { User } = require('../models');
-const storage = require('../models/storage');
+const userModel = require('../models/userModel');
 
 exports.register = async (req, res) => {
   try {
@@ -21,17 +20,8 @@ exports.register = async (req, res) => {
 
     const emailNorm = email.trim().toLowerCase();
 
-    // Proteksi: Hanya ada 1 akun administrator tunggal di sistem (admin@pasarin.com)
-    if (emailNorm === 'admin@pasarin.com' || emailNorm.startsWith('admin@')) {
-      return res.status(403).json({
-        success: false,
-        message: 'Akses ditolak: Akun administrator bersifat privat & tunggal (admin@pasarin.com). Pendaftaran akun admin baru tidak diperbolehkan.'
-      });
-    }
-
-    const db = storage.read();
-
-    const existingUser = db.users.find(u => u.email.toLowerCase() === emailNorm);
+    // Cek apakah email sudah terdaftar di database
+    const existingUser = await userModel.findByEmail(emailNorm);
     if (existingUser) {
       return res.status(409).json({
         success: false,
@@ -39,43 +29,25 @@ exports.register = async (req, res) => {
       });
     }
 
-    const { salt, hash } = storage.hashPassword(password);
-    const newUser = {
+    const coordinates = (latitude && longitude) ? { lat: Number(latitude), lng: Number(longitude) } : null;
+
+    const newUser = await userModel.create({
       id: 'user-' + Date.now(),
       name: name.trim(),
       email: emailNorm,
       phone: (phone || '').trim(),
       address: (address || '').trim(),
-      coordinates: (latitude && longitude) ? { lat: Number(latitude), lng: Number(longitude) } : null,
-      role: 'buyer', // Selalu buyer, akun admin tunggal tidak bisa digandakan
+      coordinates,
+      role: 'buyer',
       points: 0,
-      salt,
-      hash,
-      createdAt: new Date().toISOString()
-    };
+      password
+    });
 
-    db.users.push(newUser);
-    storage.write(db);
-
-    try {
-      await User.create({
-        id: newUser.id,
-        name: newUser.name,
-        email: newUser.email,
-        phone: newUser.phone,
-        role: newUser.role,
-        salt: newUser.salt,
-        hash: newUser.hash
-      });
-    } catch (e) {
-      console.warn('Sequelize User create warning:', e.message);
-    }
-
-    const token = storage.generateToken(newUser);
+    const token = userModel.generateToken(newUser);
 
     return res.status(201).json({
       success: true,
-      message: 'Registrasi berhasil! Selamat datang di Pasarin.',
+      message: 'Registrasi berhasil! Selamat datang di 168 Parts Surabaya.',
       token,
       user: {
         id: newUser.id,
@@ -84,7 +56,8 @@ exports.register = async (req, res) => {
         phone: newUser.phone,
         address: newUser.address,
         coordinates: newUser.coordinates,
-        role: newUser.role
+        role: newUser.role,
+        points: newUser.points || 0
       }
     });
   } catch (error) {
@@ -96,7 +69,7 @@ exports.register = async (req, res) => {
   }
 };
 
-exports.login = (req, res) => {
+exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -108,9 +81,9 @@ exports.login = (req, res) => {
     }
 
     const emailNorm = email.trim().toLowerCase();
-    const db = storage.read();
 
-    const user = db.users.find(u => u.email.toLowerCase() === emailNorm);
+    // Query user dari Database Supabase Cloud
+    const user = await userModel.findByEmail(emailNorm);
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -118,7 +91,7 @@ exports.login = (req, res) => {
       });
     }
 
-    const isMatch = storage.verifyPassword(password, user.salt, user.hash);
+    const isMatch = userModel.verifyPassword(password, user.salt, user.hash);
     if (!isMatch) {
       return res.status(401).json({
         success: false,
@@ -126,7 +99,7 @@ exports.login = (req, res) => {
       });
     }
 
-    const token = storage.generateToken(user);
+    const token = userModel.generateToken(user);
 
     return res.json({
       success: true,
@@ -137,6 +110,7 @@ exports.login = (req, res) => {
         name: user.name,
         email: user.email,
         phone: user.phone || '',
+        address: user.address || '',
         role: user.role,
         points: user.points || 0
       }
@@ -150,14 +124,13 @@ exports.login = (req, res) => {
   }
 };
 
-exports.getMe = (req, res) => {
+exports.getMe = async (req, res) => {
   try {
-    const db = storage.read();
-    const user = db.users.find(u => u.id === req.user.id);
+    const user = await userModel.findById(req.user.id);
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'Pengguna tidak ditemukan.'
+        message: 'Pengguna tidak ditemukan di database.'
       });
     }
 
@@ -166,13 +139,9 @@ exports.getMe = (req, res) => {
       user: {
         id: user.id,
         name: user.name,
-        username: user.username || (user.email ? user.email.split('@')[0] : 'user') + (user.id.slice(-4)),
+        username: (user.email ? user.email.split('@')[0] : 'user') + (user.id.slice(-4)),
         email: user.email,
         phone: user.phone || '',
-        shopName: user.shopName || (user.name ? user.name + ' Store' : '168Parts Official'),
-        gender: user.gender || 'Lainnya',
-        birthDate: user.birthDate || '',
-        avatar: user.avatar || '',
         address: user.address || '',
         role: user.role || 'buyer',
         points: user.points || 0,
@@ -182,73 +151,52 @@ exports.getMe = (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: 'Gagal mengambil data profil pengguna.'
+      message: 'Gagal mengambil data profil pengguna dari database.'
     });
   }
 };
 
-exports.updateProfile = (req, res) => {
+exports.updateProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    const db = storage.read();
-    const user = db.users.find(u => u.id === userId);
-    if (!user) {
+    const { name, phone, address, coordinates, password } = req.body;
+
+    const updated = await userModel.update(userId, {
+      name,
+      phone,
+      address,
+      coordinates,
+      password
+    });
+
+    if (!updated) {
       return res.status(404).json({
         success: false,
         message: 'Pengguna tidak ditemukan.'
       });
     }
 
-    const {
-      name,
-      username,
-      email,
-      phone,
-      shopName,
-      gender,
-      birthDate,
-      avatar,
-      address
-    } = req.body;
-
-    if (name && name.trim()) user.name = name.trim();
-    if (username !== undefined) user.username = username.trim();
-    if (email && email.trim()) user.email = email.trim().toLowerCase();
-    if (phone !== undefined) user.phone = phone.trim();
-    if (shopName !== undefined) user.shopName = shopName.trim();
-    if (gender !== undefined) user.gender = gender;
-    if (birthDate !== undefined) user.birthDate = birthDate;
-    if (avatar !== undefined) user.avatar = avatar;
-    if (address !== undefined) user.address = address;
-
-    storage.write(db);
-
-    const newToken = storage.generateToken(user);
+    const newToken = userModel.generateToken(updated);
 
     return res.json({
       success: true,
-      message: 'Profil berhasil diperbarui!',
+      message: 'Profil berhasil diperbarui di database!',
       token: newToken,
       user: {
-        id: user.id,
-        name: user.name,
-        username: user.username || (user.email ? user.email.split('@')[0] : 'user'),
-        email: user.email,
-        phone: user.phone || '',
-        shopName: user.shopName || '',
-        gender: user.gender || 'Lainnya',
-        birthDate: user.birthDate || '',
-        avatar: user.avatar || '',
-        address: user.address || '',
-        role: user.role || 'buyer',
-        points: user.points || 0
+        id: updated.id,
+        name: updated.name,
+        email: updated.email,
+        phone: updated.phone || '',
+        address: updated.address || '',
+        role: updated.role,
+        points: updated.points || 0
       }
     });
   } catch (error) {
     console.error('Error updateProfile:', error);
     return res.status(500).json({
       success: false,
-      message: 'Gagal memperbarui profil pengguna.'
+      message: 'Gagal memperbarui profil pengguna di database.'
     });
   }
 };
@@ -259,4 +207,3 @@ exports.logout = (req, res) => {
     message: 'Berhasil keluar (logout).'
   });
 };
-

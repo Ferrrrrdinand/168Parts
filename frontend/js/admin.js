@@ -143,7 +143,7 @@ const AdminApp = {
   fillAdminCredentials() {
     const emailInput = document.getElementById('gate-admin-email');
     const passInput = document.getElementById('gate-admin-password');
-    if (emailInput) emailInput.value = 'admin@pasarin.com';
+    if (emailInput) emailInput.value = 'admin@168parts.com';
     if (passInput) passInput.value = 'admin123';
   },
 
