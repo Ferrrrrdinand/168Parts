@@ -1,8 +1,8 @@
 {
   "name": "marketplace",
   "version": "1.0.0",
-  "description": "",
-  "main": "script.js",
+  "description": "168 Parts - Marketplace & Katalog Resmi Sparepart HP Surabaya",
+  "main": "backend/src/server.js",
   "scripts": {
     "start": "node backend/src/server.js",
     "dev": "node backend/src/server.js",
