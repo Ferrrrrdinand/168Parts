@@ -185,6 +185,14 @@ class UserModel {
     return newPoints;
   }
 
+  async deductPoints(id, spentPoints) {
+    const user = await this.findById(id);
+    if (!user) return 0;
+    const newPoints = Math.max(0, (user.points || 0) - spentPoints);
+    await dbManager.query('UPDATE users SET points = ?, updated_at = NOW() WHERE id = ?', [newPoints, id]);
+    return newPoints;
+  }
+
   async ensureDefaultUsers() {
     try {
       // 1. Admin 168 Parts

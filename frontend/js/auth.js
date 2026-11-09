@@ -39,6 +39,13 @@ const PasarinPoints = {
     return this.setPoints(newTotal);
   },
 
+  deductPoints(amount) {
+    const current = this.getPoints();
+    const cleanAmount = Math.max(0, Math.floor(amount || 0));
+    const newTotal = Math.max(0, current - cleanAmount);
+    return this.setPoints(newTotal);
+  },
+
   calculatePoints(amount) {
     // 1 Poin per setiap kelipatan Rp 1.000 transaksi
     return Math.floor((amount || 0) / 1000);

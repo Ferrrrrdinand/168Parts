@@ -20,6 +20,7 @@ class OrderModel {
       notes: row.notes || '',
       totalAmount: Number(row.total_amount || 0),
       earnedPoints: Number(row.earned_points || 0),
+      redeemedPoints: Number(row.redeemed_points || 0),
       status: row.status || 'Sedang Diproses',
       subtotal: Number(row.subtotal || row.total_amount || 0),
       promoCode: row.promo_code || null,
@@ -38,6 +39,7 @@ class OrderModel {
     const notes = data.notes || '';
     const totalAmount = Number(data.totalAmount || 0);
     const earnedPoints = Number(data.earnedPoints || Math.floor(totalAmount / 1000));
+    const redeemedPoints = Number(data.redeemedPoints || 0);
     const status = data.status || 'Sedang Diproses';
     const subtotal = Number(data.subtotal || totalAmount);
     const promoCode = data.promoCode || null;
@@ -46,14 +48,14 @@ class OrderModel {
     const sql = `
       INSERT INTO orders (
         id, user_id, items, shipping_address, payment_method, notes,
-        total_amount, earned_points, status, subtotal, promo_code, discount_amount,
+        total_amount, earned_points, redeemed_points, status, subtotal, promo_code, discount_amount,
         created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
     `;
 
     await dbManager.query(sql, [
       id, userId, itemsJson, shippingAddress, paymentMethod, notes,
-      totalAmount, earnedPoints, status, subtotal, promoCode, discountAmount
+      totalAmount, earnedPoints, redeemedPoints, status, subtotal, promoCode, discountAmount
     ]);
 
     return await this.findById(id);

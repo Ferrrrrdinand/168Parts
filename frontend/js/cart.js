@@ -5,6 +5,8 @@
 const PasarinCart = {
   items: [],
   appliedVoucher: null,
+  useCoins: false,
+  redeemedCoins: 0,
   totalQuantity: 0,
   subtotal: 0,
 
@@ -12,6 +14,11 @@ const PasarinCart = {
     this.createCartDrawerDOM();
     this.loadCart();
     this.bindCartTriggers();
+  },
+
+  toggleUseCoins(checked) {
+    this.useCoins = !!checked;
+    this.renderCheckoutPage();
   },
 
   formatRupiah(num) {
@@ -810,7 +817,20 @@ const PasarinCart = {
       }
     }
 
-    const totalPembayaran = Math.max(0, subtotalPesanan + proteksiProduk + subtotalPengiriman + biayaLayanan + voucherDiskon);
+    // 6. Penukaran Koin 168 Parts (1 Poin = Rp1 Tukar Saat Checkout)
+    const userPoints = window.PasarinPoints ? window.PasarinPoints.getPoints() : 0;
+    const tagihanSebelumKoin = Math.max(0, subtotalPesanan + proteksiProduk + subtotalPengiriman + biayaLayanan + voucherDiskon);
+    
+    let coinsToUse = 0;
+    if (this.useCoins && userPoints > 0) {
+      // 1 Poin = Rp1, maksimal sebesar sisa tagihan sebelum koin
+      coinsToUse = Math.min(userPoints, tagihanSebelumKoin);
+    }
+    this.redeemedCoins = coinsToUse;
+    const koinDiskon = -coinsToUse;
+
+    // 7. Total Pembayaran Akhir Riil
+    const totalPembayaran = Math.max(0, tagihanSebelumKoin + koinDiskon);
 
     const elSubtotal = document.getElementById('chk-calc-subtotal');
     const elProteksi = document.getElementById('chk-calc-proteksi');
@@ -818,12 +838,15 @@ const PasarinCart = {
     const elLayanan = document.getElementById('chk-calc-layanan');
     const elDiskonProd = document.getElementById('chk-calc-diskon-produk');
     const elVoucherDiskon = document.getElementById('chk-calc-voucher-diskon');
+    const elCoinsRow = document.getElementById('chk-calc-coins-row');
+    const elCoinsRedeemed = document.getElementById('chk-calc-coins-redeemed');
     const elEarnedPoints = document.getElementById('chk-calc-earned-points');
     const elCoinBalance = document.getElementById('chk-coin-balance-display');
+    const elCoinDiscountVal = document.getElementById('chk-coin-discount-val');
+    const elCoinToggle = document.getElementById('chk-use-coins-toggle');
     const elTotal = document.getElementById('chk-calc-total-bayar');
 
     const earnedPoints = window.PasarinPoints ? window.PasarinPoints.calculatePoints(totalPembayaran) : Math.floor(totalPembayaran / 1000);
-    const userPoints = window.PasarinPoints ? window.PasarinPoints.getPoints() : 0;
 
     if (elSubtotal) elSubtotal.textContent = this.formatRupiah(subtotalPesanan);
     if (elProteksi) elProteksi.textContent = this.formatRupiah(proteksiProduk);
@@ -833,6 +856,32 @@ const PasarinCart = {
     if (elVoucherDiskon) elVoucherDiskon.textContent = voucherDiskon < 0 ? '-' + this.formatRupiah(Math.abs(voucherDiskon)) : 'Rp0';
     if (elEarnedPoints) elEarnedPoints.textContent = `+${earnedPoints.toLocaleString('id-ID')} Poin`;
     if (elCoinBalance) elCoinBalance.textContent = userPoints.toLocaleString('id-ID');
+
+    // Update status toggle & nilai diskon koin 168 Parts
+    if (elCoinToggle) {
+      if (userPoints <= 0) {
+        elCoinToggle.disabled = true;
+        elCoinToggle.checked = false;
+        this.useCoins = false;
+      } else {
+        elCoinToggle.disabled = false;
+        elCoinToggle.checked = this.useCoins;
+      }
+    }
+    if (elCoinDiscountVal) {
+      elCoinDiscountVal.textContent = (this.useCoins && coinsToUse > 0)
+        ? `[-${this.formatRupiah(coinsToUse)}]`
+        : `[-Rp0]`;
+      elCoinDiscountVal.style.color = (this.useCoins && coinsToUse > 0) ? '#be123c' : '#94a3b8';
+      elCoinDiscountVal.style.fontWeight = (this.useCoins && coinsToUse > 0) ? '700' : 'normal';
+    }
+    if (elCoinsRow) {
+      elCoinsRow.style.display = (this.useCoins && coinsToUse > 0) ? 'flex' : 'none';
+    }
+    if (elCoinsRedeemed) {
+      elCoinsRedeemed.textContent = `-${this.formatRupiah(coinsToUse)}`;
+    }
+
     if (elTotal) elTotal.textContent = this.formatRupiah(totalPembayaran);
 
     // Update Banner / Tag Voucher Terpasang di Checkout Row
@@ -858,6 +907,8 @@ const PasarinCart = {
       biayaLayanan,
       diskonProduk,
       voucherDiskon,
+      koinDiskon,
+      redeemedCoins: coinsToUse,
       totalPembayaran,
       earnedPoints,
       items: activeItems
@@ -931,17 +982,20 @@ const PasarinCart = {
       btn.textContent = 'Memproses Pesanan...';
     }
 
-    const data = this.currentCheckoutData || { totalPembayaran: 0, subtotalPesanan: 0, voucherDiskon: 0 };
+    const data = this.currentCheckoutData || { totalPembayaran: 0, subtotalPesanan: 0, voucherDiskon: 0, redeemedCoins: 0 };
     const activeAddr = window.PasarinAddressBook ? window.PasarinAddressBook.getActiveAddress() : null;
     const recipient = document.getElementById('chk-display-recipient')?.textContent || 'Ferdinand';
     const address = document.getElementById('chk-display-address')?.textContent || 'Jakarta Barat';
     const fullShippingInfo = activeAddr ? `${activeAddr.name} (${activeAddr.phone}) - ${activeAddr.address}` : `${recipient} - ${address}`;
 
+    const pointsToRedeem = this.useCoins ? (data.redeemedCoins || 0) : 0;
+
     const res = await PasarinAPI.checkout({
       shippingAddress: fullShippingInfo,
       paymentMethod: this.selectedPaymentMethod || 'Debit Instan',
       promoCode: this.appliedVoucher ? this.appliedVoucher.code : null,
-      discountAmount: Math.abs(data.voucherDiskon || 0)
+      discountAmount: Math.abs(data.voucherDiskon || 0),
+      redeemedPoints: pointsToRedeem
     });
 
     if (btn) {
@@ -949,9 +1003,19 @@ const PasarinCart = {
       btn.textContent = 'Buat Pesanan';
     }
 
-    // Hitung poin yang didapatkan: 1 poin tiap Rp 1.000 dari total pembayaran
+    // 1. Kurangi poin yang ditukarkan untuk pembayaran (1 Poin = Rp1)
+    if (pointsToRedeem > 0 && window.PasarinPoints) {
+      window.PasarinPoints.deductPoints(pointsToRedeem);
+    }
+
+    // 2. Hitung poin yang didapatkan dari sisa pembayaran tunai: 1 poin tiap Rp 1.000
     const earnedPoints = window.PasarinPoints ? window.PasarinPoints.calculatePoints(data.totalPembayaran) : Math.floor(data.totalPembayaran / 1000);
     const newTotalPoints = window.PasarinPoints ? window.PasarinPoints.addPoints(earnedPoints) : earnedPoints;
+
+    // Reset pilihan koin setelah checkout sukses
+    const usedCoins = pointsToRedeem;
+    this.useCoins = false;
+    this.redeemedCoins = 0;
 
     // Buang item yang dibeli dari keranjang
     const activeItems = this.items.filter(x => x.selected);
@@ -961,12 +1025,16 @@ const PasarinCart = {
     this.updateCartBadge();
 
     if (window.showToast) {
-      window.showToast(`Pesanan berhasil! Selamat, Anda mendapatkan +${earnedPoints} Poin Belanja!`, 'success');
+      const msg = usedCoins > 0 
+        ? `Pesanan berhasil! Menukarkan ${usedCoins.toLocaleString('id-ID')} Poin (Rp${usedCoins.toLocaleString('id-ID')}) & mendapatkan +${earnedPoints} Poin baru!`
+        : `Pesanan berhasil! Selamat, Anda mendapatkan +${earnedPoints} Poin Belanja!`;
+      window.showToast(msg, 'success');
     }
 
     this.showOrderSuccessDialog({
       id: res && res.order ? res.order.id : ('ORD-' + Math.floor(100000 + Math.random() * 900000)),
       totalAmount: data.totalPembayaran,
+      redeemedPoints: usedCoins,
       earnedPoints,
       newTotalPoints
     });
@@ -1359,6 +1427,12 @@ const PasarinCart = {
             <span style="color: #64748b;">No. Pesanan:</span>
             <strong style="font-family: monospace; color: #0f172a;">${order.id}</strong>
           </div>
+          ${order.redeemedPoints > 0 ? `
+          <div style="display: flex; justify-content: space-between; color: #be123c;">
+            <span>Potongan Koin 168 (1 Poin = Rp1):</span>
+            <strong>-${this.formatRupiah(order.redeemedPoints)} (${order.redeemedPoints.toLocaleString('id-ID')} Poin)</strong>
+          </div>
+          ` : ''}
           <div style="display: flex; justify-content: space-between;">
             <span style="color: #64748b;">Total Tagihan:</span>
             <strong style="color: var(--primary); font-size: 15px;">${this.formatRupiah(order.totalAmount)}</strong>

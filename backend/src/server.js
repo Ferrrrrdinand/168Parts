@@ -31,16 +31,16 @@ app.use((req, res, next) => {
   next();
 });
 
-// API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/cart', cartRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/promos', promoRoutes);
-app.use('/api/banners', bannerRoutes);
+// API Routes - Dukung baik prefix /api maupun langsung (untuk kompatibilitas Vercel Serverless Function & Standalone)
+app.use(['/api/auth', '/auth'], authRoutes);
+app.use(['/api/products', '/products'], productRoutes);
+app.use(['/api/cart', '/cart'], cartRoutes);
+app.use(['/api/orders', '/orders'], orderRoutes);
+app.use(['/api/promos', '/promos'], promoRoutes);
+app.use(['/api/banners', '/banners'], bannerRoutes);
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+app.get(['/api/health', '/health'], (req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
@@ -64,10 +64,14 @@ app.use(express.static(legacyFrontendPath));
 
 // Fallback router untuk SPA & Static HTML
 app.use((req, res, next) => {
-  if (req.originalUrl.startsWith('/api')) {
-    return next();
+  const url = req.originalUrl || req.url || '';
+  if (url.startsWith('/api') || url.startsWith('/auth') || url.startsWith('/products') || url.startsWith('/cart') || url.startsWith('/orders') || url.startsWith('/promos') || url.startsWith('/banners')) {
+    return res.status(404).json({
+      success: false,
+      message: `Endpoint API ${req.method} ${url} tidak ditemukan.`
+    });
   }
-  if (req.originalUrl.startsWith('/react') && fs.existsSync(reactDistPath)) {
+  if (url.startsWith('/react') && fs.existsSync(reactDistPath)) {
     return res.sendFile(path.join(reactDistPath, 'index.html'));
   }
   res.sendFile(path.join(legacyFrontendPath, 'index.html'));

@@ -11,7 +11,8 @@ exports.checkout = async (req, res) => {
       paymentMethod = 'GoPay',
       notes = '',
       promoCode = null,
-      discountAmount = 0
+      discountAmount = 0,
+      redeemedPoints = 0
     } = req.body;
 
     if (!shippingAddress || !shippingAddress.trim()) {
@@ -41,7 +42,19 @@ exports.checkout = async (req, res) => {
 
     const subtotal = items.reduce((sum, it) => sum + it.itemTotal, 0);
     const disc = Number(discountAmount || 0);
-    const totalAmount = Math.max(0, subtotal - disc);
+
+    // Ambil saldo poin user saat ini dari Supabase
+    const currentUser = await userModel.findById(userId);
+    const currentBalance = currentUser ? Number(currentUser.points || 0) : 0;
+
+    // 1 Poin = Rp1. Maksimal poin yang bisa ditukar tidak melebihi sisa tagihan (subtotal - disc) dan saldo user
+    const requestedPoints = Math.max(0, parseInt(redeemedPoints, 10) || 0);
+    const billBeforePoints = Math.max(0, subtotal - disc);
+    const pointsToUse = Math.min(requestedPoints, currentBalance, billBeforePoints);
+
+    // Total bayar akhir setelah potongan voucher dan koin/poin
+    const totalAmount = Math.max(0, billBeforePoints - pointsToUse);
+    // Dapatkan poin baru dari nilai rupiah yang dibayarkan (1 Poin tiap Rp1.000)
     const earnedPoints = Math.floor(totalAmount / 1000);
 
     const newOrder = await orderModel.create({
@@ -55,12 +68,24 @@ exports.checkout = async (req, res) => {
       subtotal,
       promoCode,
       discountAmount: disc,
+      redeemedPoints: pointsToUse,
       earnedPoints,
       status: 'Sedang Diproses'
     });
 
-    // Update poin user di Supabase
-    const userPoints = await userModel.addPoints(userId, earnedPoints);
+    // 1. Kurangi poin jika ada penukaran poin saat checkout (1 Poin = Rp1)
+    if (pointsToUse > 0) {
+      await userModel.deductPoints(userId, pointsToUse);
+    }
+
+    // 2. Tambahkan poin baru yang diperoleh dari transaksi belanja (1 Poin / Rp1.000)
+    let finalUserPoints = currentBalance - pointsToUse;
+    if (earnedPoints > 0) {
+      finalUserPoints = await userModel.addPoints(userId, earnedPoints);
+    } else {
+      const updatedUser = await userModel.findById(userId);
+      finalUserPoints = updatedUser ? Number(updatedUser.points || 0) : finalUserPoints;
+    }
 
     // Jika pesanan memakai voucher promo, tandai 1 voucher terpakai
     if (promoCode) {
@@ -74,8 +99,9 @@ exports.checkout = async (req, res) => {
       success: true,
       message: 'Pesanan berhasil dibuat! Terima kasih telah berbelanja di 168 Parts Surabaya.',
       order: newOrder,
+      redeemedPoints: pointsToUse,
       earnedPoints,
-      userPoints
+      userPoints: finalUserPoints
     });
   } catch (error) {
     console.error('Error checkout:', error);

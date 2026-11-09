@@ -571,16 +571,19 @@
             </div>
           </div>
 
-          <!-- Koin 168 Parts Row -->
-          <div class="shopee-chk-row coin-row">
+          <!-- Koin 168 Parts Row (1 Poin = Rp1 Tukar Saat Checkout) -->
+          <div class="shopee-chk-row coin-row" id="chk-coin-row" style="cursor: pointer;" onclick="const chk = document.getElementById('chk-use-coins-toggle'); if(chk && !chk.disabled) { chk.checked = !chk.checked; PasarinCart.toggleUseCoins(chk.checked); }">
             <div class="chk-row-left">
-              <span class="coin-s-badge" style="background:#be123c; color:#fff;">P</span>
+              <span class="coin-s-badge" style="background:#be123c; color:#fff; font-size:12px; font-weight:900;">🪙</span>
               <span class="chk-label-bold">Koin 168 Parts</span>
-              <span class="coin-note-muted" id="chk-coin-status-note">Saldo: <b id="chk-coin-balance-display">0</b> Poin (1 Poin tiap Rp1.000)</span>
+              <span class="coin-note-muted" id="chk-coin-status-note">Tukarkan Poin (1 Poin = Rp1) • Saldo: <b id="chk-coin-balance-display">0</b></span>
             </div>
-            <div class="chk-row-right">
-              <span class="coin-val-muted">[-Rp0]</span>
-              <span class="chk-box-disabled"></span>
+            <div class="chk-row-right" style="display:flex; align-items:center; gap:10px;">
+              <span class="coin-val-muted" id="chk-coin-discount-val">[-Rp0]</span>
+              <label class="custom-chk-label" style="margin:0; cursor:pointer;" onclick="event.stopPropagation();" title="Tukarkan Koin 168 Parts (1 Poin = Rp1)">
+                <input type="checkbox" id="chk-use-coins-toggle" onchange="PasarinCart.toggleUseCoins(this.checked)">
+                <span class="custom-chk-box"></span>
+              </label>
             </div>
           </div>
         </div>
@@ -632,6 +635,10 @@
               <div class="calc-row">
                 <span class="calc-label">Voucher Diskon</span>
                 <span class="calc-value val-red" id="chk-calc-voucher-diskon">Rp0</span>
+              </div>
+              <div class="calc-row" id="chk-calc-coins-row" style="display:none;">
+                <span class="calc-label">Tukar Koin 168 Parts <span class="badge-point-rule" style="background:#fee2e2; color:#be123c;">(1 Poin = Rp1)</span></span>
+                <span class="calc-value val-red" id="chk-calc-coins-redeemed">-Rp0</span>
               </div>
               <div class="calc-row calc-row-points">
                 <span class="calc-label label-points">
