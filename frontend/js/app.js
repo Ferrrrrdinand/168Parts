@@ -1338,6 +1338,98 @@ const PasarinApp = {
     ];
   },
 
+  renderHomeQuickNav() {
+    const qkEl = document.getElementById('qk');
+    if (!qkEl) return;
+
+    const quickServices = [
+      { icon: "phone", label: "LCD & Layar", color: "#be123c", bg: "#ffe4e6" },
+      { icon: "bolt", label: "Baterai HP", color: "#e11d48", bg: "#fff1f2" },
+      { icon: "cpu", label: "IC & Chipset", color: "#0284c7", bg: "#e0f2fe" },
+      { icon: "tool", label: "Alat Servis", color: "#ea580c", bg: "#fff7ed" },
+      { icon: "flame", label: "Solder Station", color: "#d97706", bg: "#fef3c7" },
+      { icon: "bottle", label: "Lem LCD I9", color: "#16a34a", bg: "#f0fdf4" },
+      { icon: "shield", label: "Backdoor Kaca", color: "#7c3aed", bg: "#f3e8ff" },
+      { icon: "gauge", label: "Tester & Multitester", color: "#0d9488", bg: "#f0fdfa" },
+      { icon: "scissors", label: "Pinset Presisi", color: "#059669", bg: "#ecfdf5" },
+      { icon: "tag", label: "Semua Promo", color: "#be123c", bg: "#ffe4e6" }
+    ];
+
+    qkEl.innerHTML = quickServices.map(item => {
+      const isPromo = item.label === 'Semua Promo';
+      const hrefAttr = isPromo ? 'javascript:void(0)' : `#/search?q=${encodeURIComponent(item.label)}`;
+      const clickAttr = isPromo ? 'onclick="PasarinApp.openPromoModal()"' : '';
+
+      return `
+        <a href="${hrefAttr}" ${clickAttr} class="qk-item">
+          <div class="qk-circle" style="background: ${item.bg}; color: ${item.color};">
+            ${this.renderIcon(item.icon, 'i')}
+          </div>
+          <span class="qk-label">${item.label}</span>
+        </a>
+      `;
+    }).join('');
+  },
+
+  renderHomeCategories() {
+    const catsEl = document.getElementById('cats');
+    if (!catsEl) return;
+
+    catsEl.innerHTML = this.categories.map(c => {
+      const imgHtml = c.image ? `
+        <div class="cat-img-wrap">
+          <img src="${c.image}" alt="${c.name}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="cat-icon-fallback" style="display: none;">
+            ${this.renderIcon(c.icon || 'bag', 'i')}
+          </div>
+        </div>
+      ` : `
+        <div class="cat-img-wrap">
+          <div class="cat-icon-fallback">
+            ${this.renderIcon(c.icon || 'bag', 'i')}
+          </div>
+        </div>
+      `;
+
+      return `
+        <a href="#/search?category=${encodeURIComponent(c.name)}" class="cat-tile" title="${c.name}">
+          ${imgHtml}
+          <div class="cat-name">${c.name}</div>
+        </a>
+      `;
+    }).join('');
+  },
+
+  renderFlashSale(items) {
+    const fsEl = document.getElementById('fs');
+    if (!fsEl) return;
+
+    const list = Array.isArray(items) && items.length > 0 ? items : this.products.filter(p => p.isFlashSale);
+
+    fsEl.innerHTML = list.slice(0, 6).map(p => `
+      <div class="fc" onclick="PasarinApp.openProductDetail('${p.id}')">
+        ${p.discountPercent ? `<span class="fc-discount-tag">-${p.discountPercent}%</span>` : ''}
+        <div class="pic">
+          ${this.renderProductMedia(p, 'i lg')}
+          <button class="btn-quick-cart" onclick="event.stopPropagation(); if(window.PasarinCart) window.PasarinCart.addToCart('${p.id}', 1);" title="Tambah ke Keranjang" aria-label="Tambah ke Keranjang">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="fc-title">${p.name}</div>
+        <div class="pr">${this.formatRupiah(p.price)}</div>
+        ${p.originalPrice ? `<div class="original-pr">${this.formatRupiah(p.originalPrice)}</div>` : ''}
+        <div class="bar" style="--p:${p.flashSaleSold || 80}%">
+          <i></i>
+          <em>${p.flashSaleSold > 90 ? 'Segera Habis' : 'Terjual ' + (p.soldCount || 100)}</em>
+        </div>
+      </div>
+    `).join('');
+  },
+
   renderHomeGrid() {
     const gridEl = document.getElementById('grid');
     if (!gridEl) return;
