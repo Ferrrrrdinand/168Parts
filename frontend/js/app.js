@@ -2162,10 +2162,14 @@ const PasarinApp = {
     }
   },
 
-  /* ---------- MODAL KELOLA PRODUK & PROMO (KANAL PENJUAL) ---------- */
+  /* ---------- KANAL PENJUAL & ADMIN (WAJIB LOGIN) ---------- */
   activeCrudTab: 'products',
 
-  async openProductCrudModal(tab = 'products') {
+  openProductCrudModal(tab = 'products') {
+    window.location.href = 'admin.html' + (tab === 'promos' ? '#promos' : '');
+  },
+
+  async _legacyOpenProductCrudModal(tab = 'products') {
     this.activeCrudTab = tab;
     const modalId = 'product-crud-modal';
     let modal = document.getElementById(modalId);

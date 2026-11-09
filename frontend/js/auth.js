@@ -150,13 +150,9 @@ const PasarinAuth = {
                 <span class="menu-icon">👤</span>
                 <span class="menu-text">Akun Saya (Profil)</span>
               </a>
-              <a href="#" class="user-menu-item" id="btn-nav-crud">
-                <span class="menu-icon">⚙️</span>
-                <span class="menu-text">Kanal Penjual (CRUD Produk)</span>
-              </a>
               <a href="admin.html" class="user-menu-item" id="btn-nav-seller-admin">
-                <span class="menu-icon">👑</span>
-                <span class="menu-text">Seller & Admin Centre</span>
+                <span class="menu-icon">⚙️</span>
+                <span class="menu-text">Kanal Penjual (Admin)</span>
               </a>
               <a href="#/orders" class="user-menu-item" id="btn-nav-orders">
                 <span class="menu-icon">📦</span>

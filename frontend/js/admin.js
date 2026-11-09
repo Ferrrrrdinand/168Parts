@@ -33,12 +33,12 @@ const AdminApp = {
     try {
       const res = await this.authFetch('/auth/me');
       const data = await res.json();
-      if (data && data.success && data.user) {
+      if (data && data.success && data.user && data.user.role === 'admin') {
         this.currentUser = data.user;
         const nameEl = document.getElementById('topbar-admin-name');
-        if (nameEl) nameEl.textContent = data.user.name || 'Admin Seller';
+        if (nameEl) nameEl.textContent = data.user.name || 'Admin 168 Parts';
         const roleEl = document.getElementById('topbar-admin-role');
-        if (roleEl) roleEl.textContent = 'Kanal Penjual & Admin (Full Edit)';
+        if (roleEl) roleEl.textContent = 'Kanal Penjual & Admin (168 Parts)';
         return true;
       }
       return false;
@@ -122,6 +122,10 @@ const AdminApp = {
 
       if (!data.success) {
         throw new Error(data.message || 'Email atau kata sandi admin salah.');
+      }
+
+      if (data.user && data.user.role !== 'admin') {
+        throw new Error('Akses ditolak: Akun ini bukan akun Admin / Penjual 168 Parts.');
       }
 
       // Simpan sesi login admin / seller
