@@ -19,11 +19,14 @@ lerna-debug.log*
 hs_err_*.log
 replay_*.log
 
-# SQLite local database & cache
-backend/data/*.db
-backend/data/*.db-journal
-backend/data/*.sqlite
+# Local database & cache protection
+*.db
+*.db-journal
+*.sqlite
 *.sqlite3
+*.db3
+backend/data/*.db
+backend/data/db.json
 
 # OS files
 .DS_Store
