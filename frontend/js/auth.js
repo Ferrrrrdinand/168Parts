@@ -134,15 +134,18 @@ const PasarinAuth = {
                   <strong>${this.currentUser.name}</strong>
                   <small>${this.currentUser.email}</small>
                 </div>
-                <div class="user-menu-points-box" title="Setiap belanja Rp1.000 mendapatkan 1 Poin checkout">
-                  <div class="points-box-left">
-                    <span class="points-box-icon">🪙</span>
-                    <div class="points-box-info">
-                      <span class="points-box-title">Saldo Poin Belanja</span>
-                      <strong class="points-box-val"><span class="user-points-val">${formattedPoints}</span> Poin</strong>
+                <div class="user-menu-points-box" title="Setiap belanja Rp1.000 mendapatkan 1 Poin checkout" style="margin-top:10px; background:#fef3c7; border:1px solid #fcd34d; border-radius:8px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center;">
+                  <div class="points-box-left" style="display:flex; align-items:center; gap:8px;">
+                    <span class="points-box-icon" style="font-size:20px; line-height:1;">🪙</span>
+                    <div class="points-box-info" style="display:flex; flex-direction:column; text-align:left;">
+                      <span class="points-box-title" style="font-size:10.5px; color:#92400e; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; margin-right:0;">Saldo Poin Belanja</span>
+                      <strong class="points-box-val" style="font-size:14px; font-weight:800; color:#78350f; display:flex; align-items:center; gap:4px; margin-top:2px;">
+                        <span class="user-points-val" style="color:#b45309; font-weight:900; font-size:15px; margin-right:0;">${formattedPoints}</span>
+                        <span style="color:#78350f; font-weight:700; margin-right:0;">Poin</span>
+                      </strong>
                     </div>
                   </div>
-                  <span class="points-box-badge">1 Poin/Rp1rb</span>
+                  <span class="points-box-badge" style="font-size:10.5px; color:#78350f; background:#ffffff; border:1px solid #fde68a; padding:3px 8px; border-radius:6px; font-weight:800; box-shadow:0 1px 2px rgba(0,0,0,0.05); margin-right:0; white-space:nowrap;">1 Poin/Rp1rb</span>
                 </div>
               </div>
               <hr class="user-menu-divider">
