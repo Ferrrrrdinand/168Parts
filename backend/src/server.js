@@ -44,7 +44,7 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    service: 'Pasarin Marketplace Backend API'
+    service: '168 Parts Surabaya Backend API'
   });
 });
 

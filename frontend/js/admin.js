@@ -1,5 +1,5 @@
 /* =========================================================
-   Pasarin Indonesia - Admin Dashboard Controller
+   168 Parts Surabaya - Admin Dashboard Controller
    Live CRUD, Realtime Analytics, Order & Stock Management
    ========================================================= */
 
@@ -485,7 +485,7 @@ const AdminApp = {
       return `
         <tr>
           <td><span style="font-weight:700; color:#1d3f0d;">${o.id}</span><br><small style="color:#94a3b8;">${dateFormatted}</small></td>
-          <td><b>${o.customerName || 'Pelanggan Pasarin'}</b></td>
+          <td><b>${o.customerName || 'Pelanggan 168 Parts'}</b></td>
           <td style="font-size:12px; line-height:1.4;">${itemsText}</td>
           <td><b>Rp${Number(o.totalAmount || 0).toLocaleString('id-ID')}</b></td>
           <td><span style="color:#059669; font-weight:800;">+${o.earnedPoints || Math.floor((o.totalAmount||0)/1000)} Pts</span></td>
@@ -549,7 +549,7 @@ const AdminApp = {
     document.getElementById('f-prod-orig-price').value = p.originalPrice || '';
     document.getElementById('f-prod-stock').value = p.stock || 20;
     document.getElementById('f-prod-image').value = p.image || '';
-    document.getElementById('f-prod-shop').value = p.shopName || 'Pasarin Official';
+    document.getElementById('f-prod-shop').value = p.shopName || '168 Parts Official';
     document.getElementById('f-prod-location').value = p.location || 'Jakarta Barat';
     document.getElementById('f-prod-flash').checked = !!p.isFlashSale;
     document.getElementById('prod-img-preview').src = (p.image && !p.image.includes('unsplash.com')) ? p.image : 'images/product-placeholder.svg';
@@ -569,7 +569,7 @@ const AdminApp = {
     const originalPrice = Number(document.getElementById('f-prod-orig-price').value) || null;
     const stock = Number(document.getElementById('f-prod-stock').value) || 10;
     const image = document.getElementById('f-prod-image').value.trim() || 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500';
-    const shopName = document.getElementById('f-prod-shop').value.trim() || 'Pasarin Official';
+    const shopName = document.getElementById('f-prod-shop').value.trim() || '168 Parts Official';
     const location = document.getElementById('f-prod-location').value.trim() || 'Jakarta Barat';
     const isFlashSale = document.getElementById('f-prod-flash').checked;
 

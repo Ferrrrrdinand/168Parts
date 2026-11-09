@@ -1,5 +1,5 @@
 /* =========================================================
-   Pasarin Indonesia - Cart & Checkout Manager
+   168 Parts Surabaya - Cart & Checkout Manager
    ========================================================= */
 
 const PasarinCart = {
@@ -92,7 +92,7 @@ const PasarinCart = {
           price: 150000,
           originalPrice: 200000,
           image: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&auto=format&fit=crop&q=80',
-          shopName: 'Pasarin Official Store',
+          shopName: '168 Parts Official Store',
           shopType: 'Mall'
         };
       }
@@ -112,7 +112,7 @@ const PasarinCart = {
         originalPrice: p.originalPrice || p.price,
         image: p.image || null,
         icon: p.icon || 'bag',
-        shopName: p.shopName || (p.shopType ? p.shopType + ' Official Store' : 'Pasarin Official Store'),
+        shopName: p.shopName || (p.shopType ? p.shopType + ' Official Store' : '168 Parts Official Store'),
         shopBadge: p.shopType === 'Mall' ? 'Mall ORI' : 'Star+',
         variation: variation || p.selectedVariation || 'Standar',
         quantity: qty,
@@ -392,7 +392,7 @@ const PasarinCart = {
     // Group items by shopName
     const storeMap = {};
     this.items.forEach(it => {
-      const shop = it.shopName || 'Pasarin Mall Official';
+      const shop = it.shopName || '168 Parts Official Store';
       if (!storeMap[shop]) {
         storeMap[shop] = {
           shopName: shop,
@@ -538,7 +538,7 @@ const PasarinCart = {
 
   toggleStoreSelect(shopName, checked) {
     this.items.forEach(it => {
-      if ((it.shopName || 'Pasarin Mall Official') === shopName) {
+      if ((it.shopName || '168 Parts Official Store') === shopName) {
         it.selected = checked;
       }
     });
@@ -669,7 +669,7 @@ const PasarinCart = {
           </div>
           <div class="cart-item-details">
             <h4 class="cart-item-title">${it.name}</h4>
-            <div class="cart-item-shop">${it.shopName || 'Pasarin Store'}</div>
+            <div class="cart-item-shop">${it.shopName || '168 Parts Official Store'}</div>
             <div class="cart-item-price">${this.formatRupiah(it.price)}</div>
             <div class="cart-item-controls">
               <div class="qty-stepper">
@@ -1069,7 +1069,7 @@ const PasarinCart = {
               <span class="checkout-title-hint">Punya kode promo? Terapkan di sini</span>
             </div>
             <div class="checkout-promo-input-row">
-              <input type="text" id="checkout-promo-input" class="checkout-promo-input-field" placeholder="Ketik kode promo (contoh: PASARINBARU)...">
+              <input type="text" id="checkout-promo-input" class="checkout-promo-input-field" placeholder="Ketik kode promo (contoh: 168PARTSBARU)...">
               <button type="button" class="btn-checkout-apply-promo" id="btn-apply-checkout-promo">
                 Terapkan
               </button>
@@ -1309,7 +1309,7 @@ const PasarinCart = {
         <div style="width: 68px; height: 68px; background: #ecfdf5; color: #059669; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; margin: 0 auto 16px auto; box-shadow: 0 4px 14px rgba(5, 150, 105, 0.2);">✓</div>
         <h3 style="margin-bottom: 6px; font-size: 18px; font-weight: 800; color: #0f172a;">Pesanan Berhasil Dibuat!</h3>
         <p style="color: #64748b; font-size: 13px; margin-bottom: 16px; line-height: 1.5;">
-          Terima kasih telah berbelanja di Pasarin Indonesia. Pesanan Anda telah terverifikasi dan langsung diproses penjual.
+          Terima kasih telah berbelanja di 168 Parts Surabaya. Pesanan Anda telah terverifikasi dan langsung diproses penjual.
         </p>
 
         <!-- Reward Poin Checkout Card (1 Poin tiap Rp1.000) -->

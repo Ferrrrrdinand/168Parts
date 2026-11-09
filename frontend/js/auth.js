@@ -1,5 +1,5 @@
 /* =========================================================
-   Pasarin Indonesia - Authentication & Points Reward Manager
+   168 Parts Surabaya - Authentication & Points Reward Manager
    ========================================================= */
 
 const PasarinPoints = {

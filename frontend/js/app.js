@@ -1,5 +1,5 @@
 /* =========================================================
-   Pasarin Indonesia - Main Application Controller
+   168 Parts Surabaya - Main Application Controller
    Modern, Vibrant, High-Resolution Product Showcase
    ========================================================= */
 
@@ -1530,7 +1530,7 @@ const PasarinApp = {
       if (cartHeaderTitle) cartHeaderTitle.style.display = 'none';
       if (cartIconBtn) cartIconBtn.style.display = 'flex';
       if (searchSuggestions) searchSuggestions.style.display = 'flex';
-      document.title = 'Profil Saya | Pasarin Indonesia';
+      document.title = 'Profil Saya | 168 Parts Surabaya';
       this.renderUserProfileView();
     } else if (isCart) {
       if (homeView) homeView.classList.remove('active');
@@ -1546,7 +1546,7 @@ const PasarinApp = {
       }
       if (cartIconBtn) cartIconBtn.style.display = 'none';
       if (searchSuggestions) searchSuggestions.style.display = 'none';
-      document.title = 'Keranjang Belanja | Pasarin';
+      document.title = 'Keranjang Belanja | 168 Parts';
       if (window.PasarinCart) window.PasarinCart.renderCartPage();
     } else if (isCheckout) {
       if (homeView) homeView.classList.remove('active');
@@ -1562,7 +1562,7 @@ const PasarinApp = {
       }
       if (cartIconBtn) cartIconBtn.style.display = 'none';
       if (searchSuggestions) searchSuggestions.style.display = 'none';
-      document.title = 'Checkout | Pasarin';
+      document.title = 'Checkout | 168 Parts';
       if (window.PasarinCart) window.PasarinCart.renderCheckoutPage();
     } else if (isSearch) {
       if (homeView) homeView.classList.remove('active');
@@ -1574,7 +1574,7 @@ const PasarinApp = {
       if (cartHeaderTitle) cartHeaderTitle.style.display = 'none';
       if (cartIconBtn) cartIconBtn.style.display = 'flex';
       if (searchSuggestions) searchSuggestions.style.display = 'flex';
-      document.title = 'Hasil Pencarian | Pasarin';
+      document.title = 'Hasil Pencarian | 168 Parts';
       this.handleSearchRoute();
     } else {
       if (searchView) searchView.classList.remove('active');
@@ -1586,7 +1586,7 @@ const PasarinApp = {
       if (cartHeaderTitle) cartHeaderTitle.style.display = 'none';
       if (cartIconBtn) cartIconBtn.style.display = 'flex';
       if (searchSuggestions) searchSuggestions.style.display = 'flex';
-      document.title = 'Pasarin Indonesia | Belanja Cerdas & Terpercaya';
+      document.title = '168 Parts Surabaya | Pusat Sparepart & Alat Servis HP Terlengkap';
     }
 
     if (isOrders) {
@@ -1804,7 +1804,7 @@ const PasarinApp = {
             </div>
           </div>
           <div class="detail-right">
-            <span class="detail-shop-tag">${product.shopType || 'Mall'} · ${product.shopName || 'Pasarin Partner'}</span>
+            <span class="detail-shop-tag">${product.shopType || 'Mall'} · ${product.shopName || '168 Parts Official'}</span>
             <h2 class="detail-title">${product.name}</h2>
             <div class="detail-rating-row">
               <span class="rating-stars">★★★★★</span>
@@ -1824,7 +1824,7 @@ const PasarinApp = {
 
             <div class="detail-desc-box">
               <h4>Deskripsi Produk:</h4>
-              <p>${product.description || 'Produk kualitas terbaik dengan garansi terpercaya di Pasarin.'}</p>
+              <p>${product.description || 'Produk kualitas terbaik dengan garansi terpercaya di 168 Parts.'}</p>
               ${product.specs ? `
                 <ul class="detail-specs-list">
                   ${product.specs.map(s => `<li>${s}</li>`).join('')}
@@ -2188,7 +2188,7 @@ const PasarinApp = {
           <div style="display:flex; align-items:center; gap:10px;">
             <span style="background:var(--primary); color:#fff; width:34px; height:34px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:18px;">⚙️</span>
             <div>
-              <h3 style="margin:0; font-size:16px;">Kanal Penjual & Admin Pasarin</h3>
+              <h3 style="margin:0; font-size:16px;">Kanal Penjual & Admin 168 Parts</h3>
               <small style="color:#64748b;">Kelola katalog produk dan buat sistem kode promo sendiri (Database SQL)</small>
             </div>
           </div>
@@ -2237,7 +2237,7 @@ const PasarinApp = {
                       </td>
                       <td style="padding: 10px 12px; font-weight: 600; color: #1e293b; max-width: 250px;">
                         <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.name}</div>
-                        <small style="color: #64748b; font-weight: normal;">${p.shopName || 'Pasarin Partner'} • ${p.location || 'Indonesia'}</small>
+                        <small style="color: #64748b; font-weight: normal;">${p.shopName || '168 Parts Official'} • ${p.location || 'Indonesia'}</small>
                       </td>
                       <td style="padding: 10px 12px; color: #475569;">
                         <span style="background: #f1f5f9; padding: 2px 8px; border-radius: 4px; font-size: 11px;">${p.category}</span>
@@ -2535,7 +2535,7 @@ const PasarinApp = {
             </div>
             <div>
               <label style="display:block; font-size:12px; font-weight:700; margin-bottom:5px; color:#334155;">Nama Toko</label>
-              <input type="text" id="crud-shop" class="pasarin-input" value="${p ? p.shopName : 'Pasarin Official'}" style="margin-top:0;">
+              <input type="text" id="crud-shop" class="pasarin-input" value="${p ? p.shopName : '168 Parts Official'}" style="margin-top:0;">
             </div>
           </div>
 
@@ -2578,7 +2578,7 @@ const PasarinApp = {
         originalPrice: Number(modal.querySelector('#crud-original-price').value) || null,
         stock: Number(modal.querySelector('#crud-stock').value) || 10,
         location: modal.querySelector('#crud-location').value.trim() || 'Jakarta',
-        shopName: modal.querySelector('#crud-shop').value.trim() || 'Pasarin Store',
+        shopName: modal.querySelector('#crud-shop').value.trim() || '168 Parts Official Store',
         image: modal.querySelector('#crud-image').value.trim() || null,
         isFlashSale: modal.querySelector('#crud-flashsale').checked,
         description: modal.querySelector('#crud-desc').value.trim()
@@ -2671,7 +2671,7 @@ const PasarinApp = {
     {
       code: "CASHBACK50",
       category: "cashback",
-      title: "Cashback Kilat 50% PasarinPay",
+      title: "Cashback Kilat 50% 168Pay",
       desc: "Cashback Koin s.d Rp50.000 via GoPay, DANA & OVO",
       valText: "50% CB",
       typeText: "Cashback Koin",
@@ -3031,7 +3031,7 @@ const PasarinApp = {
 
       setTimeout(() => {
         if (window.showToast) {
-          window.showToast('🎉 Selamat datang di Pasarin! Klaim voucher belanja Anda.', 'success');
+          window.showToast('🎉 Selamat datang di 168 Parts! Klaim voucher belanja Anda.', 'success');
         }
         this.openPromoModal();
       }, 500);

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Masuk & Daftar Akun | Pasarin Indonesia</title>
+  <title>Masuk & Daftar Akun | 168 Parts Surabaya</title>
   <link rel="stylesheet" href="css/auth.css">
   <link rel="stylesheet" href="css/gmaps-picker.css">
   <link rel="stylesheet" href="css/responsive-sensor.css">
@@ -170,10 +170,10 @@
         </svg>
       </div>
       <h3 class="auth-success-title" id="success-modal-title">Berhasil Masuk!</h3>
-      <p class="auth-success-desc" id="success-modal-desc">Selamat datang kembali di Pasarin Marketplace.</p>
+      <p class="auth-success-desc" id="success-modal-desc">Selamat datang kembali di 168 Parts Surabaya.</p>
       
       <div class="auth-success-user-tag" id="success-modal-user">
-        <span>👤</span> <span id="success-user-name">Member Pasarin</span>
+        <span>👤</span> <span id="success-user-name">Member 168 Parts</span>
       </div>
 
       <div class="success-progress-wrap">
@@ -185,7 +185,7 @@
 
   <!-- Footer -->
   <footer class="auth-footer">
-    <div>© 2026 Pasarin Indonesia. Hak Cipta Dilindungi.</div>
+    <div>© 2026 168 Parts Surabaya. Hak Cipta Dilindungi.</div>
     <div style="margin-top: 6px; font-size: 12px;">
       <a href="index.html">Ketentuan Layanan</a> • <a href="index.html">Kebijakan Privasi</a> • <a href="index.html">Pusat Bantuan</a>
     </div>
@@ -278,7 +278,7 @@
 
       if (titleEl) titleEl.textContent = title;
       if (descEl) descEl.textContent = desc;
-      if (nameEl) nameEl.textContent = userName || 'Member Pasarin';
+      if (nameEl) nameEl.textContent = userName || 'Member 168 Parts';
 
       if (modal) {
         modal.classList.add('show');
@@ -303,10 +303,10 @@
       try {
         const res = await PasarinAuth.login(email, password);
         if (res.success) {
-          const userName = (res.user && res.user.name) ? res.user.name : 'Pengguna Pasarin';
+          const userName = (res.user && res.user.name) ? res.user.name : 'Pengguna 168 Parts';
           const isAdmin = res.user && res.user.role === 'admin';
           const redirectUrl = isAdmin ? 'admin.html' : 'index.html?login_success=1';
-          const desc = isAdmin ? 'Akun Administrator diverifikasi. Mengalihkan ke Dashboard Admin...' : 'Selamat datang kembali di Pasarin.';
+          const desc = isAdmin ? 'Akun Administrator diverifikasi. Mengalihkan ke Dashboard Admin...' : 'Selamat datang kembali di 168 Parts.';
           showSuccessModal('Login Berhasil!', desc, userName, redirectUrl);
         } else {
           triggerShake();
