@@ -170,18 +170,29 @@ const PasarinApp = {
     }
 
     if (promoRes && promoRes.success && promoRes.data && promoRes.data.length > 0) {
-      this.promos = promoRes.data.map(p => ({
-        code: p.code,
-        category: p.category || 'diskon',
-        title: p.title,
-        desc: p.description || p.title,
-        valText: p.discountType === 'percent' ? `${p.discountValue}% OFF` : `Rp${Math.round(p.discountValue / 1000)}RB`,
-        typeText: p.discountType === 'percent' ? `Diskon ${p.discountValue}%` : 'Potongan Langsung',
-        icon: p.category === 'ongkir' ? '🚚' : (p.category === 'cashback' ? '💰' : (p.category === 'lokal' ? '🏬' : '🎁')),
-        minSpend: p.minSpend > 0 ? `Min. Belanja Rp${p.minSpend.toLocaleString('id-ID')}` : 'Min. Belanja Rp0',
-        validUntil: 'Berlaku s.d akhir bulan',
-        quota: `Kuota: ${p.quota - p.usedCount} tersisa`
-      }));
+      this.promos = promoRes.data.map(p => {
+        const remaining = p.remainingQuota !== undefined ? Number(p.remainingQuota) : Math.max(0, (p.quota || 100) - (p.usedCount || 0));
+        const userClaims = Number(p.userClaimCount || 0);
+        return {
+          code: p.code,
+          category: p.category || 'diskon',
+          title: p.title,
+          desc: p.description || p.title,
+          valText: p.discountType === 'percent' ? `${p.discountValue}% OFF` : `Rp${Math.round(p.discountValue / 1000)}RB`,
+          typeText: p.discountType === 'percent' ? `Diskon ${p.discountValue}%` : 'Potongan Langsung',
+          icon: p.category === 'ongkir' ? '🚚' : (p.category === 'cashback' ? '💰' : (p.category === 'lokal' ? '🏬' : '🎁')),
+          minSpend: p.minSpend > 0 ? `Min. Belanja Rp${p.minSpend.toLocaleString('id-ID')}` : 'Min. Belanja Rp0',
+          validUntil: 'Berlaku s.d akhir bulan',
+          quota: `Sisa ${remaining} voucher`,
+          remainingQuota: remaining,
+          userClaimCount: userClaims,
+          userAvailableCount: Number(p.userAvailableCount || 0),
+          maxClaimPerUser: Number(p.maxClaimPerUser || 3),
+          isSoldOut: Boolean(p.isSoldOut || remaining <= 0),
+          isMaxClaimed: Boolean(p.isMaxClaimed || userClaims >= 3),
+          canClaim: Boolean(p.canClaim !== undefined ? p.canClaim : (remaining > 0 && userClaims < 3))
+        };
+      });
       this.renderPromoTickets();
       this.updatePromoBadgeCount();
     }
@@ -2780,21 +2791,31 @@ const PasarinApp = {
     }
 
     try {
-      const res = await fetch(`${window.PasarinAPI.baseUrl}/promos`);
-      const data = await res.json();
+      const data = await window.PasarinAPI.getPromos();
       if (data && data.success && Array.isArray(data.data) && data.data.length > 0) {
-        this.promos = data.data.map(p => ({
-          code: p.code,
-          category: p.category || 'diskon',
-          title: p.title || p.code,
-          desc: p.description || '',
-          valText: p.discountType === 'percent' ? `${p.discountValue}% OFF` : (p.category === 'ongkir' ? 'GRATIS' : (p.discountValue >= 1000 ? `Rp${Math.round(p.discountValue/1000)}RB` : `Rp${p.discountValue}`)),
-          typeText: p.discountType === 'percent' ? `Diskon ${p.discountValue}%` : (p.category === 'ongkir' ? 'Ongkir Rp0' : `Potongan Rp${p.discountValue.toLocaleString('id-ID')}`),
-          icon: p.category === 'ongkir' ? '🚚' : (p.category === 'cashback' ? '💰' : (p.category === 'lokal' ? '🏬' : '🎁')),
-          minSpend: p.minSpend > 0 ? `Min. Belanja Rp${p.minSpend.toLocaleString('id-ID')}` : 'Min. Belanja Rp0',
-          validUntil: 'Berlaku s.d akhir bulan',
-          quota: `Sisa ${p.quota - (p.usedCount || 0)} voucher`
-        }));
+        this.promos = data.data.map(p => {
+          const remaining = p.remainingQuota !== undefined ? Number(p.remainingQuota) : Math.max(0, (p.quota || 100) - (p.usedCount || 0));
+          const userClaims = Number(p.userClaimCount || 0);
+          return {
+            code: p.code,
+            category: p.category || 'diskon',
+            title: p.title || p.code,
+            desc: p.description || '',
+            valText: p.discountType === 'percent' ? `${p.discountValue}% OFF` : (p.category === 'ongkir' ? 'GRATIS' : (p.discountValue >= 1000 ? `Rp${Math.round(p.discountValue/1000)}RB` : `Rp${p.discountValue}`)),
+            typeText: p.discountType === 'percent' ? `Diskon ${p.discountValue}%` : (p.category === 'ongkir' ? 'Ongkir Rp0' : `Potongan Rp${p.discountValue.toLocaleString('id-ID')}`),
+            icon: p.category === 'ongkir' ? '🚚' : (p.category === 'cashback' ? '💰' : (p.category === 'lokal' ? '🏬' : '🎁')),
+            minSpend: p.minSpend > 0 ? `Min. Belanja Rp${p.minSpend.toLocaleString('id-ID')}` : 'Min. Belanja Rp0',
+            validUntil: 'Berlaku s.d akhir bulan',
+            quota: `Sisa ${remaining} voucher`,
+            remainingQuota: remaining,
+            userClaimCount: userClaims,
+            userAvailableCount: Number(p.userAvailableCount || 0),
+            maxClaimPerUser: Number(p.maxClaimPerUser || 3),
+            isSoldOut: Boolean(p.isSoldOut || remaining <= 0),
+            isMaxClaimed: Boolean(p.isMaxClaimed || userClaims >= 3),
+            canClaim: Boolean(p.canClaim !== undefined ? p.canClaim : (remaining > 0 && userClaims < 3))
+          };
+        });
       }
     } catch (e) {
       console.warn('Gagal memuat promo dari server', e);
@@ -2868,62 +2889,124 @@ const PasarinApp = {
     }
 
     listEl.innerHTML = filtered.map(p => {
-      const isClaimed = this.claimedPromos.includes(p.code);
+      const claimCount = Number(p.userClaimCount || 0);
+      const isMaxClaimed = claimCount >= 3;
+      const remainingQuota = p.remainingQuota !== undefined ? Number(p.remainingQuota) : 100;
+      const isSoldOut = Boolean(p.isSoldOut || remainingQuota <= 0);
+
+      let claimBtnHtml = '';
+      if (isSoldOut) {
+        claimBtnHtml = `
+          <button class="btn-claim-voucher" disabled style="background:#cbd5e1; color:#64748b; cursor:not-allowed; border:none; padding:7px 12px; border-radius:6px; font-weight:700; font-size:12px;">
+            Habis
+          </button>
+        `;
+      } else if (isMaxClaimed) {
+        claimBtnHtml = `
+          <button class="btn-claim-voucher claimed" disabled style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; cursor:not-allowed; padding:7px 12px; border-radius:6px; font-weight:700; font-size:12px;" title="Batas maksimal 3 voucher telah tercapai">
+            ✓ Maks. 3/3
+          </button>
+        `;
+      } else if (claimCount > 0) {
+        claimBtnHtml = `
+          <button class="btn-claim-voucher" onclick="PasarinApp.claimPromo('${p.code}', this)" style="background:#be123c; color:#fff; border:none; padding:7px 12px; border-radius:6px; font-weight:700; font-size:12px; cursor:pointer;" title="Klaim lagi (+1 voucher)">
+            +1 Klaim (${claimCount}/3)
+          </button>
+        `;
+      } else {
+        claimBtnHtml = `
+          <button class="btn-claim-voucher" onclick="PasarinApp.claimPromo('${p.code}', this)" style="background:#be123c; color:#fff; border:none; padding:7px 14px; border-radius:6px; font-weight:700; font-size:12px; cursor:pointer;" title="Klaim voucher (maks. 3 per akun)">
+            Klaim (0/3)
+          </button>
+        `;
+      }
+
       return `
-        <div class="promo-ticket">
-          <div class="ticket-left">
+        <div class="promo-ticket" style="border: 1px solid #fecdd3; border-radius: 8px; margin-bottom: 12px; background:#fff; overflow:hidden;">
+          <div class="ticket-left" style="background:#fff1f2; border-right:1px dashed #f43f5e;">
             <span class="ticket-icon">${p.icon}</span>
-            <span class="ticket-val">${p.valText}</span>
+            <span class="ticket-val" style="color:#be123c;">${p.valText}</span>
             <span class="ticket-type-lbl">${p.typeText}</span>
           </div>
           <div class="ticket-center">
-            <h4 class="ticket-title" title="${p.title}">${p.title}</h4>
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+              <h4 class="ticket-title" title="${p.title}" style="margin:0;">${p.title}</h4>
+              ${claimCount > 0 ? `<span style="background:#fee2e2; color:#be123c; font-size:10.5px; font-weight:800; padding:2px 7px; border-radius:10px;">Dimiliki: ${claimCount}x</span>` : ''}
+            </div>
             <p class="ticket-desc">${p.desc}</p>
-            <div class="ticket-meta">
+            <div class="ticket-meta" style="font-size:11.5px; color:#64748b; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
               <span>${p.minSpend}</span>
               <span>•</span>
               <span class="ticket-code-pill" onclick="PasarinApp.copyPromoCode('${p.code}', this)" title="Klik untuk salin kode voucher">
                 🎫 <b>${p.code}</b>
               </span>
               <span>•</span>
-              <span style="color:#d97706; font-weight:700;">${p.quota}</span>
+              <span style="color:#e11d48; font-weight:700;">Sisa: ${remainingQuota} kuota</span>
+              <span>•</span>
+              <span style="color:#475569; font-weight:600;">Maks. 3 voucher/akun</span>
             </div>
           </div>
-          <div class="ticket-right" style="display:flex; flex-direction:column; gap:6px; align-items:center;">
+          <div class="ticket-right" style="display:flex; flex-direction:column; gap:6px; align-items:center; justify-content:center; padding:12px;">
             <button class="btn-copy-code-direct" onclick="PasarinApp.copyPromoCode('${p.code}', this)" style="background:#f1f5f9; color:#1e293b; border:1px solid #cbd5e1; border-radius:6px; padding:4px 8px; font-size:11.5px; font-weight:700; cursor:pointer; width:100%; transition:all 0.2s;">
               📋 Salin Kode
             </button>
-            <button class="btn-claim-voucher ${isClaimed ? 'claimed' : ''}" onclick="PasarinApp.claimPromo('${p.code}', this)">
-              ${isClaimed ? '✓ Tersimpan' : 'Klaim'}
-            </button>
+            ${claimBtnHtml}
           </div>
         </div>
       `;
     }).join('');
   },
 
-  claimPromo(code, btn) {
-    if (!this.claimedPromos.includes(code)) {
-      this.claimedPromos.push(code);
-      localStorage.setItem('pasarin_claimed_promos', JSON.stringify(this.claimedPromos));
-    }
+  async claimPromo(code, btn) {
+    if (!code) return;
+    const cleanCode = code.trim().toUpperCase();
 
-    if (btn) {
-      btn.classList.add('claimed');
-      btn.textContent = '✓ Tersimpan';
-    }
+    try {
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Memproses...';
+      }
 
-    this.updatePromoBadgeCount();
+      const res = await PasarinAPI.claimPromo(cleanCode);
+      if (res && res.success && res.data) {
+        const p = this.promos.find(x => x.code.toUpperCase() === cleanCode);
+        if (p) {
+          p.userClaimCount = res.data.claimCount;
+          p.remainingQuota = res.data.remainingQuota;
+          p.quota = `Sisa: ${res.data.remainingQuota} kuota`;
+          p.isMaxClaimed = res.data.claimCount >= 3;
+          p.isSoldOut = res.data.remainingQuota <= 0;
+          p.canClaim = !p.isSoldOut && !p.isMaxClaimed;
+        }
 
-    // Jika sedang berada di halaman checkout, langsung pasang voucher ke pesanan
-    if (window.location.hash.startsWith('#/checkout') && window.PasarinCart) {
-      window.PasarinCart.applyVoucher(code);
-      this.closePromoModal();
-      return;
-    }
+        if (!this.claimedPromos.includes(cleanCode)) {
+          this.claimedPromos.push(cleanCode);
+          localStorage.setItem('pasarin_claimed_promos', JSON.stringify(this.claimedPromos));
+        }
 
-    if (window.showToast) {
-      window.showToast(`✓ Voucher "${code}" berhasil diklaim ke akun Anda!`, 'success');
+        this.renderPromoTickets();
+        this.updatePromoBadgeCount();
+
+        if (window.showToast) {
+          window.showToast(res.message || `✓ Berhasil klaim voucher "${cleanCode}" (${res.data.claimCount}/3)!`, 'success');
+        }
+
+        // Jika berada di checkout, pasang voucher langsung
+        if (window.location.hash.startsWith('#/checkout') && window.PasarinCart) {
+          window.PasarinCart.applyVoucher(cleanCode);
+          this.closePromoModal();
+        }
+      } else {
+        if (window.showToast) {
+          window.showToast(res ? res.message : `Gagal klaim voucher "${cleanCode}".`, 'warning');
+        }
+        this.renderPromoTickets();
+      }
+    } catch (err) {
+      if (window.showToast) {
+        window.showToast('Gagal menghubungi server untuk klaim voucher.', 'error');
+      }
+      this.renderPromoTickets();
     }
   },
 
@@ -2936,58 +3019,54 @@ const PasarinApp = {
       return;
     }
 
-    const res = await PasarinAPI.validatePromo(code, 300000);
-    if (res && res.success && res.data) {
-      const p = res.data;
-      if (!this.promos.find(x => x.code === p.code)) {
-        this.promos.unshift({
-          code: p.code,
-          category: p.category || 'diskon',
-          title: p.title || p.code,
-          desc: p.description || 'Voucher & Kode Promo Spesial',
-          valText: p.discountType === 'percent' ? `${p.discountValue}% OFF` : `Rp${Math.round(p.discountValue / 1000)}RB`,
-          typeText: p.discountType === 'percent' ? `Diskon ${p.discountValue}%` : 'Potongan Langsung',
-          icon: '🎁',
-          minSpend: 'Siap digunakan saat checkout',
-          validUntil: 'Berlaku',
-          quota: 'Aktif'
-        });
-      }
-
-      input.value = '';
-      this.renderPromoTickets();
-
-      if (window.location.hash.startsWith('#/checkout') && window.PasarinCart) {
-        this.claimPromo(p.code);
-      } else {
-        this.claimPromo(p.code);
-        if (window.showToast) window.showToast(`🎉 Voucher / Kode promo "${p.code}" berhasil diklaim!`, 'success');
-      }
-    } else {
-      if (window.showToast) window.showToast(res ? res.message : `Voucher "${code}" tidak ditemukan atau sudah tidak aktif.`, 'error');
-    }
+    input.value = '';
+    await this.claimPromo(code);
   },
 
-  claimAllPromos() {
-    this.promos.forEach(p => {
-      if (!this.claimedPromos.includes(p.code)) {
-        this.claimedPromos.push(p.code);
-      }
-    });
-
-    localStorage.setItem('pasarin_claimed_promos', JSON.stringify(this.claimedPromos));
-    this.renderPromoTickets();
-    this.updatePromoBadgeCount();
-
+  async claimAllPromos() {
     const claimAllBtn = document.getElementById('btn-claim-all');
     if (claimAllBtn) {
-      claimAllBtn.textContent = '✓ Semua Promo Berhasil Diklaim!';
-      claimAllBtn.style.background = '#10b981';
+      claimAllBtn.textContent = 'Sedang Mengklaim...';
       claimAllBtn.disabled = true;
     }
 
+    let claimedSuccess = 0;
+    for (const p of this.promos) {
+      if (!p.isSoldOut && (p.userClaimCount || 0) < 3) {
+        try {
+          const res = await PasarinAPI.claimPromo(p.code);
+          if (res && res.success && res.data) {
+            claimedSuccess++;
+            p.userClaimCount = res.data.claimCount;
+            p.remainingQuota = res.data.remainingQuota;
+            p.quota = `Sisa: ${res.data.remainingQuota} kuota`;
+            p.isMaxClaimed = res.data.claimCount >= 3;
+            p.isSoldOut = res.data.remainingQuota <= 0;
+            p.canClaim = !p.isSoldOut && !p.isMaxClaimed;
+          }
+        } catch (e) {}
+      }
+    }
+
+    this.renderPromoTickets();
+    this.updatePromoBadgeCount();
+
+    if (claimAllBtn) {
+      claimAllBtn.textContent = '✓ Selesai Diklaim!';
+      claimAllBtn.style.background = '#10b981';
+      setTimeout(() => {
+        claimAllBtn.textContent = '⚡ Klaim Semua Voucher';
+        claimAllBtn.style.background = '';
+        claimAllBtn.disabled = false;
+      }, 3000);
+    }
+
     if (window.showToast) {
-      window.showToast('🎉 Selamat! 6 Voucher belanja berhasil diklaim.', 'success');
+      if (claimedSuccess > 0) {
+        window.showToast(`🎉 Berhasil mengklaim ${claimedSuccess} voucher belanja ke akun Anda! (Maks 3 per voucher)`, 'success');
+      } else {
+        window.showToast('Seluruh voucher promo sudah mencapai batas maksimal klaim Anda (3/3).', 'info');
+      }
     }
   },
 

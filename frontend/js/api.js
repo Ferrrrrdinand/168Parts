@@ -147,6 +147,16 @@ const PasarinAPI = {
     return this.request('/promos');
   },
 
+  async claimPromo(code) {
+    return this.request(`/promos/${encodeURIComponent(code)}/claim`, {
+      method: 'POST'
+    });
+  },
+
+  async getMyVouchers() {
+    return this.request('/promos/my-vouchers');
+  },
+
   async validatePromo(code, subtotal) {
     return this.request('/promos/validate', {
       method: 'POST',

@@ -849,12 +849,8 @@ const PasarinCart = {
     const cleanCode = rawCode.trim().toUpperCase();
 
     try {
-      const res = await fetch(`${window.PasarinAPI.baseUrl}/promos/validate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: cleanCode, subtotal: 300000 })
-      });
-      const data = await res.json();
+      const subtotal = this.currentCheckoutData ? this.currentCheckoutData.subtotalPesanan : 300000;
+      const data = await window.PasarinAPI.validatePromo(cleanCode, subtotal);
 
       if (data && data.success && data.data) {
         this.appliedVoucher = {
@@ -874,7 +870,7 @@ const PasarinCart = {
         return false;
       }
     } catch (e) {
-      console.warn('Gagal validasi via API, gunakan cache lokal', e);
+      console.warn('Gagal validasi via API', e);
       const found = (window.PasarinApp?.promos || []).find(p => p.code === cleanCode);
       if (found) {
         const disc = found.discountType === 'percent' ? Math.round(300000 * ((found.discountValue || 10) / 100)) : (found.discountValue || 10000);

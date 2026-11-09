@@ -1,6 +1,7 @@
 const orderModel = require('../models/orderModel');
 const cartModel = require('../models/cartModel');
 const userModel = require('../models/userModel');
+const promoModel = require('../models/promoModel');
 
 exports.checkout = async (req, res) => {
   try {
@@ -60,6 +61,11 @@ exports.checkout = async (req, res) => {
 
     // Update poin user di Supabase
     const userPoints = await userModel.addPoints(userId, earnedPoints);
+
+    // Jika pesanan memakai voucher promo, tandai 1 voucher terpakai
+    if (promoCode) {
+      await promoModel.useVoucher(userId, promoCode);
+    }
 
     // Bersihkan keranjang belanja di database
     await cartModel.clearCart(userId);

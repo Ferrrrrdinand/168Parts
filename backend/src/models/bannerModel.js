@@ -62,3 +62,4 @@ class BannerModel {
 }
 
 module.exports = new BannerModel();
+
