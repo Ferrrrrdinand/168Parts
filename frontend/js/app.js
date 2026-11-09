@@ -2708,139 +2708,269 @@ const PasarinApp = {
 
   activePromoTab: 'all',
   claimedPromos: [],
+  activeHeroSlideIndex: 0,
+  heroSlideTimer: null,
+
+  // 4 Slide Hero Banner Interaktif 168 Parts (Mendukung YouTube, Promo, & Produk Baru)
+  heroSlides: [
+    {
+      badge: '✨ 168 PARTS SURABAYA',
+      title: 'Pusat Sparepart & Alat Servis HP Terlengkap',
+      pills: [
+        '🏷️ LCD & Baterai Bergaransi',
+        '⚡ Promo Pengguna Baru: Diskon 50RB',
+        '⭐ Sparepart Presisi Siap Kirim'
+      ],
+      modelImage: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=320&auto=format&fit=crop&q=80',
+      bgGradient: 'linear-gradient(135deg, #881337 0%, #be123c 100%)',
+      targetUrl: 'login.html?promo=newuser#register',
+      actionText: 'Daftar & Klaim 50RB ↗',
+      actionIcon: '🎁'
+    },
+    {
+      badge: '▶️ YOUTUBE CHANNEL RESMI',
+      title: 'Tutorial Servis & Review Sparepart 168 Parts',
+      pills: [
+        '🔧 Cara Pasang & Tes Touchscreen',
+        '🔋 Solusi Baterai Presisi & Awet',
+        '🎥 Tonton Gratis di YouTube'
+      ],
+      modelImage: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=320&auto=format&fit=crop&q=80',
+      bgGradient: 'linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%)',
+      targetUrl: 'https://www.youtube.com',
+      actionText: 'Tonton di YouTube ▶',
+      actionIcon: '📺'
+    },
+    {
+      badge: '🔥 PRODUK TERBARU',
+      title: 'LCD iPhone 11 Incell True Tone Grade A+',
+      pills: [
+        '📱 Layar Jernih & Presisi Tinggi',
+        '🛡️ Garansi Toko Langsung Tukar',
+        '🚚 Stok Siap Kirim Hari Ini'
+      ],
+      modelImage: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=320&auto=format&fit=crop&q=80',
+      bgGradient: 'linear-gradient(135deg, #4c0519 0%, #9f1239 100%)',
+      targetUrl: '#/product/168-lcd-ip11',
+      actionText: 'Lihat Produk Baru ➔',
+      actionIcon: '📱'
+    },
+    {
+      badge: '🎟️ VOUCHER SPESIAL TEKNISI',
+      title: 'Klaim Voucher Diskon 100RB & Bebas Ongkir',
+      pills: [
+        '💰 Potongan Belanja s.d 100RB',
+        '📦 Bebas Ongkir se-Indonesia',
+        '⚡ Kuota Terbatas untuk Member'
+      ],
+      modelImage: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=320&auto=format&fit=crop&q=80',
+      bgGradient: 'linear-gradient(135deg, #881337 0%, #e11d48 100%)',
+      targetUrl: '#promo',
+      actionText: 'Klaim Voucher ↗',
+      actionIcon: '🏷️'
+    }
+  ],
+
+  banners: {
+    left: null,
+    right: {
+      title: 'Flash Sale & Promo Spesial Teknisi',
+      pill1Title: 'DISKON S.D.',
+      pill1Val: '50%',
+      pill2Title: 'VOUCHER',
+      pill2Val: '100RB',
+      modelImage1: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=240',
+      modelImage2: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=240',
+      bgGradient: 'linear-gradient(135deg, #4c0519 0%, #9f1239 50%, #be123c 100%)',
+      targetUrl: '#promo'
+    }
+  },
 
   async loadBanners() {
+    this.initHeroSlider();
+
     try {
       const res = await fetch(`${window.PasarinAPI.baseUrl}/banners`);
       const data = await res.json();
       if (data && data.success && data.data) {
-        this.renderBanners(data.data);
+        this.banners = data.data;
+        if (data.data.left) {
+          // Sinkronkan slide pertama dengan konfigurasi admin
+          this.heroSlides[0] = {
+            ...this.heroSlides[0],
+            badge: data.data.left.badge || this.heroSlides[0].badge,
+            title: data.data.left.title || this.heroSlides[0].title,
+            pills: Array.isArray(data.data.left.pills) && data.data.left.pills.length ? data.data.left.pills : this.heroSlides[0].pills,
+            modelImage: data.data.left.modelImage || this.heroSlides[0].modelImage,
+            bgGradient: data.data.left.bgGradient || this.heroSlides[0].bgGradient,
+            targetUrl: data.data.left.targetUrl || this.heroSlides[0].targetUrl
+          };
+          this.renderHeroSlide(this.activeHeroSlideIndex);
+        }
+        if (data.data.right) {
+          this.renderRightBanner(data.data.right);
+        }
       }
     } catch (e) {
-      console.warn('Gagal fetch banner dari server:', e);
+      console.warn('Gagal fetch banner dari server, menggunakan slide default 168 Parts:', e);
     }
   },
 
-  renderBanners(banners) {
-    if (!banners) return;
+  initHeroSlider() {
+    this.renderHeroSlide(this.activeHeroSlideIndex);
+    this.renderRightBanner(this.banners.right);
 
-    // Render Banner Kiri (Hero Left)
-    if (banners.left) {
-      const elLeft = document.getElementById('hero-banner-left');
-      const elBadge = document.getElementById('banner-left-badge');
-      const elTitle = document.getElementById('banner-left-title');
-      const elPills = document.getElementById('banner-left-pills');
-      const elImg = document.getElementById('banner-left-img');
+    // Otomatis geser slide banner setiap 5 detik
+    if (this.heroSlideTimer) clearInterval(this.heroSlideTimer);
+    this.heroSlideTimer = setInterval(() => {
+      this.nextSlide();
+    }, 5000);
+  },
 
-      if (elLeft) {
-        if (banners.left.bgGradient) elLeft.style.background = banners.left.bgGradient;
-        elLeft.style.cursor = 'pointer';
-        elLeft.setAttribute('role', 'button');
-        elLeft.setAttribute('tabindex', '0');
-        const targetUrl = banners.left.targetUrl || 'login.html?promo=newuser#register';
-        elLeft.setAttribute('title', `Klik untuk membuka: ${targetUrl}`);
-        
-        elLeft.onclick = (e) => {
-          if (e.target.closest('.shopee-dots') || e.target.classList.contains('dot')) return;
-          this.handleBannerClick(targetUrl);
-        };
-        elLeft.onkeydown = (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            this.handleBannerClick(targetUrl);
-          }
-        };
-      }
-      if (elBadge && banners.left.badge) {
-        elBadge.textContent = banners.left.badge;
-      }
-      if (elTitle && banners.left.title) {
-        elTitle.textContent = banners.left.title;
-      }
-      if (elImg && banners.left.modelImage) {
-        elImg.src = banners.left.modelImage;
-      }
-      if (elPills && Array.isArray(banners.left.pills)) {
-        elPills.innerHTML = banners.left.pills.map(p => `
-          <span class="shopee-pill">${p}</span>
-        `).join('');
-      }
+  goToSlide(index) {
+    if (index >= 0 && index < this.heroSlides.length) {
+      this.activeHeroSlideIndex = index;
+      this.renderHeroSlide(index);
+    }
+  },
+
+  nextSlide() {
+    this.activeHeroSlideIndex = (this.activeHeroSlideIndex + 1) % this.heroSlides.length;
+    this.renderHeroSlide(this.activeHeroSlideIndex);
+  },
+
+  renderHeroSlide(index) {
+    const slide = this.heroSlides[index];
+    if (!slide) return;
+
+    const elLeft = document.getElementById('hero-banner-left');
+    const elBadge = document.getElementById('banner-left-badge');
+    const elTitle = document.getElementById('banner-left-title');
+    const elPills = document.getElementById('banner-left-pills');
+    const elImg = document.getElementById('banner-left-img');
+    const elActionText = document.getElementById('banner-action-text');
+    const elActionIcon = document.getElementById('banner-action-icon');
+
+    if (elLeft) {
+      if (slide.bgGradient) elLeft.style.background = slide.bgGradient;
+      elLeft.style.cursor = 'pointer';
+      elLeft.setAttribute('title', `Klik untuk membuka: ${slide.targetUrl}`);
     }
 
-    // Render Banner Kanan (Hero Right)
-    if (banners.right) {
-      const elRight = document.getElementById('hero-banner-right');
-      const elImg1 = document.getElementById('banner-right-img1');
-      const elImg2 = document.getElementById('banner-right-img2');
-      const elPill1Title = document.getElementById('banner-right-pill1-title');
-      const elPill1Val = document.getElementById('banner-right-pill1-val');
-      const elPill2Title = document.getElementById('banner-right-pill2-title');
-      const elPill2Val = document.getElementById('banner-right-pill2-val');
+    if (elBadge) elBadge.textContent = slide.badge;
+    if (elTitle) elTitle.textContent = slide.title;
+    if (elImg && slide.modelImage) elImg.src = slide.modelImage;
 
-      if (elRight) {
-        if (banners.right.bgGradient) elRight.style.background = banners.right.bgGradient;
-        elRight.style.cursor = 'pointer';
-        elRight.setAttribute('role', 'button');
-        elRight.setAttribute('tabindex', '0');
-        const targetUrl = banners.right.targetUrl || '#promo';
-        elRight.setAttribute('title', `Klik untuk membuka: ${targetUrl}`);
-
-        elRight.onclick = () => {
-          this.handleBannerClick(targetUrl);
-        };
-        elRight.onkeydown = (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            this.handleBannerClick(targetUrl);
-          }
-        };
-      }
-      if (elImg1 && banners.right.modelImage1) elImg1.src = banners.right.modelImage1;
-      if (elImg2 && banners.right.modelImage2) elImg2.src = banners.right.modelImage2;
-      if (elPill1Title && banners.right.pill1Title) elPill1Title.textContent = banners.right.pill1Title;
-      if (elPill1Val && banners.right.pill1Val) elPill1Val.textContent = banners.right.pill1Val;
-      if (elPill2Title && banners.right.pill2Title) elPill2Title.textContent = banners.right.pill2Title;
-      if (elPill2Val && banners.right.pill2Val) elPill2Val.textContent = banners.right.pill2Val;
+    if (elPills && Array.isArray(slide.pills)) {
+      elPills.innerHTML = slide.pills.map(p => `
+        <span class="shopee-pill">${p}</span>
+      `).join('');
     }
+
+    if (elActionText) {
+      elActionText.textContent = slide.actionText || 'Buka Link ↗';
+    }
+    if (elActionIcon) {
+      elActionIcon.textContent = slide.actionIcon || '🚀';
+    }
+
+    // Perbarui indikator titik aktif
+    const dots = document.querySelectorAll('.shopee-dots .dot');
+    dots.forEach((dot, idx) => {
+      dot.classList.toggle('active', idx === index);
+    });
+  },
+
+  renderRightBanner(right) {
+    if (!right) return;
+    const elRight = document.getElementById('hero-banner-right');
+    const elImg1 = document.getElementById('banner-right-img1');
+    const elImg2 = document.getElementById('banner-right-img2');
+    const elPill1Title = document.getElementById('banner-right-pill1-title');
+    const elPill1Val = document.getElementById('banner-right-pill1-val');
+    const elPill2Title = document.getElementById('banner-right-pill2-title');
+    const elPill2Val = document.getElementById('banner-right-pill2-val');
+
+    if (elRight) {
+      if (right.bgGradient) elRight.style.background = right.bgGradient;
+      elRight.style.cursor = 'pointer';
+      elRight.setAttribute('title', `Klik untuk membuka: ${right.targetUrl || '#promo'}`);
+    }
+    if (elImg1 && right.modelImage1) elImg1.src = right.modelImage1;
+    if (elImg2 && right.modelImage2) elImg2.src = right.modelImage2;
+    if (elPill1Title && right.pill1Title) elPill1Title.textContent = right.pill1Title;
+    if (elPill1Val && right.pill1Val) elPill1Val.textContent = right.pill1Val;
+    if (elPill2Title && right.pill2Title) elPill2Title.textContent = right.pill2Title;
+    if (elPill2Val && right.pill2Val) elPill2Val.textContent = right.pill2Val;
+  },
+
+  onHeroBannerLeftClick(event) {
+    if (event && (event.target.closest('.shopee-dots') || event.target.classList.contains('dot'))) return;
+    const slide = this.heroSlides[this.activeHeroSlideIndex] || {};
+    const targetUrl = slide.targetUrl || 'login.html?promo=newuser#register';
+    this.handleBannerClick(targetUrl);
+  },
+
+  onHeroBannerRightClick(event) {
+    const targetUrl = (this.banners && this.banners.right && this.banners.right.targetUrl) || '#promo';
+    this.handleBannerClick(targetUrl);
   },
 
   handleBannerClick(targetUrl) {
     if (!targetUrl) return;
     targetUrl = targetUrl.trim();
 
-    // 1. Eksternal URL (YouTube, Sosmed, Website Lain)
-    if (targetUrl.startsWith('http://') || targetUrl.startsWith('https://')) {
-      window.open(targetUrl, '_blank', 'noopener,noreferrer');
+    // 1. YouTube Video / Channel Link
+    const isYoutube = /(youtube\.com|youtu\.be)/i.test(targetUrl);
+    if (isYoutube) {
+      let ytUrl = targetUrl;
+      if (!/^https?:\/\//i.test(ytUrl)) {
+        ytUrl = 'https://' + ytUrl;
+      }
+      if (window.showToast) window.showToast('Membuka video YouTube di tab baru...', 'info');
+      window.open(ytUrl, '_blank', 'noopener,noreferrer');
       return;
     }
 
-    // 2. Link Pendaftaran Akun Baru / Login Promo
+    // 2. Website Eksternal (contoh: https://google.com atau www.domain.com)
+    const isExternal = /^(https?:\/\/|www\.)/i.test(targetUrl) || (targetUrl.includes('.') && !targetUrl.startsWith('#') && !targetUrl.endsWith('.html'));
+    if (isExternal) {
+      let extUrl = targetUrl;
+      if (!/^https?:\/\//i.test(extUrl)) {
+        extUrl = 'https://' + extUrl;
+      }
+      if (window.showToast) window.showToast('Membuka tautan di tab baru...', 'info');
+      window.open(extUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    // 3. Link Pendaftaran / Login Pengguna Baru
     if (targetUrl.startsWith('login.html')) {
+      if (window.showToast) window.showToast('Mengarahkan ke halaman pendaftaran promo baru...', 'info');
       window.location.href = targetUrl;
       return;
     }
 
-    // 3. Modal Klaim Promo / Voucher
+    // 4. Modal Klaim Promo / Voucher
     if (targetUrl === '#promo' || targetUrl === 'promo' || targetUrl.includes('promoModal')) {
       this.openPromoModal();
       return;
     }
 
-    // 4. Link Produk Spesifik (#/product/:id)
+    // 5. Link Produk Baru / Detail Produk Spesifik (#/product/:id atau ID Produk)
+    let prodId = null;
     if (targetUrl.startsWith('#/product/')) {
-      const pid = targetUrl.replace('#/product/', '').split('?')[0].trim();
-      this.openProductDetail(pid);
+      prodId = targetUrl.replace('#/product/', '').split('?')[0].trim();
+    } else if (this.products && this.products.some(p => p.id === targetUrl)) {
+      prodId = targetUrl;
+    }
+
+    if (prodId) {
+      this.openProductDetail(prodId);
       return;
     }
 
-    // 5. Cek apakah targetUrl adalah ID Produk secara langsung
-    const matchedProduct = this.products.find(p => p.id === targetUrl);
-    if (matchedProduct) {
-      this.openProductDetail(matchedProduct.id);
-      return;
-    }
-
-    // 6. Internal Route (#/search, #/cart, #/orders, dll)
+    // 6. Rute Hash Internal Toko (#/search, #/cart, dll)
     if (targetUrl.startsWith('#')) {
       window.location.hash = targetUrl;
       return;

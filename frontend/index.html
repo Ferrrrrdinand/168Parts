@@ -183,8 +183,13 @@
       
       <!-- Hero Banner (Shopee Style Split Banners) -->
       <section class="hero-shopee-row" id="hero-shopee-banners">
-        <!-- Banner Kiri: 168 Parts Hero -->
-        <div class="hero-shopee-left" id="hero-banner-left" role="button" tabindex="0" title="Klik Banner Promosi" aria-label="Banner Promosi Utama (Klik untuk membuka)">
+        <!-- Banner Kiri: 168 Parts Hero (Bisa Diklik ke Web / YouTube / Promo) -->
+        <div class="hero-shopee-left" id="hero-banner-left" role="button" tabindex="0" title="Klik Banner Promosi (Buka Link / Video)" aria-label="Banner Promosi Utama (Klik untuk membuka)" onclick="if(window.PasarinApp) window.PasarinApp.onHeroBannerLeftClick(event);">
+          <div class="banner-action-pill" id="banner-left-action" style="position: absolute; top: 12px; right: 14px; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; border: 1px solid rgba(255,255,255,0.25); z-index: 5; pointer-events: none;">
+            <span id="banner-action-icon">🎁</span>
+            <span id="banner-action-text">Daftar & Klaim 50RB ↗</span>
+          </div>
+
           <div class="shopee-hero-content">
             <div class="shopee-hero-info">
               <div class="hero-tag-badge" id="banner-left-badge">✨ 168 PARTS SURABAYA</div>
@@ -199,17 +204,21 @@
               <img id="banner-left-img" src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=320&auto=format&fit=crop&q=80" alt="Sparepart & Alat Servis" class="model-hero-img">
             </div>
           </div>
-          <!-- Dots Indicator -->
+          <!-- Dots Indicator (Dapat Diklik untuk Berpindah Slide) -->
           <div class="shopee-dots">
-            <span class="dot active"></span>
-            <span class="dot"></span>
-            <span class="dot"></span>
-            <span class="dot"></span>
+            <span class="dot active" onclick="event.stopPropagation(); if(window.PasarinApp) window.PasarinApp.goToSlide(0);" title="Slide 1: Promo Baru"></span>
+            <span class="dot" onclick="event.stopPropagation(); if(window.PasarinApp) window.PasarinApp.goToSlide(1);" title="Slide 2: Video YouTube"></span>
+            <span class="dot" onclick="event.stopPropagation(); if(window.PasarinApp) window.PasarinApp.goToSlide(2);" title="Slide 3: Produk Baru"></span>
+            <span class="dot" onclick="event.stopPropagation(); if(window.PasarinApp) window.PasarinApp.goToSlide(3);" title="Slide 4: Voucher Belanja"></span>
           </div>
         </div>
 
-        <!-- Banner Kanan: Diskon & Voucher -->
-        <div class="hero-shopee-right" id="hero-banner-right" role="button" tabindex="0" title="Klik Promo & Voucher" aria-label="Banner Promo Kanan (Klik untuk membuka)">
+        <!-- Banner Kanan: Diskon & Voucher (Dapat Diklik) -->
+        <div class="hero-shopee-right" id="hero-banner-right" role="button" tabindex="0" title="Klik untuk Klaim Promo & Voucher" aria-label="Banner Promo Kanan (Klik untuk membuka)" onclick="if(window.PasarinApp) window.PasarinApp.onHeroBannerRightClick(event);">
+          <div class="banner-action-pill" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); color: #fff; padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; border: 1px solid rgba(255,255,255,0.25); z-index: 5; pointer-events: none;">
+            <span>🎟️</span>
+            <span>Klaim Voucher ↗</span>
+          </div>
           <img id="banner-right-img1" src="https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=240&auto=format&fit=crop&q=80" alt="Sparepart Kiri" class="side-model">
           <div class="side-promo-content">
             <div class="side-promo-pill pill-diskon">
