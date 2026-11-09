@@ -106,7 +106,19 @@ const AdminApp = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
-      const data = await res.json();
+
+      let data;
+      const cType = res.headers.get('content-type') || '';
+      if (cType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        const errText = await res.text();
+        if (res.status === 404) {
+          throw new Error('Endpoint backend API tidak ditemukan (404). Pastikan server backend /api aktif.');
+        } else {
+          throw new Error(`Server error (${res.status}): ${errText.slice(0, 100)}`);
+        }
+      }
 
       if (!data.success) {
         throw new Error(data.message || 'Email atau kata sandi admin salah.');

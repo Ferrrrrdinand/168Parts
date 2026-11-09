@@ -73,15 +73,19 @@ app.use((req, res, next) => {
   res.sendFile(path.join(legacyFrontendPath, 'index.html'));
 });
 
-// Start Server & Database
+// Start Server & Database (Hanya saat standalone server: node backend/src/server.js)
 const PORT = config.port;
-app.listen(PORT, async () => {
-  console.log('====================================================');
-  console.log(`🚀 168 Parts Backend Server berjalan di port ${PORT}`);
-  console.log(`🌐 Website Frontend: http://localhost:${PORT}`);
-  console.log(`🔐 Halaman Login:    http://localhost:${PORT}/login.html`);
-  console.log(`📡 API Base URL:     http://localhost:${PORT}/api`);
-  console.log('====================================================');
-  await dbManager.init();
-  await userModel.ensureDefaultUsers();
-});
+if (require.main === module) {
+  app.listen(PORT, async () => {
+    console.log('====================================================');
+    console.log(`🚀 168 Parts Backend Server berjalan di port ${PORT}`);
+    console.log(`🌐 Website Frontend: http://localhost:${PORT}`);
+    console.log(`🔐 Halaman Login:    http://localhost:${PORT}/login.html`);
+    console.log(`📡 API Base URL:     http://localhost:${PORT}/api`);
+    console.log('====================================================');
+    await dbManager.init();
+    await userModel.ensureDefaultUsers();
+  });
+}
+
+module.exports = app;

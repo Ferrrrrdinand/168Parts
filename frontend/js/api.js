@@ -58,8 +58,14 @@ const PasarinAPI = {
         ...options,
         headers
       });
-      const data = await res.json();
-      return data;
+
+      const cType = res.headers.get('content-type') || '';
+      if (cType.includes('application/json')) {
+        const data = await res.json();
+        return data;
+      }
+      const rawText = await res.text();
+      return { success: false, status: res.status, message: `Respon non-JSON (${res.status}): ${rawText.slice(0, 100)}` };
     } catch (err) {
       console.warn(`[PasarinAPI] Gagal menghubungi backend di ${endpoint}:`, err.message);
       return { success: false, offline: true, message: 'Server backend tidak terhubung. Menggunakan mode lokal.' };
