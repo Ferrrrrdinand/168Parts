@@ -1,5 +1,4 @@
 const dbManager = require('../config/database');
-const storage = require('./storage');
 const { Product } = require('./index');
 
 class ProductModel {
@@ -128,12 +127,6 @@ class ProductModel {
       ]);
     }
 
-    // Selaraskan juga ke file storage cadangan
-    const db = storage.read();
-    if (!db.products) db.products = [];
-    db.products.unshift(productPayload);
-    storage.write(db);
-
     return productPayload;
   }
 
@@ -240,12 +233,10 @@ class ProductModel {
       }
 
       const rows = await dbManager.query(sql, params);
-      return rows.map(r => this.formatProductRow(r));
+      return (rows || []).map(r => this.formatProductRow(r));
     }
 
-    // Fallback JSON Engine jika DB belum connected
-    const db = storage.read();
-    return db.products || [];
+    return [];
   }
 
   // READ ONE: Mengambil 1 Produk Berdasarkan ID
@@ -267,14 +258,12 @@ class ProductModel {
 
     if (dbManager.isConnected) {
       const rows = await dbManager.query('SELECT * FROM products WHERE id = ? OR slug = ? LIMIT 1', [id, id]);
-      if (rows.length > 0) {
+      if (rows && rows.length > 0) {
         return this.formatProductRow(rows[0]);
       }
-      return null;
     }
 
-    const db = storage.read();
-    return (db.products || []).find(p => p.id === id || p.slug === id) || null;
+    return null;
   }
 
   // UPDATE: Memperbarui Produk di Database Lokal (CRUD - U)
@@ -340,14 +329,6 @@ class ProductModel {
       ]);
     }
 
-    // Update di JSON Storage cadangan
-    const db = storage.read();
-    const idx = (db.products || []).findIndex(p => p.id === id);
-    if (idx > -1) {
-      db.products[idx] = merged;
-      storage.write(db);
-    }
-
     return merged;
   }
 
@@ -365,12 +346,6 @@ class ProductModel {
       const res = await dbManager.query('DELETE FROM products WHERE id = ?', [id]);
       if (res && res[0] && res[0].affectedRows > 0) deleted = true;
     }
-
-    const db = storage.read();
-    const prevCount = (db.products || []).length;
-    db.products = (db.products || []).filter(p => p.id !== id);
-    if (db.products.length < prevCount) deleted = true;
-    storage.write(db);
 
     return deleted;
   }
@@ -395,10 +370,9 @@ class ProductModel {
 
     if (dbManager.isConnected) {
       const rows = await dbManager.query('SELECT * FROM products WHERE is_flash_sale = true ORDER BY flash_sale_sold DESC LIMIT 12');
-      return rows.map(r => this.formatProductRow(r));
+      return (rows || []).map(r => this.formatProductRow(r));
     }
-    const db = storage.read();
-    return (db.products || []).filter(p => p.isFlashSale);
+    return [];
   }
 }
 

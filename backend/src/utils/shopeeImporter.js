@@ -2,7 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const xlsx = require('xlsx');
 const dbManager = require('../config/database');
-const storage = require('../models/storage');
 
 class ShopeeImporter {
   /**
@@ -258,35 +257,11 @@ class ShopeeImporter {
       }
     }
 
-    // Selaraskan ke JSON storage (db.json)
-    try {
-      const db = storage.read();
-      if (!db.products) db.products = [];
-
-      if (replaceExisting) {
-        db.products = [...products];
-      } else {
-        const existingIds = new Set(db.products.map(x => x.id));
-        for (const p of products) {
-          if (!existingIds.has(p.id)) {
-            db.products.push(p);
-            existingIds.add(p.id);
-          } else {
-            const idx = db.products.findIndex(x => x.id === p.id);
-            if (idx !== -1) db.products[idx] = p;
-          }
-        }
-      }
-      storage.write(db);
-    } catch (e) {
-      console.warn('⚠️ [Importer] Gagal sinkron ke db.json:', e.message);
-    }
-
     return {
       success: true,
       count: insertedCount,
       totalReceived: products.length,
-      message: `Berhasil mengimpor ${insertedCount} produk 168part ke database!`
+      message: `Berhasil mengimpor ${insertedCount} produk 168part ke database Supabase!`
     };
   }
 }
