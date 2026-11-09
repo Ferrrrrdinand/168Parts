@@ -768,28 +768,49 @@ const PasarinCart = {
       }).join('');
     }
 
-    // Perhitungan Presisi Tepat Sesuai Screenshot Pengguna
-    // Subtotal Pesanan: Rp300.000
-    // Total Proteksi Produk: Rp1.700
-    // Subtotal Pengiriman: Rp5.000
-    // Biaya Layanan: Rp1.200
-    // Diskon Produk: -Rp141.000
-    // Voucher Diskon: -Rp3.000
-    // Total Pembayaran: Rp163.900
+    // 1. Perhitungan Subtotal Riil Berdasarkan Produk & Jumlah yang Dibeli
+    const subtotalPesanan = activeItems.reduce((acc, it) => {
+      const price = Number(it.price) || 0;
+      const qty = Math.max(1, parseInt(it.quantity, 10) || 1);
+      return acc + (price * qty);
+    }, 0);
 
-    const subtotalPesanan = 300000;
-    const proteksiProduk = 1700;
-    const subtotalPengiriman = 5000;
-    const biayaLayanan = 1200;
-    const diskonProduk = -141000;
-    
-    // Diskon Voucher / Kode Promo (Dinamis dari Super Admin)
-    let voucherDiskon = -3000;
-    if (this.appliedVoucher && this.appliedVoucher.discountAmount) {
-      voucherDiskon = -Math.abs(this.appliedVoucher.discountAmount);
+    // 2. Diskon Produk Riil (Bila ada potongan dari harga asli/original)
+    const totalOriginal = activeItems.reduce((acc, it) => {
+      const price = Number(it.price) || 0;
+      const orig = Number(it.originalPrice) && Number(it.originalPrice) > price ? Number(it.originalPrice) : price;
+      const qty = Math.max(1, parseInt(it.quantity, 10) || 1);
+      return acc + (orig * qty);
+    }, 0);
+    const diskonProduk = totalOriginal > subtotalPesanan ? -(totalOriginal - subtotalPesanan) : 0;
+
+    // 3. Subtotal Pengiriman (Gratis ongkir jika subtotal >= 150rb atau voucher ongkir)
+    let subtotalPengiriman = subtotalPesanan > 0 ? (subtotalPesanan >= 150000 ? 0 : 5000) : 0;
+    if (this.appliedVoucher && (this.appliedVoucher.category === 'ongkir' || this.appliedVoucher.code === 'ONGKIRXTRA')) {
+      subtotalPengiriman = 0;
     }
 
-    const totalPembayaran = Math.max(0, subtotalPesanan + proteksiProduk + subtotalPengiriman + biayaLayanan + diskonProduk + voucherDiskon);
+    // 4. Biaya Layanan & Proteksi
+    const biayaLayanan = subtotalPesanan > 0 ? 1000 : 0;
+    const proteksiProduk = subtotalPesanan > 0 ? 1500 : 0;
+    
+    // 5. Diskon Voucher / Kode Promo (Dihitung dari subtotalPesanan riil)
+    let voucherDiskon = 0;
+    if (this.appliedVoucher) {
+      if (typeof this.appliedVoucher.discountAmount === 'number' && this.appliedVoucher.discountAmount > 0) {
+        voucherDiskon = -Math.min(subtotalPesanan, this.appliedVoucher.discountAmount);
+      } else if (this.appliedVoucher.discountValue) {
+        if (this.appliedVoucher.discountType === 'percent') {
+          const rawDisc = Math.round(subtotalPesanan * (this.appliedVoucher.discountValue / 100));
+          const maxDisc = this.appliedVoucher.maxDiscount || rawDisc;
+          voucherDiskon = -Math.min(subtotalPesanan, Math.min(rawDisc, maxDisc));
+        } else {
+          voucherDiskon = -Math.min(subtotalPesanan, this.appliedVoucher.discountValue);
+        }
+      }
+    }
+
+    const totalPembayaran = Math.max(0, subtotalPesanan + proteksiProduk + subtotalPengiriman + biayaLayanan + voucherDiskon);
 
     const elSubtotal = document.getElementById('chk-calc-subtotal');
     const elProteksi = document.getElementById('chk-calc-proteksi');
@@ -808,8 +829,8 @@ const PasarinCart = {
     if (elProteksi) elProteksi.textContent = this.formatRupiah(proteksiProduk);
     if (elOngkir) elOngkir.textContent = this.formatRupiah(subtotalPengiriman);
     if (elLayanan) elLayanan.textContent = this.formatRupiah(biayaLayanan);
-    if (elDiskonProd) elDiskonProd.textContent = '-' + this.formatRupiah(Math.abs(diskonProduk));
-    if (elVoucherDiskon) elVoucherDiskon.textContent = '-' + this.formatRupiah(Math.abs(voucherDiskon));
+    if (elDiskonProd) elDiskonProd.textContent = diskonProduk < 0 ? '-' + this.formatRupiah(Math.abs(diskonProduk)) : 'Rp0';
+    if (elVoucherDiskon) elVoucherDiskon.textContent = voucherDiskon < 0 ? '-' + this.formatRupiah(Math.abs(voucherDiskon)) : 'Rp0';
     if (elEarnedPoints) elEarnedPoints.textContent = `+${earnedPoints.toLocaleString('id-ID')} Poin`;
     if (elCoinBalance) elCoinBalance.textContent = userPoints.toLocaleString('id-ID');
     if (elTotal) elTotal.textContent = this.formatRupiah(totalPembayaran);
@@ -848,18 +869,22 @@ const PasarinCart = {
     const cleanCode = rawCode.trim().toUpperCase();
 
     try {
-      const subtotal = this.currentCheckoutData ? this.currentCheckoutData.subtotalPesanan : 300000;
+      const activeItems = this.items.filter(x => x.selected);
+      const subtotal = activeItems.reduce((acc, it) => acc + ((Number(it.price) || 0) * (Math.max(1, parseInt(it.quantity, 10) || 1))), 0);
       const data = await window.PasarinAPI.validatePromo(cleanCode, subtotal);
 
       if (data && data.success && data.data) {
         this.appliedVoucher = {
           code: data.data.code,
           title: data.data.title,
-          discountAmount: data.data.discountAmount || 10000
+          category: data.data.category,
+          discountAmount: data.data.discountAmount || 0,
+          discountValue: data.data.discountValue,
+          discountType: data.data.discountType
         };
         this.renderCheckoutPage();
         if (window.showToast) {
-          window.showToast(`🎉 Voucher / Kode Promo "${cleanCode}" berhasil digunakan! Hemat ${this.formatRupiah(this.appliedVoucher.discountAmount)}`, 'success');
+          window.showToast(`🎉 Voucher / Kode Promo "${cleanCode}" berhasil digunakan!`, 'success');
         }
         return true;
       } else {
@@ -870,12 +895,15 @@ const PasarinCart = {
       }
     } catch (e) {
       console.warn('Gagal validasi via API', e);
+      const activeItems = this.items.filter(x => x.selected);
+      const subtotal = activeItems.reduce((acc, it) => acc + ((Number(it.price) || 0) * (Math.max(1, parseInt(it.quantity, 10) || 1))), 0);
       const found = (window.PasarinApp?.promos || []).find(p => p.code === cleanCode);
       if (found) {
-        const disc = found.discountType === 'percent' ? Math.round(300000 * ((found.discountValue || 10) / 100)) : (found.discountValue || 10000);
+        const disc = found.discountType === 'percent' ? Math.round(subtotal * ((found.discountValue || 10) / 100)) : (found.discountValue || 10000);
         this.appliedVoucher = {
           code: found.code,
           title: found.title,
+          category: found.category,
           discountAmount: disc
         };
         this.renderCheckoutPage();
@@ -903,7 +931,7 @@ const PasarinCart = {
       btn.textContent = 'Memproses Pesanan...';
     }
 
-    const data = this.currentCheckoutData || { totalPembayaran: 163900 };
+    const data = this.currentCheckoutData || { totalPembayaran: 0, subtotalPesanan: 0, voucherDiskon: 0 };
     const activeAddr = window.PasarinAddressBook ? window.PasarinAddressBook.getActiveAddress() : null;
     const recipient = document.getElementById('chk-display-recipient')?.textContent || 'Ferdinand';
     const address = document.getElementById('chk-display-address')?.textContent || 'Jakarta Barat';
@@ -911,7 +939,9 @@ const PasarinCart = {
 
     const res = await PasarinAPI.checkout({
       shippingAddress: fullShippingInfo,
-      paymentMethod: this.selectedPaymentMethod || 'Debit Instan'
+      paymentMethod: this.selectedPaymentMethod || 'Debit Instan',
+      promoCode: this.appliedVoucher ? this.appliedVoucher.code : null,
+      discountAmount: Math.abs(data.voucherDiskon || 0)
     });
 
     if (btn) {
