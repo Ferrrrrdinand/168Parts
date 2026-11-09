@@ -17,7 +17,7 @@ class PromoModel {
       const { data, error } = await dbManager.supabaseClient.from('promos').select('*').eq('is_active', true).order('created_at', { ascending: false });
       if (!error && data) return data.map(this.formatRow);
     }
-    const sql = 'SELECT * FROM promos WHERE is_active = 1 ORDER BY created_at DESC';
+    const sql = 'SELECT * FROM promos WHERE is_active = true ORDER BY created_at DESC';
     const rows = await dbManager.query(sql);
     return rows.map(this.formatRow);
   }
@@ -60,7 +60,7 @@ class PromoModel {
       INSERT INTO promos (
         code, title, description, discount_type, discount_value,
         min_spend, max_discount, quota, used_count, category, is_active
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, 1)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, true)
     `;
 
     await dbManager.query(sql, [
@@ -91,9 +91,9 @@ class PromoModel {
 
   async toggleActive(code, isActive) {
     const cleanCode = (code || '').trim().toUpperCase();
-    const val = isActive ? 1 : 0;
+    const val = Boolean(isActive);
     if (dbManager.isConnected && dbManager.supabaseClient && !dbManager.pgPool) {
-      await dbManager.supabaseClient.from('promos').update({ is_active: Boolean(isActive) }).ilike('code', cleanCode);
+      await dbManager.supabaseClient.from('promos').update({ is_active: val }).ilike('code', cleanCode);
       return await this.findByCode(cleanCode);
     }
     const sql = 'UPDATE promos SET is_active = ? WHERE UPPER(code) = ?';

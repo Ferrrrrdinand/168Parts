@@ -1,3 +1,4 @@
+require('dotenv').config();
 const path = require('path');
 const fs = require('fs');
 const sqlite3 = require('sqlite3').verbose();
@@ -5,7 +6,7 @@ const seedProducts = require('../../data/seedProducts');
 
 class DatabaseManager {
   constructor() {
-    this.dbType = (process.env.DB_TYPE || 'sqlite').toLowerCase();
+    this.dbType = (process.env.DB_TYPE || 'supabase').toLowerCase();
     this.sqliteDb = null;
     this.mysqlPool = null;
     this.pgPool = null;
@@ -14,11 +15,15 @@ class DatabaseManager {
   }
 
   async init() {
+    this.dbType = (process.env.DB_TYPE || 'supabase').toLowerCase();
     if (this.dbType === 'supabase' || this.dbType === 'postgres') {
       const supabaseOk = await this.initSupabase();
-      if (supabaseOk) return true;
-      console.log('🔄 [Database] Supabase tidak dapat terhubung, beralih ke Database SQL Lokal (SQLite)...');
-      this.dbType = 'sqlite';
+      if (supabaseOk) {
+        console.log('✅ [Database Cloud] Sistem 100% menggunakan Supabase Cloud (PostgreSQL). Database lokal tidak digunakan.');
+        return true;
+      }
+      console.error('❌ [Database] Gagal terhubung ke Supabase Cloud!');
+      throw new Error('Supabase Cloud connection failed. Database lokal dinonaktifkan.');
     } else if (this.dbType === 'mysql') {
       const mysqlOk = await this.initMySQL();
       if (mysqlOk) return true;
@@ -369,7 +374,15 @@ class DatabaseManager {
       return rows;
     } else if ((this.dbType === 'supabase' || this.dbType === 'postgres') && this.pgPool) {
       let paramIndex = 1;
-      const pgSql = sql.replace(/\?/g, () => `$${paramIndex++}`);
+      let pgSql = sql.replace(/\?/g, () => `$${paramIndex++}`);
+      // Replace LIKE with ILIKE for case-insensitivity on PostgreSQL
+      pgSql = pgSql.replace(/\bLIKE\b/g, 'ILIKE');
+      // Normalize boolean comparisons for PostgreSQL
+      pgSql = pgSql.replace(/is_flash_sale\s*=\s*1/gi, 'is_flash_sale = true');
+      pgSql = pgSql.replace(/is_flash_sale\s*=\s*0/gi, 'is_flash_sale = false');
+      pgSql = pgSql.replace(/is_active\s*=\s*1/gi, 'is_active = true');
+      pgSql = pgSql.replace(/is_active\s*=\s*0/gi, 'is_active = false');
+
       const res = await this.pgPool.query(pgSql, params);
       const trimmed = sql.trim().toUpperCase();
       if (trimmed.startsWith('SELECT')) {
@@ -381,32 +394,44 @@ class DatabaseManager {
     return [];
   }
 
-  // SQLite Helper Wrappers (Promise-based)
-  run(sql, params = []) {
-    return new Promise((resolve, reject) => {
-      this.sqliteDb.run(sql, params, function (err) {
-        if (err) reject(err);
-        else resolve({ changes: this.changes, lastID: this.lastID });
+  // Promise-based Helper Wrappers (Multi-Database Support)
+  async run(sql, params = []) {
+    if (this.dbType === 'sqlite' && this.sqliteDb) {
+      return new Promise((resolve, reject) => {
+        this.sqliteDb.run(sql, params, function (err) {
+          if (err) reject(err);
+          else resolve({ changes: this.changes, lastID: this.lastID });
+        });
       });
-    });
+    }
+    const res = await this.query(sql, params);
+    const affected = res && res[0] ? (res[0].affectedRows || 0) : 0;
+    return { changes: affected, lastID: null };
   }
 
-  get(sql, params = []) {
-    return new Promise((resolve, reject) => {
-      this.sqliteDb.get(sql, params, (err, row) => {
-        if (err) reject(err);
-        else resolve(row);
+  async get(sql, params = []) {
+    if (this.dbType === 'sqlite' && this.sqliteDb) {
+      return new Promise((resolve, reject) => {
+        this.sqliteDb.get(sql, params, (err, row) => {
+          if (err) reject(err);
+          else resolve(row);
+        });
       });
-    });
+    }
+    const rows = await this.query(sql, params);
+    return (rows && rows.length > 0) ? rows[0] : null;
   }
 
-  all(sql, params = []) {
-    return new Promise((resolve, reject) => {
-      this.sqliteDb.all(sql, params, (err, rows) => {
-        if (err) reject(err);
-        else resolve(rows);
+  async all(sql, params = []) {
+    if (this.dbType === 'sqlite' && this.sqliteDb) {
+      return new Promise((resolve, reject) => {
+        this.sqliteDb.all(sql, params, (err, rows) => {
+          if (err) reject(err);
+          else resolve(rows);
+        });
       });
-    });
+    }
+    return await this.query(sql, params);
   }
 }
 

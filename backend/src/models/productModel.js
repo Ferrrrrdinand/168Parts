@@ -121,7 +121,7 @@ class ProductModel {
         productPayload.icon,
         productPayload.image,
         productPayload.bgPattern,
-        productPayload.isFlashSale ? 1 : 0,
+        Boolean(productPayload.isFlashSale),
         productPayload.flashSaleSold,
         productPayload.description,
         JSON.stringify(productPayload.specs)
@@ -333,7 +333,7 @@ class ProductModel {
         merged.shopName,
         merged.shopType,
         merged.image,
-        merged.isFlashSale ? 1 : 0,
+        Boolean(merged.isFlashSale),
         merged.description,
         JSON.stringify(merged.specs || []),
         id
@@ -394,7 +394,7 @@ class ProductModel {
     }
 
     if (dbManager.isConnected) {
-      const rows = await dbManager.query('SELECT * FROM products WHERE is_flash_sale = 1 ORDER BY flash_sale_sold DESC LIMIT 12');
+      const rows = await dbManager.query('SELECT * FROM products WHERE is_flash_sale = true ORDER BY flash_sale_sold DESC LIMIT 12');
       return rows.map(r => this.formatProductRow(r));
     }
     const db = storage.read();
