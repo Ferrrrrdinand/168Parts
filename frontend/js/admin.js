@@ -101,11 +101,26 @@ const AdminApp = {
     }
 
     try {
-      const res = await fetch(`${window.PasarinAPI.baseUrl}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
+      let res;
+      try {
+        res = await fetch(`${window.PasarinAPI.baseUrl}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+      } catch (netErr) {
+        if (window.PasarinAPI && (window.PasarinAPI.baseUrl.includes('localhost:3000') || window.PasarinAPI.baseUrl.includes('127.0.0.1:3000'))) {
+          console.info('[Admin] Server lokal port 3000 offline. Mengalihkan ke Cloud API Vercel.');
+          window.PasarinAPI.baseUrl = 'https://partonesixeight.vercel.app/api';
+          res = await fetch(`${window.PasarinAPI.baseUrl}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+        } else {
+          throw netErr;
+        }
+      }
 
       let data;
       const cType = res.headers.get('content-type') || '';
@@ -189,10 +204,21 @@ const AdminApp = {
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
-    return fetch(`${window.PasarinAPI.baseUrl}${endpoint}`, {
-      ...options,
-      headers
-    });
+    try {
+      return await fetch(`${window.PasarinAPI.baseUrl}${endpoint}`, {
+        ...options,
+        headers
+      });
+    } catch (netErr) {
+      if (window.PasarinAPI && (window.PasarinAPI.baseUrl.includes('localhost:3000') || window.PasarinAPI.baseUrl.includes('127.0.0.1:3000'))) {
+        window.PasarinAPI.baseUrl = 'https://partonesixeight.vercel.app/api';
+        return await fetch(`${window.PasarinAPI.baseUrl}${endpoint}`, {
+          ...options,
+          headers
+        });
+      }
+      throw netErr;
+    }
   },
 
   async loadAllDashboardData() {

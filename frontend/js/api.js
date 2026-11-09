@@ -5,7 +5,10 @@
    ========================================================= */
 
 // Gunakan origin saat aplikasi dilayani backend; pada development lokal yang
-// memakai server statis, arahkan request ke backend lokal.
+// memakai server statis (seperti VS Code Live Server di port 5500), arahkan request ke backend lokal port 3000,
+// dan otomatis fallback ke cloud Vercel jika server port 3000 belum dinyalakan.
+const CLOUD_API_BASE = 'https://partonesixeight.vercel.app/api';
+
 const API_BASE = (() => {
   if (typeof window === 'undefined') return '/api';
 
@@ -19,6 +22,7 @@ const API_BASE = (() => {
 
 const PasarinAPI = {
   baseUrl: API_BASE,
+  cloudBaseUrl: CLOUD_API_BASE,
 
   getToken() {
     return localStorage.getItem('pasarin_token');
@@ -54,10 +58,25 @@ const PasarinAPI = {
     }
 
     try {
-      const res = await fetch(`${API_BASE}${endpoint}`, {
-        ...options,
-        headers
-      });
+      let res;
+      try {
+        res = await fetch(`${this.baseUrl}${endpoint}`, {
+          ...options,
+          headers
+        });
+      } catch (netErr) {
+        // Jika server lokal di port 3000 offline/belum dijalankan, otomatis fallback ke backend Cloud Vercel
+        if (this.baseUrl.includes('localhost:3000') || this.baseUrl.includes('127.0.0.1:3000')) {
+          console.info(`[PasarinAPI] Server lokal port 3000 offline. Mengalihkan ke Cloud API: ${this.cloudBaseUrl}${endpoint}`);
+          this.baseUrl = this.cloudBaseUrl;
+          res = await fetch(`${this.baseUrl}${endpoint}`, {
+            ...options,
+            headers
+          });
+        } else {
+          throw netErr;
+        }
+      }
 
       const cType = res.headers.get('content-type') || '';
       if (cType.includes('application/json')) {
