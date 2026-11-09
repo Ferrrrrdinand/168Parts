@@ -1617,6 +1617,17 @@ const PasarinApp = {
       this.openOrdersModal();
     }
 
+    if (hash === '#promo') {
+      this.openPromoModal();
+    }
+
+    if (hash.startsWith('#/product/')) {
+      const pid = hash.replace('#/product/', '').split('?')[0].trim();
+      if (pid) {
+        setTimeout(() => this.openProductDetail(pid), 50);
+      }
+    }
+
     window.scrollTo({ top: 0, behavior: 'instant' });
   },
 
@@ -2741,8 +2752,24 @@ const PasarinApp = {
       const elPills = document.getElementById('banner-left-pills');
       const elImg = document.getElementById('banner-left-img');
 
-      if (elLeft && banners.left.bgGradient) {
-        elLeft.style.background = banners.left.bgGradient;
+      if (elLeft) {
+        if (banners.left.bgGradient) elLeft.style.background = banners.left.bgGradient;
+        elLeft.style.cursor = 'pointer';
+        elLeft.setAttribute('role', 'button');
+        elLeft.setAttribute('tabindex', '0');
+        const targetUrl = banners.left.targetUrl || 'login.html?promo=newuser#register';
+        elLeft.setAttribute('title', `Klik untuk membuka: ${targetUrl}`);
+        
+        elLeft.onclick = (e) => {
+          if (e.target.closest('.shopee-dots') || e.target.classList.contains('dot')) return;
+          this.handleBannerClick(targetUrl);
+        };
+        elLeft.onkeydown = (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            this.handleBannerClick(targetUrl);
+          }
+        };
       }
       if (elBadge && banners.left.badge) {
         elBadge.textContent = banners.left.badge;
@@ -2770,8 +2797,23 @@ const PasarinApp = {
       const elPill2Title = document.getElementById('banner-right-pill2-title');
       const elPill2Val = document.getElementById('banner-right-pill2-val');
 
-      if (elRight && banners.right.bgGradient) {
-        elRight.style.background = banners.right.bgGradient;
+      if (elRight) {
+        if (banners.right.bgGradient) elRight.style.background = banners.right.bgGradient;
+        elRight.style.cursor = 'pointer';
+        elRight.setAttribute('role', 'button');
+        elRight.setAttribute('tabindex', '0');
+        const targetUrl = banners.right.targetUrl || '#promo';
+        elRight.setAttribute('title', `Klik untuk membuka: ${targetUrl}`);
+
+        elRight.onclick = () => {
+          this.handleBannerClick(targetUrl);
+        };
+        elRight.onkeydown = (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            this.handleBannerClick(targetUrl);
+          }
+        };
       }
       if (elImg1 && banners.right.modelImage1) elImg1.src = banners.right.modelImage1;
       if (elImg2 && banners.right.modelImage2) elImg2.src = banners.right.modelImage2;
@@ -2780,6 +2822,52 @@ const PasarinApp = {
       if (elPill2Title && banners.right.pill2Title) elPill2Title.textContent = banners.right.pill2Title;
       if (elPill2Val && banners.right.pill2Val) elPill2Val.textContent = banners.right.pill2Val;
     }
+  },
+
+  handleBannerClick(targetUrl) {
+    if (!targetUrl) return;
+    targetUrl = targetUrl.trim();
+
+    // 1. Eksternal URL (YouTube, Sosmed, Website Lain)
+    if (targetUrl.startsWith('http://') || targetUrl.startsWith('https://')) {
+      window.open(targetUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    // 2. Link Pendaftaran Akun Baru / Login Promo
+    if (targetUrl.startsWith('login.html')) {
+      window.location.href = targetUrl;
+      return;
+    }
+
+    // 3. Modal Klaim Promo / Voucher
+    if (targetUrl === '#promo' || targetUrl === 'promo' || targetUrl.includes('promoModal')) {
+      this.openPromoModal();
+      return;
+    }
+
+    // 4. Link Produk Spesifik (#/product/:id)
+    if (targetUrl.startsWith('#/product/')) {
+      const pid = targetUrl.replace('#/product/', '').split('?')[0].trim();
+      this.openProductDetail(pid);
+      return;
+    }
+
+    // 5. Cek apakah targetUrl adalah ID Produk secara langsung
+    const matchedProduct = this.products.find(p => p.id === targetUrl);
+    if (matchedProduct) {
+      this.openProductDetail(matchedProduct.id);
+      return;
+    }
+
+    // 6. Internal Route (#/search, #/cart, #/orders, dll)
+    if (targetUrl.startsWith('#')) {
+      window.location.hash = targetUrl;
+      return;
+    }
+
+    // 7. Fallback navigasi umum
+    window.location.href = targetUrl;
   },
 
   async initPromoSystem() {

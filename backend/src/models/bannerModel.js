@@ -7,12 +7,12 @@ const defaultBanners = {
     subtitle: 'Kualitas Original Garansi Toko Terpercaya',
     pills: [
       '🏷️ LCD & Baterai Bergaransi',
-      '⚡ Alat Servis Teknisi Handal',
+      '⚡ Promo Pengguna Baru: Diskon 50RB',
       '⭐ Sparepart Presisi Siap Kirim'
     ],
     modelImage: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=320&auto=format&fit=crop&q=80',
     bgGradient: 'linear-gradient(135deg, #881337 0%, #be123c 100%)',
-    targetUrl: '#/search?category=LCD+%26+Layar'
+    targetUrl: 'login.html?promo=newuser#register'
   },
   right: {
     title: 'Flash Sale & Promo Spesial Teknisi',
@@ -23,7 +23,7 @@ const defaultBanners = {
     pill2Title: 'VOUCHER',
     pill2Val: '100RB',
     bgGradient: 'linear-gradient(135deg, #4c0519 0%, #9f1239 50%, #be123c 100%)',
-    targetUrl: '#/search?q=promo'
+    targetUrl: '#promo'
   }
 };
 
@@ -58,6 +58,17 @@ class BannerModel {
     `;
     await dbManager.query(sql, [jsonStr]);
     return merged;
+  }
+
+  async resetBanner() {
+    const jsonStr = JSON.stringify(defaultBanners);
+    const sql = `
+      INSERT INTO banners (id, config_json, created_at, updated_at)
+      VALUES ('main_banner', ?, NOW(), NOW())
+      ON CONFLICT (id) DO UPDATE SET config_json = EXCLUDED.config_json, updated_at = NOW()
+    `;
+    await dbManager.query(sql, [jsonStr]);
+    return defaultBanners;
   }
 }
 

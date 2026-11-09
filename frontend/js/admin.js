@@ -267,6 +267,11 @@ const AdminApp = {
       titleEl.textContent = titles[tabName] || 'Dashboard Admin';
     }
 
+    if (tabName === 'banners') {
+      this.populateBannerProductSelects();
+      this.populateBannerForm();
+    }
+
     // Auto close sidebar on mobile
     const sidebar = document.getElementById('admin-sidebar');
     if (sidebar && window.innerWidth <= 768) {
@@ -897,30 +902,90 @@ const AdminApp = {
     }
   },
 
+  populateBannerProductSelects() {
+    const leftSelect = document.getElementById('cfg-b-left-prod-select');
+    const rightSelect = document.getElementById('cfg-b-right-prod-select');
+    if (!this.products || this.products.length === 0) return;
+
+    const optionsHtml = '<option value="">-- Pilih Produk untuk Ditautkan Otomatis --</option>' +
+      this.products.map(p => `
+        <option value="${p.id}">[${p.category || 'Sparepart'}] ${p.name} (Rp${Number(p.price || 0).toLocaleString('id-ID')})</option>
+      `).join('');
+
+    if (leftSelect) leftSelect.innerHTML = optionsHtml;
+    if (rightSelect) rightSelect.innerHTML = optionsHtml;
+  },
+
+  applyBannerPreset(side, url) {
+    const inputEl = document.getElementById(`cfg-b-${side}-url`);
+    if (inputEl) {
+      inputEl.value = url;
+      this.updateBannerPreview();
+      this.showToast(`✓ Preset link ${side === 'left' ? 'Banner Kiri' : 'Banner Kanan'} diterapkan!`);
+    }
+  },
+
+  selectBannerProduct(side, productId) {
+    if (!productId) return;
+    const prod = this.products.find(p => p.id === productId);
+    const inputEl = document.getElementById(`cfg-b-${side}-url`);
+    if (inputEl) {
+      inputEl.value = `#/product/${productId}`;
+    }
+
+    // Optional quick banner auto-fill hint
+    if (prod && side === 'left') {
+      const titleInput = document.getElementById('cfg-b-left-title');
+      const badgeInput = document.getElementById('cfg-b-left-badge');
+      if (confirm(`Apakah Anda juga ingin memperbarui Judul & Badge Banner Kiri dengan produk "${prod.name}"?`)) {
+        if (titleInput) titleInput.value = prod.name;
+        if (badgeInput) badgeInput.value = '🔥 PRODUK TERBARU 168 PARTS';
+        if (prod.image) {
+          const imgInput = document.getElementById('cfg-b-left-img');
+          if (imgInput) imgInput.value = prod.image;
+        }
+      }
+    } else if (prod && side === 'right') {
+      const titleInput = document.getElementById('cfg-b-right-title');
+      if (confirm(`Apakah Anda ingin memperbarui Judul Banner Kanan dengan produk "${prod.name}"?`)) {
+        if (titleInput) titleInput.value = prod.name;
+        if (prod.image) {
+          const img1Input = document.getElementById('cfg-b-right-img1');
+          if (img1Input) img1Input.value = prod.image;
+        }
+      }
+    }
+
+    this.updateBannerPreview();
+  },
+
   populateBannerForm() {
     if (!this.banners) return;
     const { left, right } = this.banners;
 
+    const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+
     if (left) {
-      const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
-      setVal('cfg-b-left-badge', left.badge);
-      setVal('cfg-b-left-title', left.title);
-      setVal('cfg-b-left-p1', left.pills ? left.pills[0] : '');
-      setVal('cfg-b-left-p2', left.pills ? left.pills[1] : '');
-      setVal('cfg-b-left-p3', left.pills ? left.pills[2] : '');
-      setVal('cfg-b-left-img', left.modelImage);
-      setVal('cfg-b-left-color', left.bgGradient || 'linear-gradient(135deg, #1d3f0d 0%, #285715 100%)');
+      setVal('cfg-b-left-badge', left.badge || '✨ 168 PARTS SURABAYA');
+      setVal('cfg-b-left-title', left.title || 'Pusat Sparepart & Alat Servis HP Terlengkap');
+      setVal('cfg-b-left-p1', left.pills ? left.pills[0] : '🏷️ LCD & Baterai Bergaransi');
+      setVal('cfg-b-left-p2', left.pills ? left.pills[1] : '⚡ Promo Pengguna Baru: Diskon 50RB');
+      setVal('cfg-b-left-p3', left.pills ? left.pills[2] : '⭐ Sparepart Presisi Siap Kirim');
+      setVal('cfg-b-left-img', left.modelImage || 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=320');
+      setVal('cfg-b-left-color', left.bgGradient || 'linear-gradient(135deg, #881337 0%, #be123c 100%)');
+      setVal('cfg-b-left-url', left.targetUrl || 'login.html?promo=newuser#register');
     }
 
     if (right) {
-      const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
-      setVal('cfg-b-right-p1-title', right.pill1Title);
-      setVal('cfg-b-right-p1-val', right.pill1Val);
-      setVal('cfg-b-right-p2-title', right.pill2Title);
-      setVal('cfg-b-right-p2-val', right.pill2Val);
-      setVal('cfg-b-right-img1', right.modelImage1);
-      setVal('cfg-b-right-img2', right.modelImage2);
-      setVal('cfg-b-right-color', right.bgGradient || 'linear-gradient(135deg, #3b0764 0%, #581c87 50%, #4c1d95 100%)');
+      setVal('cfg-b-right-title', right.title || 'Flash Sale & Promo Spesial Teknisi');
+      setVal('cfg-b-right-p1-title', right.pill1Title || 'DISKON S.D.');
+      setVal('cfg-b-right-p1-val', right.pill1Val || '50%');
+      setVal('cfg-b-right-p2-title', right.pill2Title || 'VOUCHER');
+      setVal('cfg-b-right-p2-val', right.pill2Val || '100RB');
+      setVal('cfg-b-right-img1', right.modelImage1 || 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=240');
+      setVal('cfg-b-right-img2', right.modelImage2 || 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=240');
+      setVal('cfg-b-right-color', right.bgGradient || 'linear-gradient(135deg, #4c0519 0%, #9f1239 50%, #be123c 100%)');
+      setVal('cfg-b-right-url', right.targetUrl || '#promo');
     }
 
     this.updateBannerPreview();
@@ -928,13 +993,14 @@ const AdminApp = {
 
   updateBannerPreview() {
     // Left preview elements
-    const badgeVal = document.getElementById('cfg-b-left-badge')?.value || '✨ PASARIN PILIH LOKAL';
-    const titleVal = document.getElementById('cfg-b-left-title')?.value || 'Kreasi Unggulan & Inovasi Nusantara';
-    const p1Val = document.getElementById('cfg-b-left-p1')?.value || '🏷️ Produk Unik Asli Indonesia';
-    const p2Val = document.getElementById('cfg-b-left-p2')?.value || '⚡ Inovasi Lokal Rasa Global';
-    const p3Val = document.getElementById('cfg-b-left-p3')?.value || '⭐ Kualitas Unggulan Nusantara';
-    const imgVal = document.getElementById('cfg-b-left-img')?.value || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=320';
-    const colorVal = document.getElementById('cfg-b-left-color')?.value || 'linear-gradient(135deg, #1d3f0d 0%, #285715 100%)';
+    const badgeVal = document.getElementById('cfg-b-left-badge')?.value || '✨ 168 PARTS SURABAYA';
+    const titleVal = document.getElementById('cfg-b-left-title')?.value || 'Pusat Sparepart & Alat Servis HP Terlengkap';
+    const p1Val = document.getElementById('cfg-b-left-p1')?.value || '🏷️ LCD & Baterai Bergaransi';
+    const p2Val = document.getElementById('cfg-b-left-p2')?.value || '⚡ Promo Pengguna Baru: Diskon 50RB';
+    const p3Val = document.getElementById('cfg-b-left-p3')?.value || '⭐ Sparepart Presisi Siap Kirim';
+    const imgVal = document.getElementById('cfg-b-left-img')?.value || 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=320';
+    const colorVal = document.getElementById('cfg-b-left-color')?.value || 'linear-gradient(135deg, #881337 0%, #be123c 100%)';
+    const leftUrlVal = document.getElementById('cfg-b-left-url')?.value || 'login.html?promo=newuser#register';
 
     const prevLeftBox = document.getElementById('prev-left-box');
     const prevLeftBadge = document.getElementById('prev-left-badge');
@@ -943,6 +1009,7 @@ const AdminApp = {
     const prevLeftP2 = document.getElementById('prev-left-p2');
     const prevLeftP3 = document.getElementById('prev-left-p3');
     const prevLeftImg = document.getElementById('prev-left-img');
+    const prevLeftUrlLabel = document.getElementById('prev-left-url-label');
 
     if (prevLeftBox) prevLeftBox.style.background = colorVal;
     if (prevLeftBadge) prevLeftBadge.textContent = badgeVal;
@@ -951,31 +1018,38 @@ const AdminApp = {
     if (prevLeftP2) prevLeftP2.textContent = p2Val;
     if (prevLeftP3) prevLeftP3.textContent = p3Val;
     if (prevLeftImg) prevLeftImg.src = imgVal;
+    if (prevLeftUrlLabel) prevLeftUrlLabel.textContent = leftUrlVal || '(Tidak ada tautan)';
 
     // Right preview elements
+    const rTitle = document.getElementById('cfg-b-right-title')?.value || 'Flash Sale & Promo Spesial';
     const rp1Title = document.getElementById('cfg-b-right-p1-title')?.value || 'DISKON S.D.';
-    const rp1Val = document.getElementById('cfg-b-right-p1-val')?.value || '80%';
+    const rp1Val = document.getElementById('cfg-b-right-p1-val')?.value || '50%';
     const rp2Title = document.getElementById('cfg-b-right-p2-title')?.value || 'VOUCHER';
     const rp2Val = document.getElementById('cfg-b-right-p2-val')?.value || '100RB';
-    const rImg1 = document.getElementById('cfg-b-right-img1')?.value || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=240';
-    const rImg2 = document.getElementById('cfg-b-right-img2')?.value || 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=240';
-    const rColor = document.getElementById('cfg-b-right-color')?.value || 'linear-gradient(135deg, #3b0764 0%, #581c87 50%, #4c1d95 100%)';
+    const rImg1 = document.getElementById('cfg-b-right-img1')?.value || 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=240';
+    const rImg2 = document.getElementById('cfg-b-right-img2')?.value || 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=240';
+    const rColor = document.getElementById('cfg-b-right-color')?.value || 'linear-gradient(135deg, #4c0519 0%, #9f1239 50%, #be123c 100%)';
+    const rightUrlVal = document.getElementById('cfg-b-right-url')?.value || '#promo';
 
     const prevRightBox = document.getElementById('prev-right-box');
+    const prevRightTitle = document.getElementById('prev-right-title');
     const prevRightP1Title = document.getElementById('prev-right-p1-title');
     const prevRightP1Val = document.getElementById('prev-right-p1-val');
     const prevRightP2Title = document.getElementById('prev-right-p2-title');
     const prevRightP2Val = document.getElementById('prev-right-p2-val');
     const prevRightImg1 = document.getElementById('prev-right-img1');
     const prevRightImg2 = document.getElementById('prev-right-img2');
+    const prevRightUrlLabel = document.getElementById('prev-right-url-label');
 
     if (prevRightBox) prevRightBox.style.background = rColor;
+    if (prevRightTitle) prevRightTitle.textContent = rTitle;
     if (prevRightP1Title) prevRightP1Title.textContent = rp1Title;
     if (prevRightP1Val) prevRightP1Val.textContent = rp1Val;
     if (prevRightP2Title) prevRightP2Title.textContent = rp2Title;
     if (prevRightP2Val) prevRightP2Val.textContent = rp2Val;
     if (prevRightImg1) prevRightImg1.src = rImg1;
     if (prevRightImg2) prevRightImg2.src = rImg2;
+    if (prevRightUrlLabel) prevRightUrlLabel.textContent = rightUrlVal || '(Tidak ada tautan)';
   },
 
   onBannerLeftColorChange(color) {
@@ -991,26 +1065,27 @@ const AdminApp = {
   async saveBanners() {
     const payload = {
       left: {
-        badge: document.getElementById('cfg-b-left-badge')?.value || '✨ PASARIN PILIH LOKAL',
-        title: document.getElementById('cfg-b-left-title')?.value || 'Kreasi Unggulan & Inovasi Nusantara',
+        badge: document.getElementById('cfg-b-left-badge')?.value || '✨ 168 PARTS SURABAYA',
+        title: document.getElementById('cfg-b-left-title')?.value || 'Pusat Sparepart & Alat Servis HP Terlengkap',
         pills: [
-          document.getElementById('cfg-b-left-p1')?.value || '🏷️ Produk Unik Asli Indonesia',
-          document.getElementById('cfg-b-left-p2')?.value || '⚡ Inovasi Lokal Rasa Global',
-          document.getElementById('cfg-b-left-p3')?.value || '⭐ Kualitas Unggulan Nusantara'
+          document.getElementById('cfg-b-left-p1')?.value || '🏷️ LCD & Baterai Bergaransi',
+          document.getElementById('cfg-b-left-p2')?.value || '⚡ Promo Pengguna Baru: Diskon 50RB',
+          document.getElementById('cfg-b-left-p3')?.value || '⭐ Sparepart Presisi Siap Kirim'
         ],
-        modelImage: document.getElementById('cfg-b-left-img')?.value || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=320',
-        bgGradient: document.getElementById('cfg-b-left-color')?.value || 'linear-gradient(135deg, #1d3f0d 0%, #285715 100%)',
-        targetUrl: '#/search?category=Pilih+Lokal'
+        modelImage: document.getElementById('cfg-b-left-img')?.value || 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=320',
+        bgGradient: document.getElementById('cfg-b-left-color')?.value || 'linear-gradient(135deg, #881337 0%, #be123c 100%)',
+        targetUrl: document.getElementById('cfg-b-left-url')?.value.trim() || 'login.html?promo=newuser#register'
       },
       right: {
+        title: document.getElementById('cfg-b-right-title')?.value || 'Flash Sale & Promo Spesial Teknisi',
         pill1Title: document.getElementById('cfg-b-right-p1-title')?.value || 'DISKON S.D.',
-        pill1Val: document.getElementById('cfg-b-right-p1-val')?.value || '80%',
+        pill1Val: document.getElementById('cfg-b-right-p1-val')?.value || '50%',
         pill2Title: document.getElementById('cfg-b-right-p2-title')?.value || 'VOUCHER',
         pill2Val: document.getElementById('cfg-b-right-p2-val')?.value || '100RB',
-        modelImage1: document.getElementById('cfg-b-right-img1')?.value || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=240',
-        modelImage2: document.getElementById('cfg-b-right-img2')?.value || 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=240',
-        bgGradient: document.getElementById('cfg-b-right-color')?.value || 'linear-gradient(135deg, #3b0764 0%, #581c87 50%, #4c1d95 100%)',
-        targetUrl: '#/search?q=promo'
+        modelImage1: document.getElementById('cfg-b-right-img1')?.value || 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=240',
+        modelImage2: document.getElementById('cfg-b-right-img2')?.value || 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=240',
+        bgGradient: document.getElementById('cfg-b-right-color')?.value || 'linear-gradient(135deg, #4c0519 0%, #9f1239 50%, #be123c 100%)',
+        targetUrl: document.getElementById('cfg-b-right-url')?.value.trim() || '#promo'
       }
     };
 
@@ -1022,7 +1097,7 @@ const AdminApp = {
       const data = await res.json();
       if (data && data.success) {
         this.banners = data.data;
-        this.showToast('✅ Pengaturan banner beranda berhasil disimpan!');
+        this.showToast('✅ Pengaturan banner beranda berhasil disimpan di database!');
       } else {
         alert(data.message || 'Gagal menyimpan perubahan banner.');
       }
@@ -1033,7 +1108,7 @@ const AdminApp = {
   },
 
   async resetBanners() {
-    if (!confirm('Apakah Anda yakin ingin mengembalikan semua banner ke desain bawaan awal?')) {
+    if (!confirm('Apakah Anda yakin ingin mengembalikan semua banner ke desain bawaan awal 168 Parts?')) {
       return;
     }
 

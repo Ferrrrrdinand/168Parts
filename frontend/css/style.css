@@ -645,14 +645,21 @@ main.w {
 }
 
 .hero-shopee-left {
-  background: linear-gradient(135deg, #9f1239 0%, #be123c 55%, #2e6919 100%);
-  border-radius: 4px;
+  background: linear-gradient(135deg, #881337 0%, #be123c 100%);
+  border-radius: 6px;
   padding: 24px 26px 14px 26px;
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.hero-shopee-left:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -4px rgba(190, 18, 60, 0.25);
 }
 
 .shopee-hero-content {
@@ -758,8 +765,8 @@ main.w {
 
 /* Banner Kanan (Diskon & Voucher Shopee Style) */
 .hero-shopee-right {
-  background: linear-gradient(135deg, #3b0764 0%, #581c87 50%, #4c1d95 100%);
-  border-radius: 4px;
+  background: linear-gradient(135deg, #4c0519 0%, #9f1239 50%, #be123c 100%);
+  border-radius: 6px;
   padding: 14px 12px;
   display: flex;
   align-items: center;
@@ -767,6 +774,13 @@ main.w {
   gap: 8px;
   overflow: hidden;
   position: relative;
+  cursor: pointer;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.hero-shopee-right:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -4px rgba(159, 18, 57, 0.25);
 }
 
 .side-model {

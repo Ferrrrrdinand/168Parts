@@ -35,7 +35,7 @@ exports.updateBanners = async (req, res) => {
 
 exports.resetBanners = async (req, res) => {
   try {
-    const reset = await bannerModel.updateBanner({});
+    const reset = await bannerModel.resetBanner();
     return res.json({
       success: true,
       message: 'Banner berhasil direset ke pengaturan default 168 Parts!',

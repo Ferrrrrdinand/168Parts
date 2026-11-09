@@ -100,6 +100,20 @@
 
         <!-- FORM REGISTER -->
         <form class="auth-form" id="form-register">
+
+          <!-- Banner Promo Khusus Pendaftaran Pengguna Baru -->
+          <div id="register-promo-banner" style="background:linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); border:1.5px dashed #be123c; border-radius:10px; padding:12px 14px; margin-bottom:16px;">
+            <div style="display:flex; align-items:flex-start; gap:10px;">
+              <span style="font-size:24px; line-height:1;">🎁</span>
+              <div>
+                <div style="font-size:13px; font-weight:800; color:#881337;">Promo Pengguna Baru 168 Parts Surabaya!</div>
+                <div style="font-size:12px; color:#9f1239; margin-top:3px; line-height:1.4;">
+                  Daftar sekarang & dapatkan <b>Voucher Belanja Diskon Rp 50.000</b> (Min. Belanja Rp 600.000). Kode Promo <b>NEW168</b> langsung dapat Anda klaim setelah pendaftaran.
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="form-group">
             <label class="form-label" for="reg-name">Nama Lengkap</label>
             <input class="auth-input" type="text" id="reg-name" placeholder="Nama lengkap Anda" required>
@@ -221,8 +235,8 @@
     tabLogin.addEventListener('click', () => setTab('login'));
     tabRegister.addEventListener('click', () => setTab('register'));
 
-    // Check hash on load
-    if (window.location.hash === '#register') {
+    // Check hash or query on load
+    if (window.location.hash === '#register' || window.location.search.includes('promo') || window.location.search.includes('register')) {
       setTab('register');
     }
 
