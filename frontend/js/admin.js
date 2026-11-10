@@ -554,11 +554,102 @@ const AdminApp = {
     }
   },
 
+  /* =========================================================
+     KALKULASI OTOMATIS HARGA ASLI, DISKON PERSEN & HARGA POTONGAN
+     ========================================================= */
+  calcDiscountFromPercent() {
+    const origInput = document.getElementById('f-prod-orig-price');
+    const pctInput = document.getElementById('f-prod-discount-percent');
+    const priceInput = document.getElementById('f-prod-price');
+
+    const origPrice = Number(origInput?.value) || 0;
+    let pct = Number(pctInput?.value) || 0;
+    if (pct < 0) pct = 0;
+    if (pct > 99) pct = 99;
+
+    if (origPrice > 0) {
+      if (pct > 0) {
+        // Hitung harga potongan setelah diskon
+        const finalPrice = Math.max(0, Math.round(origPrice * (1 - pct / 100)));
+        if (priceInput) priceInput.value = finalPrice;
+      } else {
+        // Tanpa diskon (0%), harga potongan = harga asli
+        if (priceInput) priceInput.value = origPrice;
+      }
+    }
+    this.updatePricePreview();
+  },
+
+  calcDiscountFromPrice() {
+    const origInput = document.getElementById('f-prod-orig-price');
+    const pctInput = document.getElementById('f-prod-discount-percent');
+    const priceInput = document.getElementById('f-prod-price');
+
+    const origPrice = Number(origInput?.value) || 0;
+    const finalPrice = Number(priceInput?.value) || 0;
+
+    if (origPrice > 0 && finalPrice > 0 && origPrice > finalPrice) {
+      const pct = Math.round(((origPrice - finalPrice) / origPrice) * 100);
+      if (pctInput) pctInput.value = pct;
+    } else if (origPrice > 0 && finalPrice >= origPrice) {
+      if (pctInput) pctInput.value = 0;
+    }
+    this.updatePricePreview();
+  },
+
+  updatePricePreview() {
+    const origInput = document.getElementById('f-prod-orig-price');
+    const pctInput = document.getElementById('f-prod-discount-percent');
+    const priceInput = document.getElementById('f-prod-price');
+
+    const origPrice = Number(origInput?.value) || 0;
+    const finalPrice = Number(priceInput?.value) || 0;
+    const pct = Number(pctInput?.value) || 0;
+
+    const elStrike = document.getElementById('preview-strikethrough-price');
+    const elFinal = document.getElementById('preview-discounted-price');
+    const elBadge = document.getElementById('preview-discount-badge');
+    const elSaving = document.getElementById('preview-saving-pill');
+
+    const formatRp = (n) => 'Rp' + Number(n || 0).toLocaleString('id-ID');
+
+    const displayPrice = finalPrice > 0 ? finalPrice : origPrice;
+    if (elFinal) {
+      elFinal.textContent = formatRp(displayPrice);
+    }
+
+    if (origPrice > 0 && (pct > 0 || (finalPrice > 0 && finalPrice < origPrice))) {
+      const effectivePct = pct > 0 ? pct : Math.round(((origPrice - displayPrice) / origPrice) * 100);
+      const savings = Math.max(0, origPrice - displayPrice);
+
+      if (elStrike) {
+        elStrike.textContent = formatRp(origPrice);
+        elStrike.style.display = 'inline';
+      }
+      if (elBadge && effectivePct > 0) {
+        elBadge.textContent = `-${effectivePct}%`;
+        elBadge.style.display = 'inline-block';
+      }
+      if (elSaving && savings > 0) {
+        elSaving.textContent = `Hemat ${formatRp(savings)}`;
+        elSaving.style.display = 'inline-block';
+      }
+    } else {
+      if (elStrike) elStrike.style.display = 'none';
+      if (elBadge) elBadge.style.display = 'none';
+      if (elSaving) elSaving.style.display = 'none';
+    }
+  },
+
   openAddModal() {
     this.activeEditingId = null;
     document.getElementById('modal-product-title').textContent = 'Tambah Produk Baru';
     document.getElementById('form-product').reset();
+    document.getElementById('f-prod-orig-price').value = '';
+    document.getElementById('f-prod-discount-percent').value = '';
+    document.getElementById('f-prod-price').value = '';
     document.getElementById('prod-img-preview').src = 'images/product-placeholder.svg';
+    this.updatePricePreview();
     document.getElementById('admin-modal-product').classList.add('active');
   },
 
@@ -570,15 +661,24 @@ const AdminApp = {
     document.getElementById('modal-product-title').textContent = 'Edit Informasi Produk';
     document.getElementById('f-prod-name').value = p.name || '';
     document.getElementById('f-prod-category').value = p.category || 'LCD & Layar';
-    document.getElementById('f-prod-price').value = p.price || '';
-    document.getElementById('f-prod-orig-price').value = p.originalPrice || '';
+    
+    // Inisialisasi Harga Asli, Persentase Diskon, dan Harga Potongan
+    const origPrice = p.originalPrice || p.price || 0;
+    const finalPrice = p.price || 0;
+    const discountPercent = p.discountPercent || (origPrice > finalPrice ? Math.round(((origPrice - finalPrice) / origPrice) * 100) : 0);
+
+    document.getElementById('f-prod-orig-price').value = origPrice || '';
+    document.getElementById('f-prod-discount-percent').value = discountPercent > 0 ? discountPercent : '';
+    document.getElementById('f-prod-price').value = finalPrice || '';
+
     document.getElementById('f-prod-stock').value = p.stock || 20;
     document.getElementById('f-prod-image').value = p.image || '';
-    document.getElementById('f-prod-shop').value = p.shopName || '168 Parts Official';
-    document.getElementById('f-prod-location').value = p.location || 'Jakarta Barat';
+    document.getElementById('f-prod-shop').value = p.shopName || '168 Parts Surabaya';
+    document.getElementById('f-prod-location').value = p.location || 'Kota Surabaya';
     document.getElementById('f-prod-flash').checked = !!p.isFlashSale;
     document.getElementById('prod-img-preview').src = (p.image && !p.image.includes('unsplash.com')) ? p.image : 'images/product-placeholder.svg';
 
+    this.updatePricePreview();
     document.getElementById('admin-modal-product').classList.add('active');
   },
 
@@ -590,15 +690,24 @@ const AdminApp = {
     event.preventDefault();
     const name = document.getElementById('f-prod-name').value.trim();
     const category = document.getElementById('f-prod-category').value;
-    const price = Number(document.getElementById('f-prod-price').value);
     const originalPrice = Number(document.getElementById('f-prod-orig-price').value) || null;
+    let price = Number(document.getElementById('f-prod-price').value);
+    let discountPercent = Number(document.getElementById('f-prod-discount-percent').value) || 0;
+
+    // Jika harga potongan belum terisi tapi harga asli dan diskon terisi
+    if (!price && originalPrice) {
+      price = discountPercent > 0 ? Math.round(originalPrice * (1 - discountPercent / 100)) : originalPrice;
+    }
+
+    if (originalPrice && price && originalPrice > price && !discountPercent) {
+      discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
+    }
+
     const stock = Number(document.getElementById('f-prod-stock').value) || 10;
     const image = document.getElementById('f-prod-image').value.trim() || 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500';
-    const shopName = document.getElementById('f-prod-shop').value.trim() || '168 Parts Official';
-    const location = document.getElementById('f-prod-location').value.trim() || 'Jakarta Barat';
+    const shopName = document.getElementById('f-prod-shop').value.trim() || '168 Parts Surabaya';
+    const location = document.getElementById('f-prod-location').value.trim() || 'Kota Surabaya';
     const isFlashSale = document.getElementById('f-prod-flash').checked;
-
-    const discountPercent = originalPrice && originalPrice > price ? Math.round((1 - price / originalPrice) * 100) : 0;
 
     const payload = {
       name, category, price, originalPrice, discountPercent, stock, image, shopName, location, isFlashSale
