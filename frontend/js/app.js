@@ -3844,19 +3844,19 @@ const PasarinApp = {
     const tabBtns = document.querySelectorAll('.promo-tab-item');
     tabBtns.forEach(btn => {
       btn.classList.remove('active');
-      btn.style.background = '#ffffff';
-      btn.style.color = '#64748b';
-      btn.style.borderColor = '#cbd5e1';
+      btn.style.background = '#f8fafc';
+      btn.style.color = '#475569';
+      btn.style.borderColor = '#e2e8f0';
       btn.style.boxShadow = 'none';
       const lbl = btn.querySelector('.tab-label');
-      if (lbl) lbl.style.color = '#64748b';
+      if (lbl) lbl.style.color = '#475569';
     });
     if (btnElement) {
       btnElement.classList.add('active');
-      btnElement.style.background = '#be123c';
+      btnElement.style.background = 'linear-gradient(135deg, #be123c 0%, #e11d48 100%)';
       btnElement.style.color = '#ffffff';
       btnElement.style.borderColor = '#be123c';
-      btnElement.style.boxShadow = '0 3px 10px rgba(190, 18, 60, 0.3)';
+      btnElement.style.boxShadow = '0 3px 10px rgba(190, 18, 60, 0.28)';
       const lbl = btnElement.querySelector('.tab-label');
       if (lbl) lbl.style.color = '#ffffff';
     }
