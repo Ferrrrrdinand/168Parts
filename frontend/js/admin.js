@@ -16,6 +16,10 @@ const AdminApp = {
   async init() {
     this.bindEvents();
 
+    // Jalankan pengecekan status database real-time (Hijau = Connected, Merah = Disconnected)
+    this.checkDbHealth(false);
+    setInterval(() => this.checkDbHealth(false), 20000);
+
     const isAuthed = await this.checkAdminAuth();
     if (!isAuthed) {
       this.showAuthGate();
@@ -1494,19 +1498,97 @@ const AdminApp = {
     }
   },
 
-  showToast(message) {
+  async checkDbHealth(showToast = false) {
+    const pill = document.getElementById('admin-db-status-pill');
+    const dot = document.getElementById('admin-db-status-dot');
+    const text = document.getElementById('admin-db-status-text');
+
+    if (pill) {
+      pill.classList.remove('status-pill-connected', 'status-pill-disconnected');
+      pill.classList.add('status-pill-checking');
+    }
+    if (text) text.textContent = 'Memeriksa DB...';
+
+    const getBaseUrl = () => {
+      if (window.PasarinAPI && window.PasarinAPI.baseUrl) {
+        return window.PasarinAPI.baseUrl;
+      }
+      return '/api';
+    };
+
+    let isConnected = false;
+    let latency = 0;
+    let errMessage = '';
+
+    try {
+      let apiBase = getBaseUrl();
+      let res;
+      try {
+        res = await fetch(`${apiBase}/health`, { cache: 'no-cache' });
+      } catch (netErr) {
+        const cloudBase = (window.PasarinAPI && window.PasarinAPI.cloudBaseUrl) || 'https://partonesixeight.vercel.app/api';
+        if (apiBase !== cloudBase) {
+          if (window.PasarinAPI) window.PasarinAPI.baseUrl = cloudBase;
+          res = await fetch(`${cloudBase}/health`, { cache: 'no-cache' });
+        } else {
+          throw netErr;
+        }
+      }
+
+      if (res) {
+        const data = await res.json();
+        if (data && data.database && data.database.connected) {
+          isConnected = true;
+          latency = data.database.latencyMs || 0;
+        } else {
+          errMessage = (data && data.database && data.database.message) || 'Status database offline';
+        }
+      }
+    } catch (err) {
+      isConnected = false;
+      errMessage = err.message || 'Gagal tersambung ke server / database';
+    }
+
+    if (isConnected) {
+      if (pill) {
+        pill.classList.remove('status-pill-checking', 'status-pill-disconnected');
+        pill.classList.add('status-pill-connected');
+        pill.title = `Database Supabase Cloud Terkoneksi Aktif (${latency}ms). Klik untuk periksa ulang.`;
+      }
+      if (text) {
+        text.textContent = 'Database Terhubung (Supabase)';
+      }
+      if (showToast) {
+        this.showToast(`🟢 Database Supabase Cloud terhubung aktif (${latency}ms)!`);
+      }
+    } else {
+      if (pill) {
+        pill.classList.remove('status-pill-checking', 'status-pill-connected');
+        pill.classList.add('status-pill-disconnected');
+        pill.title = `Database Terputus (Offline): ${errMessage}. Klik untuk coba tes ulang.`;
+      }
+      if (text) {
+        text.textContent = 'Database Terputus (Offline)';
+      }
+      if (showToast) {
+        this.showToast(`🔴 Database terputus / offline: ${errMessage}`, true);
+      }
+    }
+  },
+
+  showToast(message, isError = false) {
     let toast = document.getElementById('admin-toast');
     if (!toast) {
       toast = document.createElement('div');
       toast.id = 'admin-toast';
-      toast.style.cssText = `
-        position: fixed; top: 20px; right: 24px; z-index: 99999;
-        background: #1d3f0d; color: #ffffff; padding: 12px 20px;
-        border-radius: 8px; font-weight: 700; font-size: 13.5px;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.25); transition: all 0.3s ease;
-      `;
       document.body.appendChild(toast);
     }
+    toast.style.cssText = `
+      position: fixed; top: 20px; right: 24px; z-index: 99999;
+      background: ${isError ? '#be123c' : '#047857'}; color: #ffffff; padding: 12px 20px;
+      border-radius: 8px; font-weight: 700; font-size: 13.5px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25); transition: all 0.3s ease;
+    `;
     toast.textContent = message;
     toast.style.display = 'block';
     toast.style.opacity = '1';

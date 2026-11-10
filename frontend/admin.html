@@ -130,9 +130,10 @@
       </div>
 
       <div class="topbar-right">
-        <div class="status-pill">
-          <span class="status-dot"></span>
-          <span>Server Active : 3000</span>
+        <!-- Indikator Status Database: Hijau jika terkoneksi, Merah jika terputus -->
+        <div class="status-pill status-pill-connected" id="admin-db-status-pill" onclick="AdminApp.checkDbHealth(true)" title="Status Koneksi Database Supabase Cloud (Klik untuk tes ulang)">
+          <span class="status-dot" id="admin-db-status-dot"></span>
+          <span id="admin-db-status-text">Database Terhubung (Supabase)</span>
         </div>
 
         <div class="admin-profile-badge" title="Akun Administrator & Penjual 168 Parts">

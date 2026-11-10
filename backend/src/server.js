@@ -39,10 +39,40 @@ app.use(['/api/orders', '/orders'], orderRoutes);
 app.use(['/api/promos', '/promos'], promoRoutes);
 app.use(['/api/banners', '/banners'], bannerRoutes);
 
-// Health check endpoint
-app.get(['/api/health', '/health'], (req, res) => {
-  res.json({
-    status: 'ok',
+// Health check endpoint dengan pengujian koneksi database Supabase nyata
+app.get(['/api/health', '/health', '/api/health/db', '/health/db'], async (req, res) => {
+  const startTime = Date.now();
+  let dbStatus = 'disconnected';
+  let dbMessage = 'Database belum terhubung';
+  let dbName = 'postgres';
+  let latencyMs = 0;
+
+  try {
+    const dbRes = await dbManager.query('SELECT NOW() as now, current_database() as db_name');
+    latencyMs = Date.now() - startTime;
+    if (dbRes && dbRes.length > 0) {
+      dbStatus = 'connected';
+      dbName = dbRes[0].db_name || 'postgres';
+      dbMessage = `Supabase PostgreSQL Cloud (${dbName}) terhubung`;
+    }
+  } catch (err) {
+    latencyMs = Date.now() - startTime;
+    dbStatus = 'disconnected';
+    dbMessage = err.message || 'Gagal koneksi database';
+  }
+
+  const isHealthy = dbStatus === 'connected';
+
+  return res.status(isHealthy ? 200 : 503).json({
+    status: isHealthy ? 'ok' : 'degraded',
+    database: {
+      status: dbStatus,
+      type: 'supabase',
+      connected: isHealthy,
+      databaseName: dbName,
+      message: dbMessage,
+      latencyMs
+    },
     timestamp: new Date().toISOString(),
     service: '168 Parts Surabaya Backend API'
   });

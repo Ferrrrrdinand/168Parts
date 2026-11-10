@@ -263,25 +263,84 @@ body {
   gap: 16px;
 }
 
+/* Database Health Status Pill (Hijau = Terkoneksi, Merah = Terputus) */
 .status-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  background: #ecfdf5;
-  color: #059669;
-  border: 1px solid #a7f3d0;
+  gap: 7px;
+  padding: 5px 13px;
   border-radius: 20px;
   font-size: 11.5px;
   font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.25s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.status-pill:hover {
+  transform: translateY(-1px);
+  filter: brightness(0.97);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
 .status-dot {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+}
+
+/* 🟢 HIJAU: Database Terkoneksi (Supabase Cloud Active) */
+.status-pill.status-pill-connected {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.status-pill.status-pill-connected .status-dot {
   background: #10b981;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35);
+  animation: pulseDbGreen 2.2s infinite;
+}
+
+/* 🔴 MERAH: Database Terputus / Gagal Terkoneksi */
+.status-pill.status-pill-disconnected {
+  background: #fff1f2;
+  color: #be123c;
+  border: 1px solid #fecdd3;
+}
+
+.status-pill.status-pill-disconnected .status-dot {
+  background: #e11d48;
+  box-shadow: 0 0 0 2px rgba(225, 29, 72, 0.35);
+  animation: pulseDbRed 1.8s infinite;
+}
+
+/* 🟡/⚪ ABU: Sedang Memeriksa Koneksi Database */
+.status-pill.status-pill-checking {
+  background: #f8fafc;
+  color: #64748b;
+  border: 1px solid #cbd5e1;
+}
+
+.status-pill.status-pill-checking .status-dot {
+  background: #94a3b8;
+  box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.3);
+}
+
+@keyframes pulseDbGreen {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+  70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+@keyframes pulseDbRed {
+  0% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.65); }
+  70% { box-shadow: 0 0 0 6px rgba(225, 29, 72, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0); }
 }
 
 .admin-profile-badge {
