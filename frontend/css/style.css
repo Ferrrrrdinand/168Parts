@@ -2922,6 +2922,7 @@ main.w {
 /* Promo Tabs Filter */
 .promo-tabs-bar {
   display: flex;
+  align-items: center;
   background: #f8fafc;
   padding: 10px 24px;
   border-bottom: 1px solid #e2e8f0;
@@ -2929,6 +2930,7 @@ main.w {
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  box-sizing: border-box;
 }
 
 .promo-tabs-bar::-webkit-scrollbar {
@@ -2936,29 +2938,40 @@ main.w {
 }
 
 .promo-tab-item {
-  padding: 6px 14px;
-  border-radius: var(--radius-full);
-  font-size: 12px;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 16px !important;
+  line-height: 1 !important;
+  vertical-align: middle !important;
+  border-radius: 9999px !important;
+  font-family: inherit;
+  font-size: 12.5px;
   font-weight: 700;
   color: #64748b;
   background: #ffffff;
-  border: 1px solid #cbd5e1;
+  border: 1.5px solid #cbd5e1 !important;
   cursor: pointer;
   white-space: nowrap;
-  flex-shrink: 0;
+  flex-shrink: 0 !important;
+  box-sizing: border-box !important;
   transition: all 0.2s ease;
+  user-select: none;
 }
 
 .promo-tab-item:hover {
   color: #be123c;
-  border-color: #fca5a5;
+  border-color: #fca5a5 !important;
   background: #fff1f2;
 }
 
 .promo-tab-item.active {
-  background: #be123c;
-  color: #ffffff;
-  border-color: #be123c;
+  background: #be123c !important;
+  color: #ffffff !important;
+  border-color: #be123c !important;
   box-shadow: 0 2px 8px rgba(190, 18, 60, 0.25);
 }
 
@@ -3356,17 +3369,30 @@ main.w {
     justify-content: center !important;
   }
   .promo-tabs-bar {
+    display: flex !important;
+    align-items: center !important;
     padding: 8px 12px !important;
     gap: 6px !important;
     scrollbar-width: none !important;
     -webkit-overflow-scrolling: touch !important;
+    box-sizing: border-box !important;
   }
   .promo-tabs-bar::-webkit-scrollbar {
     display: none !important;
   }
   .promo-tab-item {
-    padding: 5px 12px !important;
-    font-size: 11px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 12px !important;
+    font-size: 11.5px !important;
+    line-height: 1 !important;
+    border-radius: 9999px !important;
+    box-sizing: border-box !important;
+    flex-shrink: 0 !important;
   }
   .promo-body {
     padding: 10px 12px !important;
