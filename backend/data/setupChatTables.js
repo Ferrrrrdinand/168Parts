@@ -61,3 +61,4 @@ setupChat().catch(err => {
   console.error('❌ Error setting up chat tables:', err);
   process.exit(1);
 });
+

@@ -1,5 +1,28 @@
 const userModel = require('../models/userModel');
 
+// Helper validasi kekuatan password: min 8 karakter, huruf besar & kecil, angka, dan karakter spesial
+function validatePasswordRequirements(pwd) {
+  if (!pwd) return { isValid: false, message: 'Password wajib diisi!' };
+  
+  if (pwd.length < 8) {
+    return { isValid: false, message: 'Password minimal 8 karakter!' };
+  }
+  if (!/[A-Z]/.test(pwd)) {
+    return { isValid: false, message: 'Password harus mengandung minimal 1 huruf besar (A-Z)!' };
+  }
+  if (!/[a-z]/.test(pwd)) {
+    return { isValid: false, message: 'Password harus mengandung minimal 1 huruf kecil (a-z)!' };
+  }
+  if (!/[0-9]/.test(pwd)) {
+    return { isValid: false, message: 'Password harus mengandung minimal 1 angka (0-9)!' };
+  }
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(pwd) && !/[^A-Za-z0-9]/.test(pwd)) {
+    return { isValid: false, message: 'Password harus mengandung minimal 1 karakter spesial/simbol (@, #, $, %, !, dll)!' };
+  }
+
+  return { isValid: true };
+}
+
 exports.register = async (req, res) => {
   try {
     const { name, email, phone, password, address, latitude, longitude } = req.body;
@@ -11,10 +34,11 @@ exports.register = async (req, res) => {
       });
     }
 
-    if (password.length < 6) {
+    const pwdCheck = validatePasswordRequirements(password);
+    if (!pwdCheck.isValid) {
       return res.status(400).json({
         success: false,
-        message: 'Password minimal 6 karakter!'
+        message: pwdCheck.message
       });
     }
 
@@ -254,10 +278,11 @@ exports.changePassword = async (req, res) => {
       });
     }
 
-    if (newPassword.length < 6) {
+    const pwdCheck = validatePasswordRequirements(newPassword);
+    if (!pwdCheck.isValid) {
       return res.status(400).json({
         success: false,
-        message: 'Password baru minimal 6 karakter.'
+        message: pwdCheck.message
       });
     }
 

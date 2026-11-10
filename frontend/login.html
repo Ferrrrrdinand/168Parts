@@ -130,10 +130,35 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="reg-password">Password (Min. 6 Karakter)</label>
+            <label class="form-label" for="reg-password">Password (Min. 8 Karakter, Huruf Besar, Kecil, Angka & Simbol)</label>
             <div class="input-wrap">
-              <input class="auth-input" type="password" id="reg-password" placeholder="Buat kata sandi aman..." minlength="6" required>
+              <input class="auth-input" type="password" id="reg-password" placeholder="Buat kata sandi aman (Cth: Rahasia@168)..." minlength="8" required oninput="checkRegisterPasswordStrength(this.value)">
               <button class="btn-toggle-pwd" type="button" onclick="togglePasswordVisibility('reg-password', this)">Lihat</button>
+            </div>
+
+            <!-- Password Requirements Live Checklist & Strength Indicator -->
+            <div id="reg-pwd-checklist" style="margin-top: 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; font-size: 11.5px; transition: all 0.2s ease;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-weight: 700; color: #475569;">Syarat Keamanan Sandi:</span>
+                <span id="pwd-strength-text" style="font-weight: 800; font-size: 10.5px; color: #94a3b8;">Belum Diisi</span>
+              </div>
+              <div style="height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden; margin-bottom: 8px;">
+                <div id="pwd-strength-meter" style="width: 0%; height: 100%; background: #ef4444; transition: width 0.3s ease, background 0.3s ease;"></div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px 8px; line-height: 1.35;">
+                <div id="chk-len" style="color: #64748b; display: flex; align-items: center; gap: 4px;">
+                  <span class="chk-icon">⚪</span> <span>Min. 8 Karakter</span>
+                </div>
+                <div id="chk-case" style="color: #64748b; display: flex; align-items: center; gap: 4px;">
+                  <span class="chk-icon">⚪</span> <span>Huruf Besar & Kecil</span>
+                </div>
+                <div id="chk-num" style="color: #64748b; display: flex; align-items: center; gap: 4px;">
+                  <span class="chk-icon">⚪</span> <span>Mengandung Angka</span>
+                </div>
+                <div id="chk-sym" style="color: #64748b; display: flex; align-items: center; gap: 4px;">
+                  <span class="chk-icon">⚪</span> <span>Simbol Khusus (@#$!)</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -322,6 +347,62 @@
       }
     });
 
+    // Realtime Password Strength & Requirement Checklist Checker
+    function checkRegisterPasswordStrength(pwd) {
+      const hasMinLen = pwd.length >= 8;
+      const hasUpper = /[A-Z]/.test(pwd);
+      const hasLower = /[a-z]/.test(pwd);
+      const hasCase = hasUpper && hasLower;
+      const hasNum = /[0-9]/.test(pwd);
+      const hasSym = /[^A-Za-z0-9]/.test(pwd);
+
+      const updateRule = (elId, passed) => {
+        const el = document.getElementById(elId);
+        if (!el) return;
+        const icon = el.querySelector('.chk-icon');
+        if (passed) {
+          el.style.color = '#047857';
+          el.style.fontWeight = '700';
+          if (icon) icon.textContent = '✅';
+        } else {
+          el.style.color = '#64748b';
+          el.style.fontWeight = 'normal';
+          if (icon) icon.textContent = '⚪';
+        }
+      };
+
+      updateRule('chk-len', hasMinLen);
+      updateRule('chk-case', hasCase);
+      updateRule('chk-num', hasNum);
+      updateRule('chk-sym', hasSym);
+
+      let score = 0;
+      if (hasMinLen) score++;
+      if (hasCase) score++;
+      if (hasNum) score++;
+      if (hasSym) score++;
+
+      const meter = document.getElementById('pwd-strength-meter');
+      const text = document.getElementById('pwd-strength-text');
+
+      if (!pwd) {
+        if (meter) { meter.style.width = '0%'; meter.style.background = '#ef4444'; }
+        if (text) { text.textContent = 'Belum Diisi'; text.style.color = '#94a3b8'; }
+      } else if (score <= 1) {
+        if (meter) { meter.style.width = '25%'; meter.style.background = '#ef4444'; }
+        if (text) { text.textContent = 'Lemah (Belum Memenuhi)'; text.style.color = '#ef4444'; }
+      } else if (score === 2) {
+        if (meter) { meter.style.width = '50%'; meter.style.background = '#f59e0b'; }
+        if (text) { text.textContent = 'Sedang (Lengkapi Syarat)'; text.style.color = '#f59e0b'; }
+      } else if (score === 3) {
+        if (meter) { meter.style.width = '75%'; meter.style.background = '#0284c7'; }
+        if (text) { text.textContent = 'Hampir Lengkap'; text.style.color = '#0284c7'; }
+      } else {
+        if (meter) { meter.style.width = '100%'; meter.style.background = '#10b981'; }
+        if (text) { text.textContent = 'Sangat Kuat & Aman ✓'; text.style.color = '#059669'; }
+      }
+    }
+
     // Handle Register Submit
     formRegister.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -333,9 +414,39 @@
       const password = document.getElementById('reg-password').value;
       const address = document.getElementById('reg-address').value.trim();
 
-      if (password.length < 6) {
+      // Validasi Syarat Password Lengkap: 8 karakter, huruf besar & kecil, angka, dan simbol khusus
+      if (password.length < 8) {
         triggerShake();
-        showAlert('Kata sandi minimal 6 karakter!');
+        showAlert('Kata sandi minimal harus 8 karakter!');
+        document.getElementById('reg-password').focus();
+        return;
+      }
+
+      if (!/[A-Z]/.test(password)) {
+        triggerShake();
+        showAlert('Kata sandi harus mengandung minimal 1 huruf besar (A-Z)!');
+        document.getElementById('reg-password').focus();
+        return;
+      }
+
+      if (!/[a-z]/.test(password)) {
+        triggerShake();
+        showAlert('Kata sandi harus mengandung minimal 1 huruf kecil (a-z)!');
+        document.getElementById('reg-password').focus();
+        return;
+      }
+
+      if (!/[0-9]/.test(password)) {
+        triggerShake();
+        showAlert('Kata sandi harus mengandung minimal 1 angka (0-9)!');
+        document.getElementById('reg-password').focus();
+        return;
+      }
+
+      if (!/[^A-Za-z0-9]/.test(password)) {
+        triggerShake();
+        showAlert('Kata sandi harus mengandung minimal 1 karakter spesial/simbol (@, #, $, %, !, dll)!');
+        document.getElementById('reg-password').focus();
         return;
       }
 

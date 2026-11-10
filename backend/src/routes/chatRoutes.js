@@ -18,3 +18,4 @@ router.post('/rooms/:roomId/messages', chatController.sendMessage);
 router.patch('/rooms/:roomId/status', chatController.updateRoomStatus);
 
 module.exports = router;
+

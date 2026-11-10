@@ -2862,8 +2862,20 @@ const PasarinApp = {
       if (window.showToast) window.showToast('Silakan masukkan kata sandi saat ini.', 'warning');
       return;
     }
-    if (newPass.length < 6) {
-      if (window.showToast) window.showToast('Kata sandi baru minimal 6 karakter.', 'warning');
+    if (newPass.length < 8) {
+      if (window.showToast) window.showToast('Kata sandi baru minimal 8 karakter!', 'warning');
+      return;
+    }
+    if (!/[A-Z]/.test(newPass) || !/[a-z]/.test(newPass)) {
+      if (window.showToast) window.showToast('Kata sandi baru harus mengandung huruf besar (A-Z) dan kecil (a-z)!', 'warning');
+      return;
+    }
+    if (!/[0-9]/.test(newPass)) {
+      if (window.showToast) window.showToast('Kata sandi baru harus mengandung minimal 1 angka (0-9)!', 'warning');
+      return;
+    }
+    if (!/[^A-Za-z0-9]/.test(newPass)) {
+      if (window.showToast) window.showToast('Kata sandi baru harus mengandung minimal 1 karakter spesial/simbol (@, #, $, dll)!', 'warning');
       return;
     }
     if (newPass !== confPass) {
