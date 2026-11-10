@@ -13,7 +13,8 @@ exports.getProducts = async (req, res) => {
     console.error('Error getProducts:', error);
     return res.status(500).json({
       success: false,
-      message: 'Gagal mengambil data produk dari database.'
+      message: 'Gagal mengambil data produk dari database.',
+      error: error.message
     });
   }
 };
