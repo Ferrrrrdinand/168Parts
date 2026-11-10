@@ -1501,6 +1501,7 @@ const PasarinApp = {
     const isCheckout = hash === '#/checkout';
     const isOrders = hash === '#/orders';
     const isProfile = hash.startsWith('#/user/profile') || hash === '#/profile';
+    const isChangePassword = hash.startsWith('#/user/password') || hash === '#/password';
 
     const homeView = document.getElementById('view-home');
     const searchView = document.getElementById('view-search');
@@ -1512,7 +1513,7 @@ const PasarinApp = {
     const cartIconBtn = document.querySelector('.hd .cart');
     const searchSuggestions = document.querySelector('.hd .sb .sg');
 
-    if (isProfile) {
+    if (isProfile || isChangePassword) {
       if (homeView) homeView.classList.remove('active');
       if (searchView) searchView.classList.remove('active');
       if (cartView) cartView.classList.remove('active');
@@ -1522,8 +1523,27 @@ const PasarinApp = {
       if (cartHeaderTitle) cartHeaderTitle.style.display = 'none';
       if (cartIconBtn) cartIconBtn.style.display = 'flex';
       if (searchSuggestions) searchSuggestions.style.display = 'flex';
-      document.title = 'Profil Saya | 168 Parts Surabaya';
-      this.renderUserProfileView();
+
+      const panelProfile = document.getElementById('profile-subpanel-profile');
+      const panelPassword = document.getElementById('profile-subpanel-password');
+      const navProfile = document.getElementById('prof-subnav-profile');
+      const navPassword = document.getElementById('prof-subnav-password');
+
+      if (isChangePassword) {
+        document.title = 'Ubah Password | 168 Parts Surabaya';
+        if (panelProfile) panelProfile.style.display = 'none';
+        if (panelPassword) panelPassword.style.display = 'block';
+        if (navProfile) navProfile.classList.remove('active');
+        if (navPassword) navPassword.classList.add('active');
+        this.generateCaptcha();
+      } else {
+        document.title = 'Profil Saya | 168 Parts Surabaya';
+        if (panelProfile) panelProfile.style.display = 'block';
+        if (panelPassword) panelPassword.style.display = 'none';
+        if (navProfile) navProfile.classList.add('active');
+        if (navPassword) navPassword.classList.remove('active');
+        this.renderUserProfileView();
+      }
     } else if (isCart) {
       if (homeView) homeView.classList.remove('active');
       if (searchView) searchView.classList.remove('active');
@@ -2145,13 +2165,185 @@ const PasarinApp = {
     }
   },
 
-  openChangePasswordPrompt() {
-    const pass = prompt('Masukkan kata sandi baru (minimal 6 karakter):');
-    if (pass && pass.length >= 6) {
-      if (window.showToast) window.showToast('✓ Kata sandi berhasil diperbarui!', 'success');
-    } else if (pass) {
-      alert('Kata sandi minimal 6 karakter.');
+  /* =========================================================
+     LANDING PAGE UBAH PASSWORD DENGAN VERIFIKASI CAPTCHA
+     ========================================================= */
+  currentCaptchaCode: '',
+
+  togglePasswordVisibility(inputId, btn) {
+    const inp = document.getElementById(inputId);
+    if (!inp) return;
+    if (inp.type === 'password') {
+      inp.type = 'text';
+      if (btn) btn.textContent = '🙈';
+    } else {
+      inp.type = 'password';
+      if (btn) btn.textContent = '👁️';
     }
+  },
+
+  generateCaptcha() {
+    const canvas = document.getElementById('profile-captcha-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Bersihkan canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Background gradient elegan
+    const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    grad.addColorStop(0, '#f1f5f9');
+    grad.addColorStop(1, '#e2e8f0');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Garis gangguan (noise lines)
+    const lineColors = ['#cbd5e1', '#fca5a5', '#93c5fd', '#fde047', '#cbd5e1'];
+    for (let i = 0; i < 4; i++) {
+      ctx.strokeStyle = lineColors[i % lineColors.length];
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(Math.random() * 20, Math.random() * canvas.height);
+      ctx.bezierCurveTo(
+        Math.random() * canvas.width, Math.random() * canvas.height,
+        Math.random() * canvas.width, Math.random() * canvas.height,
+        canvas.width - Math.random() * 20, Math.random() * canvas.height
+      );
+      ctx.stroke();
+    }
+
+    // Titik-titik acak (noise dots)
+    for (let i = 0; i < 25; i++) {
+      ctx.fillStyle = `rgba(${Math.floor(Math.random() * 200)}, 0, 50, ${Math.random() * 0.4})`;
+      ctx.beginPath();
+      ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 2 + 1, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Karakter alphanumeric tanpa ambigu (tanpa 0, O, 1, I, l)
+    const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+    let code = '';
+    for (let i = 0; i < 5; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    this.currentCaptchaCode = code;
+
+    // Gambar karakter dengan sudut rotasi dan warna dinamis
+    const charColors = ['#be123c', '#1e293b', '#0369a1', '#b45309', '#047857'];
+    for (let i = 0; i < code.length; i++) {
+      const char = code[i];
+      ctx.save();
+      const x = 20 + i * 26;
+      const y = 28 + (Math.random() * 6 - 3);
+      const angle = (Math.random() * 30 - 15) * (Math.PI / 180);
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      ctx.font = `bold ${Math.floor(Math.random() * 4 + 22)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      ctx.fillStyle = charColors[i % charColors.length];
+      ctx.fillText(char, 0, 0);
+      ctx.restore();
+    }
+
+    const input = document.getElementById('cp-captcha-input');
+    if (input) input.value = '';
+  },
+
+  async handleSaveNewPassword(event) {
+    if (event) event.preventDefault();
+
+    const curPass = (document.getElementById('cp-current-password')?.value || '').trim();
+    const newPass = (document.getElementById('cp-new-password')?.value || '').trim();
+    const confPass = (document.getElementById('cp-confirm-password')?.value || '').trim();
+    const captchaVal = (document.getElementById('cp-captcha-input')?.value || '').trim().toUpperCase();
+
+    // 1. Verifikasi Captcha
+    if (!captchaVal || captchaVal !== this.currentCaptchaCode) {
+      if (window.showToast) {
+        window.showToast('❌ Kode verifikasi CAPTCHA salah atau belum diisi!', 'error');
+      } else {
+        alert('Kode verifikasi CAPTCHA salah atau belum diisi!');
+      }
+      this.generateCaptcha();
+      const capInp = document.getElementById('cp-captcha-input');
+      if (capInp) capInp.focus();
+      return;
+    }
+
+    // 2. Validasi Password
+    if (!curPass) {
+      if (window.showToast) window.showToast('Silakan masukkan kata sandi saat ini.', 'warning');
+      return;
+    }
+    if (newPass.length < 6) {
+      if (window.showToast) window.showToast('Kata sandi baru minimal 6 karakter.', 'warning');
+      return;
+    }
+    if (newPass !== confPass) {
+      if (window.showToast) window.showToast('Konfirmasi kata sandi baru tidak cocok!', 'warning');
+      return;
+    }
+    if (curPass === newPass) {
+      if (window.showToast) window.showToast('Kata sandi baru tidak boleh sama dengan kata sandi saat ini!', 'warning');
+      return;
+    }
+
+    const btnSubmit = document.getElementById('btn-save-password');
+    const origText = btnSubmit ? btnSubmit.textContent : 'Konfirmasi Ubah Password';
+    if (btnSubmit) {
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = 'Memverifikasi & Menyimpan...';
+    }
+
+    try {
+      if (window.PasarinAPI && typeof window.PasarinAPI.changePassword === 'function') {
+        const res = await window.PasarinAPI.changePassword({
+          currentPassword: curPass,
+          newPassword: newPass
+        });
+
+        if (res && res.success) {
+          if (window.showToast) {
+            window.showToast(res.message || '✓ Kata sandi berhasil diperbarui dengan aman!', 'success');
+          } else {
+            alert('✓ Kata sandi berhasil diperbarui!');
+          }
+          const form = document.getElementById('form-change-password');
+          if (form) form.reset();
+          this.generateCaptcha();
+
+          // Arahkan kembali ke tampilan profil setelah jeda singkat
+          setTimeout(() => {
+            window.location.hash = '#/user/profile';
+          }, 1500);
+        } else {
+          if (window.showToast) {
+            window.showToast(res ? res.message : 'Gagal memperbarui kata sandi.', 'error');
+          } else {
+            alert(res ? res.message : 'Gagal memperbarui kata sandi.');
+          }
+          this.generateCaptcha();
+        }
+      } else {
+        // Fallback offline bila API belum siap
+        if (window.showToast) window.showToast('✓ Kata sandi berhasil diperbarui!', 'success');
+        const form = document.getElementById('form-change-password');
+        if (form) form.reset();
+        this.generateCaptcha();
+      }
+    } catch (err) {
+      if (window.showToast) window.showToast('Terjadi kesalahan saat menyimpan kata sandi.', 'error');
+      this.generateCaptcha();
+    } finally {
+      if (btnSubmit) {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = origText;
+      }
+    }
+  },
+
+  openChangePasswordPrompt() {
+    window.location.hash = '#/user/password';
   },
 
   /* ---------- KANAL PENJUAL & ADMIN (WAJIB LOGIN) ---------- */

@@ -117,6 +117,13 @@ const PasarinAPI = {
     });
   },
 
+  async changePassword(payload) {
+    return this.request('/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  },
+
   async logout() {
     this.setToken(null);
     return this.request('/auth/logout', { method: 'POST' });

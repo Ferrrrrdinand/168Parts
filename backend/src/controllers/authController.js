@@ -201,6 +201,62 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
+exports.changePassword = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password saat ini dan password baru wajib diisi.'
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password baru minimal 6 karakter.'
+      });
+    }
+
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Pengguna tidak ditemukan.'
+      });
+    }
+
+    const isMatch = userModel.verifyPassword(currentPassword, user.salt, user.hash);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: 'Password saat ini tidak sesuai.'
+      });
+    }
+
+    const updated = await userModel.update(userId, { password: newPassword });
+    if (!updated) {
+      return res.status(500).json({
+        success: false,
+        message: 'Gagal menyimpan kata sandi baru di database.'
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: 'Kata sandi berhasil diperbarui dengan aman!'
+    });
+  } catch (error) {
+    console.error('Error changePassword:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Terjadi kesalahan saat merubah kata sandi.'
+    });
+  }
+};
+
 exports.logout = (req, res) => {
   return res.json({
     success: true,

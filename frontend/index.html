@@ -736,11 +736,9 @@
                 <span>Akun Saya</span>
               </div>
               <div class="profile-nav-sublist">
-                <a href="#/user/profile" class="profile-nav-subitem active">Profil</a>
-                <a href="javascript:void(0)" onclick="if(window.PasarinApp) window.PasarinApp.openAddressModal()" class="profile-nav-subitem">Alamat</a>
-                <a href="javascript:void(0)" onclick="PasarinApp.openChangePasswordPrompt()" class="profile-nav-subitem">Ubah Password</a>
-                <a href="javascript:void(0)" onclick="if(window.showToast) window.showToast('Pengaturan Notifikasi aktif.', 'info')" class="profile-nav-subitem">Pengaturan Notifikasi</a>
-                <a href="javascript:void(0)" onclick="if(window.showToast) window.showToast('Pengaturan Privasi aktif.', 'info')" class="profile-nav-subitem">Pengaturan Privasi</a>
+                <a href="#/user/profile" class="profile-nav-subitem active" id="prof-subnav-profile">Profil</a>
+                <a href="javascript:void(0)" onclick="if(window.PasarinApp) window.PasarinApp.openAddressModal()" class="profile-nav-subitem" id="prof-subnav-address">Alamat</a>
+                <a href="#/user/password" class="profile-nav-subitem" id="prof-subnav-password">Ubah Password</a>
               </div>
             </div>
 
@@ -777,7 +775,7 @@
         </aside>
 
         <!-- MAIN CARD PROFIL SAYA (Persis Screenshot) -->
-        <main class="shopee-profile-main-card">
+        <main class="shopee-profile-main-card" id="profile-subpanel-profile">
           <!-- Card Header -->
           <div class="profile-card-header">
             <h1 class="profile-card-title">Profil Saya</h1>
@@ -893,6 +891,89 @@
               </div>
             </div>
 
+          </div>
+        </main>
+
+        <!-- MAIN CARD UBAH PASSWORD (LANDING PAGE DENGAN CAPTCHA) -->
+        <main class="shopee-profile-main-card" id="profile-subpanel-password" style="display:none;">
+          <!-- Card Header -->
+          <div class="profile-card-header">
+            <h1 class="profile-card-title">Ubah Password</h1>
+            <p class="profile-card-subtitle">Untuk keamanan akun Anda, mohon jangan berikan kata sandi kepada orang lain</p>
+          </div>
+
+          <div class="profile-card-body" style="display:block; max-width:680px;">
+            <form id="form-change-password" class="profile-edit-form" onsubmit="PasarinApp.handleSaveNewPassword(event)">
+              
+              <!-- Password Saat Ini -->
+              <div class="profile-form-row">
+                <label class="profile-form-label" for="cp-current-password">Password Saat Ini</label>
+                <div class="profile-form-field" style="position:relative; max-width:360px;">
+                  <input type="password" id="cp-current-password" class="profile-text-input" placeholder="Masukkan kata sandi lama" required style="padding-right:40px;">
+                  <button type="button" class="btn-toggle-eye" onclick="PasarinApp.togglePasswordVisibility('cp-current-password', this)" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); border:none; background:transparent; cursor:pointer; font-size:16px;">👁️</button>
+                </div>
+              </div>
+
+              <!-- Password Baru -->
+              <div class="profile-form-row">
+                <label class="profile-form-label" for="cp-new-password">Password Baru</label>
+                <div class="profile-form-field" style="position:relative; max-width:360px;">
+                  <input type="password" id="cp-new-password" class="profile-text-input" placeholder="Minimal 6 karakter" required minlength="6" style="padding-right:40px;">
+                  <button type="button" class="btn-toggle-eye" onclick="PasarinApp.togglePasswordVisibility('cp-new-password', this)" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); border:none; background:transparent; cursor:pointer; font-size:16px;">👁️</button>
+                </div>
+              </div>
+
+              <!-- Konfirmasi Password Baru -->
+              <div class="profile-form-row">
+                <label class="profile-form-label" for="cp-confirm-password">Konfirmasi Password</label>
+                <div class="profile-form-field" style="position:relative; max-width:360px;">
+                  <input type="password" id="cp-confirm-password" class="profile-text-input" placeholder="Ulangi kata sandi baru" required minlength="6" style="padding-right:40px;">
+                  <button type="button" class="btn-toggle-eye" onclick="PasarinApp.togglePasswordVisibility('cp-confirm-password', this)" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); border:none; background:transparent; cursor:pointer; font-size:16px;">👁️</button>
+                </div>
+              </div>
+
+              <!-- Verifikasi Captcha -->
+              <div class="profile-form-row">
+                <label class="profile-form-label" for="cp-captcha-input">Verifikasi Keamanan</label>
+                <div class="profile-form-field">
+                  <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px; flex-wrap:wrap;">
+                    <div style="border:1px solid #cbd5e1; border-radius:8px; overflow:hidden; background:#f8fafc; display:inline-flex; box-shadow:inset 0 1px 3px rgba(0,0,0,0.06);">
+                      <canvas id="profile-captcha-canvas" width="160" height="42" style="display:block; cursor:pointer;" onclick="PasarinApp.generateCaptcha()" title="Klik untuk ganti kode Captcha"></canvas>
+                    </div>
+                    <button type="button" onclick="PasarinApp.generateCaptcha()" class="btn-reload-captcha" style="background:#f1f5f9; border:1px solid #cbd5e1; padding:7px 12px; border-radius:6px; cursor:pointer; font-size:13px; font-weight:600; color:#334155; display:inline-flex; align-items:center; gap:6px;">
+                      <span>🔄</span>
+                      <span>Acak Kode</span>
+                    </button>
+                  </div>
+                  <input type="text" id="cp-captcha-input" class="profile-text-input" placeholder="Ketik kode CAPTCHA di atas *" required maxlength="6" style="max-width:240px; text-transform:uppercase; letter-spacing:2px; font-weight:700;">
+                  <div style="font-size:12px; color:#64748b; margin-top:4px;">Ketik 5 karakter huruf/angka sesuai gambar untuk memastikan Anda bukan robot.</div>
+                </div>
+              </div>
+
+              <!-- Tombol Simpan -->
+              <div class="profile-form-row profile-row-submit" style="margin-top:24px;">
+                <div class="profile-form-label"></div>
+                <div class="profile-form-field">
+                  <button type="submit" class="btn-shopee-save-profile" id="btn-save-password" style="background:#be123c; color:#fff; font-weight:700; padding:10px 24px; border-radius:4px; border:none; cursor:pointer;">
+                    Konfirmasi Ubah Password
+                  </button>
+                </div>
+              </div>
+
+              <!-- Kotak Panduan Keamanan Akun -->
+              <div style="margin-top:30px; background:#fff1f2; border:1px solid #fecdd3; border-radius:8px; padding:16px 20px;">
+                <div style="font-weight:700; color:#be123c; font-size:13px; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+                  <span>🛡️</span>
+                  <span>Pedoman Keamanan Sandi 168 Parts:</span>
+                </div>
+                <ul style="margin:0; padding-left:20px; font-size:12px; color:#475569; line-height:1.6;">
+                  <li>Minimal 6 karakter dengan kombinasi angka dan huruf.</li>
+                  <li>Jangan gunakan password yang sama dengan akun sosial media lain.</li>
+                  <li>Staf 168 Parts Surabaya tidak akan pernah meminta kata sandi akun Anda.</li>
+                </ul>
+              </div>
+
+            </form>
           </div>
         </main>
 
