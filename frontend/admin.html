@@ -198,14 +198,24 @@
 
         <!-- Recent Orders & Fast Actions -->
         <div style="background:#ffffff; border:1px solid var(--admin-border); border-radius:var(--radius-md); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:24px;">
-          <div style="padding:18px 24px; border-bottom:1px solid var(--admin-border); display:flex; align-items:center; justify-content:space-between;">
+          <div style="padding:18px 24px; border-bottom:1px solid var(--admin-border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
             <div>
               <h2 style="font-size:15px; font-weight:800; color:#0f172a;">Pesanan Masuk Terbaru</h2>
               <p style="font-size:12px; color:#64748b; margin-top:2px;">5 pesanan pelanggan terkini yang perlu dipantau</p>
             </div>
-            <button class="btn-primary" style="padding:7px 14px; font-size:12.5px;" onclick="AdminApp.switchTab('orders')">
-              Lihat Semua Pesanan →
-            </button>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <button class="btn-export-sales" onclick="AdminApp.exportSalesCSV()" style="background:#059669; color:#ffffff; padding:7px 14px; border-radius:6px; font-weight:700; font-size:12px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(5,150,105,0.25); transition:all 0.2s ease;">
+                <span>📊</span>
+                <span>Ekspor Excel (CSV)</span>
+              </button>
+              <button class="btn-export-sales" onclick="AdminApp.printSalesReport()" style="background:#0284c7; color:#ffffff; padding:7px 14px; border-radius:6px; font-weight:700; font-size:12px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(2,132,199,0.25); transition:all 0.2s ease;">
+                <span>🖨️</span>
+                <span>Cetak Rekap</span>
+              </button>
+              <button class="btn-primary" style="padding:7px 14px; font-size:12px;" onclick="AdminApp.switchTab('orders')">
+                Lihat Semua Pesanan →
+              </button>
+            </div>
           </div>
           <div class="admin-table-container">
             <table class="admin-table">
@@ -306,15 +316,24 @@
               <p style="font-size:12px; color:#64748b; margin-top:2px;">Update status pesanan pelanggan secara realtime</p>
             </div>
 
-            <div style="display:flex; align-items:center; gap:10px;">
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
               <label for="admin-order-status-filter" style="font-size:12.5px; font-weight:700; color:#475569;">Filter Status:</label>
-              <select id="admin-order-status-filter" class="admin-select" style="min-width:180px;">
+              <select id="admin-order-status-filter" class="admin-select" style="min-width:160px;" onchange="AdminApp.renderOrdersTable()">
                 <option value="Semua">Semua Status</option>
                 <option value="Sedang Diproses">Sedang Diproses</option>
                 <option value="Sedang Dikirim">Sedang Dikirim</option>
                 <option value="Selesai">Selesai</option>
                 <option value="Dibatalkan">Dibatalkan</option>
               </select>
+
+              <button class="btn-export-sales" onclick="AdminApp.exportSalesCSV()" style="background:#059669; color:#ffffff; padding:7px 14px; border-radius:6px; font-weight:700; font-size:12px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(5,150,105,0.25);">
+                <span>📊</span>
+                <span>Ekspor CSV</span>
+              </button>
+              <button class="btn-export-sales" onclick="AdminApp.printSalesReport()" style="background:#0284c7; color:#ffffff; padding:7px 14px; border-radius:6px; font-weight:700; font-size:12px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(2,132,199,0.25);">
+                <span>🖨️</span>
+                <span>Cetak Rekap</span>
+              </button>
             </div>
           </div>
 

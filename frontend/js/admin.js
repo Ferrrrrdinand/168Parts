@@ -537,6 +537,222 @@ const AdminApp = {
     return `<span class="badge-status badge-danger">❌ ${status || 'Pending'}</span>`;
   },
 
+  /* =========================================================
+     SISTEM EKSPOR DATA PENJUALAN (EXCEL CSV & CETAK REKAP)
+     ========================================================= */
+  exportSalesCSV() {
+    if (!this.orders || this.orders.length === 0) {
+      alert('Tidak ada data pesanan/penjualan untuk diekspor.');
+      return;
+    }
+
+    const headers = [
+      'No. Pesanan',
+      'Tanggal Transaksi',
+      'Nama Pembeli',
+      'Rincian Produk',
+      'Jumlah Item',
+      'Metode Pembayaran',
+      'Alamat Pengiriman',
+      'Voucher Digunakan',
+      'Diskon Voucher (Rp)',
+      'Poin Ditukar (Rp)',
+      'Total Belanja (Rp)',
+      'Poin Didapat',
+      'Status Pesanan'
+    ];
+
+    const escapeCsv = (str) => {
+      if (str === null || str === undefined) return '""';
+      const s = String(str).replace(/"/g, '""');
+      return `"${s}"`;
+    };
+
+    const rows = this.orders.map(o => {
+      const dateFormatted = new Date(o.createdAt || Date.now()).toLocaleDateString('id-ID', {
+        year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
+      });
+
+      const itemsSummary = (o.items || [])
+        .map(i => `${i.name} (x${i.quantity || 1} @Rp${Number(i.price || 0).toLocaleString('id-ID')})`)
+        .join('; ');
+
+      const totalQty = (o.items || []).reduce((sum, i) => sum + Number(i.quantity || 1), 0);
+
+      return [
+        escapeCsv(o.id),
+        escapeCsv(dateFormatted),
+        escapeCsv(o.customerName || 'Pelanggan 168 Parts'),
+        escapeCsv(itemsSummary),
+        escapeCsv(totalQty),
+        escapeCsv(o.paymentMethod || 'Transfer Bank'),
+        escapeCsv(o.shippingAddress || '-'),
+        escapeCsv(o.promoCode || '-'),
+        escapeCsv(Number(o.discountAmount || 0)),
+        escapeCsv(Number(o.redeemedPoints || 0)),
+        escapeCsv(Number(o.totalAmount || 0)),
+        escapeCsv(Number(o.earnedPoints || 0)),
+        escapeCsv(o.status || 'Sedang Diproses')
+      ].join(',');
+    });
+
+    const totalRevenue = this.orders.reduce((acc, o) => acc + (Number(o.totalAmount) || 0), 0);
+    const summaryRow = [
+      escapeCsv('TOTAL PENJUALAN'),
+      escapeCsv(''),
+      escapeCsv(`${this.orders.length} Transaksi`),
+      escapeCsv(''),
+      escapeCsv(''),
+      escapeCsv(''),
+      escapeCsv(''),
+      escapeCsv(''),
+      escapeCsv(''),
+      escapeCsv(''),
+      escapeCsv(totalRevenue),
+      escapeCsv(''),
+      escapeCsv('')
+    ].join(',');
+
+    // UTF-8 BOM (\uFEFF) untuk kompatibilitas sempurna dengan Microsoft Excel di Windows
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows, summaryRow].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `Laporan_Penjualan_168Parts_${dateStr}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    this.showToast(`📊 Berhasil mengekspor ${this.orders.length} data penjualan ke file Excel (CSV)!`);
+  },
+
+  printSalesReport() {
+    if (!this.orders || this.orders.length === 0) {
+      alert('Tidak ada data pesanan/penjualan untuk dicetak.');
+      return;
+    }
+
+    const totalRevenue = this.orders.reduce((acc, o) => acc + (Number(o.totalAmount) || 0), 0);
+    const printDate = new Date().toLocaleDateString('id-ID', {
+      day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+
+    const rowsHtml = this.orders.map((o, idx) => {
+      const itemsList = (o.items || []).map(i => `<div>• ${i.name} <b>(x${i.quantity || 1})</b> - Rp${Number(i.price || 0).toLocaleString('id-ID')}</div>`).join('');
+      const dateStr = new Date(o.createdAt || Date.now()).toLocaleDateString('id-ID', {
+        day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+      return `
+        <tr style="border-bottom: 1px solid #e2e8f0;">
+          <td style="padding: 10px; text-align: center;">${idx + 1}</td>
+          <td style="padding: 10px;"><b>${o.id}</b><br><small style="color:#64748b;">${dateStr}</small></td>
+          <td style="padding: 10px;">${o.customerName || 'Pelanggan'}<br><small style="color:#64748b;">${o.paymentMethod || 'Transfer'}</small></td>
+          <td style="padding: 10px; font-size: 12px;">${itemsList || '-'}</td>
+          <td style="padding: 10px; text-align: right; font-weight: bold; color: #be123c;">Rp${Number(o.totalAmount || 0).toLocaleString('id-ID')}</td>
+          <td style="padding: 10px; text-align: center;"><span style="background:#f1f5f9; padding:3px 8px; border-radius:4px; font-size:11px; font-weight:700;">${o.status}</span></td>
+        </tr>
+      `;
+    }).join('');
+
+    const printWin = window.open('', '_blank');
+    if (!printWin) {
+      alert('Popup diblokir oleh browser. Mohon izinkan popup untuk mencetak laporan.');
+      return;
+    }
+
+    printWin.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Rekap Laporan Penjualan - 168 Parts Surabaya</title>
+        <style>
+          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #1e293b; padding: 24px; margin: 0; }
+          .header { border-bottom: 2px solid #be123c; padding-bottom: 14px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
+          .brand { color: #be123c; font-size: 22px; font-weight: 800; }
+          .sub { font-size: 12px; color: #64748b; margin-top: 2px; }
+          .kpi-box { display: flex; gap: 16px; margin-bottom: 20px; }
+          .kpi-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 18px; flex: 1; }
+          .kpi-title { font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; }
+          .kpi-val { font-size: 18px; font-weight: 800; color: #0f172a; margin-top: 4px; }
+          table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+          th { background: #f1f5f9; padding: 10px; text-align: left; font-weight: 700; border-bottom: 2px solid #cbd5e1; }
+          @media print {
+            .no-print { display: none !important; }
+            body { padding: 0; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="no-print" style="margin-bottom: 16px; display: flex; justify-content: flex-end; gap: 8px;">
+          <button onclick="window.print()" style="background:#be123c; color:#fff; border:none; padding:8px 18px; font-weight:700; border-radius:6px; cursor:pointer;">🖨️ Cetak / Simpan PDF</button>
+          <button onclick="window.close()" style="background:#e2e8f0; color:#334155; border:none; padding:8px 14px; font-weight:600; border-radius:6px; cursor:pointer;">Tutup</button>
+        </div>
+
+        <div class="header">
+          <div>
+            <div class="brand">168 PARTS SURABAYA</div>
+            <div class="sub">Pusat Sparepart & Alat Servis HP • Kanal Penjual & Admin</div>
+            <div class="sub">Dicetak pada: ${printDate}</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-weight: 800; font-size: 16px; color: #be123c;">REKAP PENJUALAN TOKO</div>
+            <div style="font-size: 12px; color: #64748b;">Periode: Seluruh Transaksi Penjualan</div>
+          </div>
+        </div>
+
+        <div class="kpi-box">
+          <div class="kpi-item">
+            <div class="kpi-title">Total Pendapatan (Omzet)</div>
+            <div class="kpi-val" style="color: #be123c;">Rp${totalRevenue.toLocaleString('id-ID')}</div>
+          </div>
+          <div class="kpi-item">
+            <div class="kpi-title">Total Transaksi Selesai</div>
+            <div class="kpi-val">${this.orders.length} Pesanan</div>
+          </div>
+          <div class="kpi-item">
+            <div class="kpi-title">Rata-rata Nilai Order</div>
+            <div class="kpi-val">Rp${Math.round(totalRevenue / Math.max(1, this.orders.length)).toLocaleString('id-ID')}</div>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 30px; text-align: center;">No</th>
+              <th>No. Pesanan / Tanggal</th>
+              <th>Pelanggan</th>
+              <th>Rincian Produk</th>
+              <th style="text-align: right;">Total Transaksi</th>
+              <th style="text-align: center;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+          </tbody>
+          <tfoot>
+            <tr style="background: #fff1f2; font-weight: bold;">
+              <td colspan="4" style="padding: 12px; text-align: right; color: #9f1239;">TOTAL KESELURUHAN PENDAPATAN:</td>
+              <td style="padding: 12px; text-align: right; color: #be123c; font-size: 15px;">Rp${totalRevenue.toLocaleString('id-ID')}</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <div style="margin-top: 30px; border-top: 1px dashed #cbd5e1; padding-top: 14px; font-size: 11px; color: #64748b; display: flex; justify-content: space-between;">
+          <span>Sistem Resmi Seller Centre 168 Parts Surabaya</span>
+          <span>Dokumen otomatis digenerate dari Supabase Cloud</span>
+        </div>
+      </body>
+      </html>
+    `);
+    printWin.document.close();
+  },
+
   async toggleFlashSale(prodId, isFlash) {
     const p = this.products.find(x => x.id === prodId);
     if (!p) return;
