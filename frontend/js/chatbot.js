@@ -586,3 +586,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 window.PasarinChatBot = PasarinChatBot;
+

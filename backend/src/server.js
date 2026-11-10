@@ -46,6 +46,7 @@ app.get(['/api/health', '/health', '/api/health/db', '/health/db'], async (req, 
   let dbMessage = 'Database belum terhubung';
   let dbName = 'postgres';
   let latencyMs = 0;
+  let errorDetail = null;
 
   try {
     const dbRes = await dbManager.query('SELECT NOW() as now, current_database() as db_name');
@@ -59,6 +60,7 @@ app.get(['/api/health', '/health', '/api/health/db', '/health/db'], async (req, 
     latencyMs = Date.now() - startTime;
     dbStatus = 'disconnected';
     dbMessage = err.message || 'Gagal koneksi database';
+    errorDetail = dbManager.lastError || { message: err.message, code: err.code };
   }
 
   const isHealthy = dbStatus === 'connected';
@@ -71,7 +73,8 @@ app.get(['/api/health', '/health', '/api/health/db', '/health/db'], async (req, 
       connected: isHealthy,
       databaseName: dbName,
       message: dbMessage,
-      latencyMs
+      latencyMs,
+      error: errorDetail
     },
     timestamp: new Date().toISOString(),
     service: '168 Parts Surabaya Backend API'
