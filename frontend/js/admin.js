@@ -189,13 +189,24 @@ const AdminApp = {
     }
   },
 
-  handleAdminLogout() {
-    if (confirm('Apakah Anda yakin ingin keluar dari sesi Administrator?')) {
+  async handleAdminLogout() {
+    const confirmed = await this.confirmModal({
+      title: 'Keluar dari Sesi Administrator?',
+      message: 'Apakah Anda yakin ingin mengakhiri sesi login Admin 168 Parts?',
+      subtext: 'Anda akan dialihkan kembali ke portal login toko. Semua data yang tersimpan di cloud Supabase tetap aman.',
+      icon: '🚪',
+      confirmText: 'Ya, Logout Sekarang',
+      cancelText: 'Tetap di Admin',
+      isDanger: true
+    });
+
+    if (confirmed) {
       if (window.PasarinAPI) window.PasarinAPI.setToken(null);
       localStorage.removeItem('pasarin_token');
       localStorage.removeItem('pasarin_user');
       this.currentUser = null;
       this.showAuthGate();
+      this.showToast('👋 Sesi Administrator telah berakhir.');
     }
   },
 
@@ -974,9 +985,16 @@ const AdminApp = {
 
   async deleteProduct(prodId) {
     const p = this.products.find(x => x.id === prodId);
-    if (!confirm(`Apakah Anda yakin ingin menghapus produk "${p ? p.name : prodId}"?`)) {
-      return;
-    }
+    const confirmed = await this.confirmModal({
+      title: 'Hapus Produk dari Katalog?',
+      message: `Hapus "${p ? p.name : prodId}" dari etalase toko?`,
+      subtext: 'Produk akan dihapus permanen dari database Supabase dan tidak lagi dapat dibeli pelanggan.',
+      icon: '🗑️',
+      confirmText: 'Ya, Hapus Produk',
+      cancelText: 'Batal',
+      isDanger: true
+    });
+    if (!confirmed) return;
 
     try {
       const res = await this.authFetch(`/products/${prodId}`, {
@@ -1237,9 +1255,16 @@ const AdminApp = {
   },
 
   async deletePromo(code) {
-    if (!confirm(`Apakah Anda yakin ingin menghapus voucher "${code}" dari sistem?`)) {
-      return;
-    }
+    const confirmed = await this.confirmModal({
+      title: 'Hapus Voucher Promo?',
+      message: `Hapus voucher "${code}" dari sistem?`,
+      subtext: 'Pelanggan tidak akan dapat lagi menggunakan voucher ini saat checkout belanja.',
+      icon: '🎟️',
+      confirmText: 'Ya, Hapus Voucher',
+      cancelText: 'Batal',
+      isDanger: true
+    });
+    if (!confirmed) return;
 
     try {
       const res = await this.authFetch(`/promos/${code}`, {
@@ -1478,9 +1503,16 @@ const AdminApp = {
   },
 
   async resetBanners() {
-    if (!confirm('Apakah Anda yakin ingin mengembalikan semua banner ke desain bawaan awal 168 Parts?')) {
-      return;
-    }
+    const confirmed = await this.confirmModal({
+      title: 'Reset Desain Banner?',
+      message: 'Kembalikan semua banner ke desain awal bawaan 168 Parts?',
+      subtext: 'Desain banner utama beranda akan direset ke pengaturan standar resmi toko.',
+      icon: '🔄',
+      confirmText: 'Ya, Reset Banner',
+      cancelText: 'Batal',
+      isDanger: false
+    });
+    if (!confirmed) return;
 
     try {
       const res = await this.authFetch('/banners/reset', { method: 'POST' });
@@ -1574,6 +1606,101 @@ const AdminApp = {
         this.showToast(`🔴 Database terputus / offline: ${errMessage}`, true);
       }
     }
+  },
+
+  confirmModal({
+    title = 'Konfirmasi Tindakan',
+    message = 'Apakah Anda yakin?',
+    subtext = '',
+    icon = '⚠️',
+    confirmText = 'Ya, Lanjutkan',
+    cancelText = 'Batal',
+    isDanger = true
+  } = {}) {
+    return new Promise((resolve) => {
+      const modal = document.getElementById('admin-confirm-modal');
+      const iconWrap = document.getElementById('confirm-modal-icon-wrap');
+      const iconEl = document.getElementById('confirm-modal-icon');
+      const titleEl = document.getElementById('confirm-modal-title');
+      const msgEl = document.getElementById('confirm-modal-message');
+      const subEl = document.getElementById('confirm-modal-subtext');
+      const btnCancel = document.getElementById('confirm-modal-btn-cancel');
+      const btnOk = document.getElementById('confirm-modal-btn-ok');
+
+      if (!modal) {
+        // Fallback jika elemen modal belum ada di DOM
+        resolve(window.confirm(`${title}\n${message}`));
+        return;
+      }
+
+      if (iconEl) iconEl.textContent = icon;
+      if (titleEl) titleEl.textContent = title;
+      if (msgEl) msgEl.textContent = message;
+      if (subEl) {
+        subEl.textContent = subtext;
+        subEl.style.display = subtext ? 'block' : 'none';
+      }
+      if (btnCancel) btnCancel.textContent = cancelText;
+      if (btnOk) {
+        btnOk.textContent = confirmText;
+        if (isDanger) {
+          btnOk.classList.remove('is-primary');
+          if (iconWrap) {
+            iconWrap.classList.remove('is-primary');
+            iconWrap.classList.add('is-danger');
+          }
+        } else {
+          btnOk.classList.add('is-primary');
+          if (iconWrap) {
+            iconWrap.classList.remove('is-danger');
+            iconWrap.classList.add('is-primary');
+          }
+        }
+      }
+
+      const cleanup = () => {
+        modal.classList.remove('active');
+        document.removeEventListener('keydown', onKeyDown);
+        if (btnOk) btnOk.onclick = null;
+        if (btnCancel) btnCancel.onclick = null;
+        modal.onclick = null;
+      };
+
+      const onKeyDown = (e) => {
+        if (e.key === 'Escape') {
+          cleanup();
+          resolve(false);
+        } else if (e.key === 'Enter') {
+          cleanup();
+          resolve(true);
+        }
+      };
+
+      if (btnOk) {
+        btnOk.onclick = () => {
+          cleanup();
+          resolve(true);
+        };
+      }
+
+      if (btnCancel) {
+        btnCancel.onclick = () => {
+          cleanup();
+          resolve(false);
+        };
+      }
+
+      modal.onclick = (e) => {
+        if (e.target === modal) {
+          cleanup();
+          resolve(false);
+        }
+      };
+
+      document.addEventListener('keydown', onKeyDown);
+      modal.classList.add('active');
+      if (btnOk) btnOk.focus();
+    });
   },
 
   showToast(message, isError = false) {

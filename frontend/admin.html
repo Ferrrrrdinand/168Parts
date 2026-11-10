@@ -952,6 +952,25 @@
     </div>
   </div>
 
+  <!-- =========================================================
+       5. MODAL DIALOG: KONFIRMASI MODERN (PENGGANTI POPUP BROWSER)
+       ========================================================= -->
+  <div class="confirm-modal-overlay" id="admin-confirm-modal" aria-hidden="true">
+    <div class="confirm-modal-card">
+      <div class="confirm-modal-icon-wrap is-danger" id="confirm-modal-icon-wrap">
+        <span id="confirm-modal-icon">🚪</span>
+      </div>
+      <h3 class="confirm-modal-title" id="confirm-modal-title">Keluar dari Sesi Administrator?</h3>
+      <p class="confirm-modal-message" id="confirm-modal-message">Apakah Anda yakin ingin mengakhiri sesi login Admin 168 Parts?</p>
+      <p class="confirm-modal-subtext" id="confirm-modal-subtext">Anda akan dialihkan kembali ke halaman login admin toko.</p>
+      
+      <div class="confirm-modal-actions">
+        <button type="button" class="btn-confirm-cancel" id="confirm-modal-btn-cancel">Batal</button>
+        <button type="button" class="btn-confirm-proceed" id="confirm-modal-btn-ok">Ya, Logout Sekarang</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/api.js"></script>
   <script src="js/admin.js"></script>
 </body>
