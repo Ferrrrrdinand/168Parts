@@ -303,8 +303,7 @@ const AdminApp = {
         products: '📦 Manajemen & Katalog Produk',
         orders: '📑 Daftar Pesanan & Pengiriman',
         banners: '🎨 Pengaturan & Desain Banner Toko',
-        promos: '🎟️ Kelola Voucher & Kode Promo',
-        settings: '⚙️ Konfigurasi Sistem & Database'
+        promos: '🎟️ Kelola Voucher & Kode Promo'
       };
       titleEl.textContent = titles[tabName] || 'Dashboard Admin';
     }

@@ -101,11 +101,6 @@
         <span class="nav-icon">🎨</span>
         <span>Kelola Banner</span>
       </button>
-
-      <button class="sidebar-nav-item" data-tab="settings">
-        <span class="nav-icon">⚙️</span>
-        <span>Konfigurasi & DB</span>
-      </button>
     </nav>
 
     <div class="admin-sidebar-footer" style="display:flex; flex-direction:column; gap:8px;">
@@ -693,57 +688,6 @@
 
         </div>
 
-      </section>
-
-      <!-- =========================================================
-           TAB 6: SETTINGS (KONFIGURASI & DB)
-           ========================================================= -->
-      <section class="admin-tab-pane" id="pane-settings">
-        <div style="background:#ffffff; border:1px solid var(--admin-border); border-radius:var(--radius-md); padding:24px; box-shadow:var(--shadow-sm); max-width:800px;">
-          <h2 style="font-size:16px; font-weight:800; color:#0f172a; margin-bottom:16px;">⚙️ Informasi Sistem & Penyimpanan</h2>
-          
-          <div style="display:flex; flex-direction:column; gap:16px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; border-bottom:1px solid #f1f5f9;">
-              <div>
-                <b>Mode Database Backend</b>
-                <div style="font-size:12px; color:#64748b;">Penyimpanan data cloud utama</div>
-              </div>
-              <span style="background:#ecfdf5; color:#047857; padding:4px 10px; border-radius:6px; font-weight:700; font-size:12px;">
-                ☁️ Supabase PostgreSQL Cloud (100% Non-Lokal)
-              </span>
-            </div>
-
-            <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; border-bottom:1px solid #f1f5f9;">
-              <div>
-                <b>API Endpoint Server</b>
-                <div style="font-size:12px; color:#64748b;">Node.js / Express REST API</div>
-              </div>
-              <span style="background:#e0f2fe; color:#0369a1; padding:4px 10px; border-radius:6px; font-weight:700; font-size:12px;">
-                http://localhost:3000/api
-              </span>
-            </div>
-
-            <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; border-bottom:1px solid #f1f5f9;">
-              <div>
-                <b>Identitas Toko</b>
-                <div style="font-size:12px; color:#64748b;">Nama platform & tema warna</div>
-              </div>
-              <span style="color:#be123c; font-weight:800; font-size:12px;">
-                168 Parts Surabaya (#be123c)
-              </span>
-            </div>
-
-            <div style="display:flex; justify-content:space-between; align-items:center; padding-top:6px;">
-              <div>
-                <b>Cadangkan Data (Backup)</b>
-                <div style="font-size:12px; color:#64748b;">Unduh salinan produk & pesanan</div>
-              </div>
-              <button class="btn-secondary" onclick="window.open('http://localhost:3000/api/products', '_blank')">
-                📥 Ekspor Produk JSON
-              </button>
-            </div>
-          </div>
-        </div>
       </section>
 
     </main>
