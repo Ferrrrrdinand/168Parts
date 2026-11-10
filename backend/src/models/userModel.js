@@ -69,9 +69,14 @@ class UserModel {
     return {
       id: row.id,
       name: row.name,
+      username: row.username || (row.email ? row.email.split('@')[0] : 'user') + (row.id ? String(row.id).slice(-4) : ''),
       email: row.email,
       phone: row.phone || '',
       address: row.address || '',
+      shopName: row.shop_name || '',
+      gender: row.gender || '',
+      birthDate: row.birth_date || '',
+      avatar: row.avatar || '',
       coordinates: coords,
       role: row.role || 'buyer',
       points: Number(row.points || 0),
@@ -111,8 +116,13 @@ class UserModel {
     const id = data.id || ('user-' + Date.now());
     const email = data.email.trim().toLowerCase();
     const name = data.name.trim();
+    const username = data.username ? data.username.trim() : (email.split('@')[0] + id.slice(-4));
     const phone = (data.phone || '').trim();
     const address = (data.address || '').trim();
+    const shopName = (data.shopName || data.shop_name || '').trim();
+    const gender = (data.gender || '').trim();
+    const birthDate = data.birthDate || data.birth_date || null;
+    const avatar = data.avatar || null;
     const role = data.role || 'buyer';
     const points = Number(data.points || 0);
     const coordinates = data.coordinates ? JSON.stringify(data.coordinates) : null;
@@ -126,12 +136,12 @@ class UserModel {
     }
 
     const sql = `
-      INSERT INTO users (id, name, email, phone, address, coordinates, role, points, salt, hash, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+      INSERT INTO users (id, name, username, email, phone, address, shop_name, gender, birth_date, avatar, coordinates, role, points, salt, hash, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
     `;
 
     await dbManager.query(sql, [
-      id, name, email, phone, address, coordinates, role, points, salt, hash
+      id, name, username, email, phone, address, shopName, gender, birthDate, avatar, coordinates, role, points, salt, hash
     ]);
 
     return await this.findById(id);
@@ -143,15 +153,41 @@ class UserModel {
 
     if (fields.name !== undefined) {
       sets.push('name = ?');
-      params.push(fields.name.trim());
+      params.push(fields.name ? fields.name.trim() : '');
+    }
+    if (fields.username !== undefined) {
+      sets.push('username = ?');
+      params.push(fields.username ? fields.username.trim() : '');
+    }
+    if (fields.email !== undefined) {
+      sets.push('email = ?');
+      params.push(fields.email.trim().toLowerCase());
     }
     if (fields.phone !== undefined) {
       sets.push('phone = ?');
-      params.push(fields.phone.trim());
+      params.push(fields.phone ? fields.phone.trim() : '');
     }
     if (fields.address !== undefined) {
       sets.push('address = ?');
-      params.push(fields.address.trim());
+      params.push(fields.address ? fields.address.trim() : '');
+    }
+    if (fields.shopName !== undefined || fields.shop_name !== undefined) {
+      sets.push('shop_name = ?');
+      const val = fields.shopName !== undefined ? fields.shopName : fields.shop_name;
+      params.push(val ? val.trim() : '');
+    }
+    if (fields.gender !== undefined) {
+      sets.push('gender = ?');
+      params.push(fields.gender ? fields.gender.trim() : '');
+    }
+    if (fields.birthDate !== undefined || fields.birth_date !== undefined) {
+      sets.push('birth_date = ?');
+      const val = fields.birthDate !== undefined ? fields.birthDate : fields.birth_date;
+      params.push(val || null);
+    }
+    if (fields.avatar !== undefined) {
+      sets.push('avatar = ?');
+      params.push(fields.avatar || null);
     }
     if (fields.points !== undefined) {
       sets.push('points = ?');
@@ -204,13 +240,13 @@ class UserModel {
   async findAllWithStats() {
     const sql = `
       SELECT 
-        u.id, u.name, u.email, u.phone, u.address, u.coordinates, u.role, u.points, u.created_at, u.updated_at,
+        u.id, u.name, u.username, u.email, u.phone, u.address, u.shop_name, u.gender, u.birth_date, u.avatar, u.coordinates, u.role, u.points, u.created_at, u.updated_at,
         COUNT(o.id) AS total_orders,
         COALESCE(SUM(o.total_amount), 0) AS total_spent,
         MAX(o.created_at) AS last_order_date
       FROM users u
       LEFT JOIN orders o ON u.id = o.user_id
-      GROUP BY u.id, u.name, u.email, u.phone, u.address, u.coordinates, u.role, u.points, u.created_at, u.updated_at
+      GROUP BY u.id, u.name, u.username, u.email, u.phone, u.address, u.shop_name, u.gender, u.birth_date, u.avatar, u.coordinates, u.role, u.points, u.created_at, u.updated_at
       ORDER BY u.created_at DESC
     `;
     const rows = await dbManager.query(sql);
@@ -228,9 +264,14 @@ class UserModel {
       return {
         id: r.id,
         name: r.name,
+        username: r.username || (r.email ? r.email.split('@')[0] : 'user') + (r.id ? String(r.id).slice(-4) : ''),
         email: r.email,
         phone: r.phone || '',
         address: r.address || '',
+        shopName: r.shop_name || '',
+        gender: r.gender || '',
+        birthDate: r.birth_date || '',
+        avatar: r.avatar || '',
         coordinates: coords,
         role: r.role || 'buyer',
         points: Number(r.points || 0),
@@ -298,8 +339,22 @@ class UserModel {
     };
   }
 
+  async ensureSchema() {
+    try {
+      await dbManager.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS username text");
+      await dbManager.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS shop_name text");
+      await dbManager.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS gender text");
+      await dbManager.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS birth_date text");
+      await dbManager.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar text");
+    } catch (e) {
+      console.warn('⚠️ Gagal memastikan kolom profile users di Supabase:', e.message);
+    }
+  }
+
   async ensureDefaultUsers() {
     try {
+      await this.ensureSchema();
+
       // 1. Admin 168 Parts
       const admin168 = await this.findByEmail('admin@168parts.com');
       if (!admin168) {

@@ -52,9 +52,14 @@ exports.register = async (req, res) => {
       user: {
         id: newUser.id,
         name: newUser.name,
+        username: newUser.username || (newUser.email.split('@')[0] + newUser.id.slice(-4)),
         email: newUser.email,
-        phone: newUser.phone,
-        address: newUser.address,
+        phone: newUser.phone || '',
+        address: newUser.address || '',
+        shopName: newUser.shopName || '',
+        gender: newUser.gender || '',
+        birthDate: newUser.birthDate || '',
+        avatar: newUser.avatar || '',
         coordinates: newUser.coordinates,
         role: newUser.role,
         points: newUser.points || 0
@@ -108,9 +113,14 @@ exports.login = async (req, res) => {
       user: {
         id: user.id,
         name: user.name,
+        username: user.username || (user.email ? user.email.split('@')[0] : 'user') + (user.id ? String(user.id).slice(-4) : ''),
         email: user.email,
         phone: user.phone || '',
         address: user.address || '',
+        shopName: user.shopName || '',
+        gender: user.gender || '',
+        birthDate: user.birthDate || '',
+        avatar: user.avatar || '',
         role: user.role,
         points: user.points || 0
       }
@@ -139,10 +149,15 @@ exports.getMe = async (req, res) => {
       user: {
         id: user.id,
         name: user.name,
-        username: (user.email ? user.email.split('@')[0] : 'user') + (user.id.slice(-4)),
+        username: user.username || (user.email ? user.email.split('@')[0] : 'user') + (user.id ? String(user.id).slice(-4) : ''),
         email: user.email,
         phone: user.phone || '',
         address: user.address || '',
+        shopName: user.shopName || '',
+        gender: user.gender || '',
+        birthDate: user.birthDate || '',
+        avatar: user.avatar || '',
+        coordinates: user.coordinates,
         role: user.role || 'buyer',
         points: user.points || 0,
         createdAt: user.createdAt
@@ -159,11 +174,31 @@ exports.getMe = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { name, phone, address, coordinates, password } = req.body;
+    const {
+      name,
+      username,
+      email,
+      phone,
+      shopName,
+      shop_name,
+      gender,
+      birthDate,
+      birth_date,
+      avatar,
+      address,
+      coordinates,
+      password
+    } = req.body;
 
     const updated = await userModel.update(userId, {
       name,
+      username,
+      email,
       phone,
+      shopName: shopName !== undefined ? shopName : shop_name,
+      gender,
+      birthDate: birthDate !== undefined ? birthDate : birth_date,
+      avatar,
       address,
       coordinates,
       password
@@ -180,14 +215,20 @@ exports.updateProfile = async (req, res) => {
 
     return res.json({
       success: true,
-      message: 'Profil berhasil diperbarui di database!',
+      message: 'Profil berhasil diperbarui dan tersimpan di database!',
       token: newToken,
       user: {
         id: updated.id,
         name: updated.name,
+        username: updated.username,
         email: updated.email,
         phone: updated.phone || '',
         address: updated.address || '',
+        shopName: updated.shopName || '',
+        gender: updated.gender || '',
+        birthDate: updated.birthDate || '',
+        avatar: updated.avatar || '',
+        coordinates: updated.coordinates,
         role: updated.role,
         points: updated.points || 0
       }

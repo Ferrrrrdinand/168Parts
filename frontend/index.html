@@ -789,9 +789,10 @@
               <!-- Username -->
               <div class="profile-form-row">
                 <label class="profile-form-label">Username</label>
-                <div class="profile-form-field">
+                <div class="profile-form-field profile-field-inline">
                   <span class="profile-text-val" id="prof-val-username" style="font-weight:600;">ferdinand2341</span>
-                  <input type="text" id="prof-input-username" class="profile-text-input" style="max-width:240px; display:none;" value="ferdinand2341">
+                  <button type="button" class="profile-link-btn" onclick="PasarinApp.promptChangeUsername()">Ubah</button>
+                  <input type="hidden" id="prof-hidden-username">
                 </div>
               </div>
 

@@ -2587,6 +2587,9 @@ const PasarinApp = {
     const valUsername = document.getElementById('prof-val-username');
     if (valUsername) valUsername.textContent = currentUsername;
 
+    const hiddenUsername = document.getElementById('prof-hidden-username');
+    if (hiddenUsername) hiddenUsername.value = currentUsername;
+
     const inputName = document.getElementById('prof-input-name');
     if (inputName) inputName.value = currentName;
 
@@ -2618,17 +2621,32 @@ const PasarinApp = {
     if (bigAvatar) bigAvatar.src = currentAvatar;
   },
 
+  promptChangeUsername() {
+    const hiddenUsername = document.getElementById('prof-hidden-username');
+    const valUsername = document.getElementById('prof-val-username');
+    const current = hiddenUsername?.value || valUsername?.textContent || 'demomo-1';
+    const newUsername = prompt('Masukkan Username baru Anda (tanpa spasi):', current);
+    if (newUsername && newUsername.trim()) {
+      const clean = newUsername.trim().replace(/\s+/g, '_');
+      if (hiddenUsername) hiddenUsername.value = clean;
+      if (valUsername) valUsername.textContent = clean;
+      const sideUsername = document.getElementById('sidebar-user-username');
+      if (sideUsername) sideUsername.textContent = clean;
+      if (window.showToast) window.showToast('Username diperbarui. Klik "Simpan" untuk menyimpan ke database.', 'info');
+    }
+  },
+
   async handleSaveUserProfile(event) {
     if (event) event.preventDefault();
 
     const name = document.getElementById('prof-input-name')?.value.trim();
+    const username = document.getElementById('prof-hidden-username')?.value.trim() || document.getElementById('prof-val-username')?.textContent.trim();
     const email = document.getElementById('prof-hidden-email')?.value.trim();
     const phone = document.getElementById('prof-hidden-phone')?.value.trim();
     const shopName = document.getElementById('prof-input-shop')?.value.trim();
     const birthDate = document.getElementById('prof-input-birthdate')?.value;
     const gender = document.querySelector('input[name="prof-gender"]:checked')?.value || 'Laki-laki';
     const avatar = document.getElementById('prof-avatar-big-img')?.src;
-    const username = document.getElementById('prof-val-username')?.textContent.trim() || 'ferdinand2341';
 
     const payload = {
       name,
@@ -2644,7 +2662,7 @@ const PasarinApp = {
     const saveBtn = document.getElementById('btn-save-profile');
     if (saveBtn) {
       saveBtn.disabled = true;
-      saveBtn.textContent = 'Menyimpan...';
+      saveBtn.textContent = 'Menyimpan ke Database...';
     }
 
     try {
@@ -2656,7 +2674,7 @@ const PasarinApp = {
           window.PasarinAuth.renderNavbarUser();
         }
         if (window.showToast) {
-          window.showToast('✓ Profil Anda berhasil diperbarui!', 'success');
+          window.showToast('✓ Profil Anda berhasil disimpan ke database!', 'success');
         }
       } else {
         const current = window.PasarinAuth?.currentUser || {};
@@ -2667,13 +2685,13 @@ const PasarinApp = {
           window.PasarinAuth.renderNavbarUser();
         }
         if (window.showToast) {
-          window.showToast('✓ Profil berhasil diperbarui!', 'success');
+          window.showToast(res?.message || '✓ Profil berhasil diperbarui!', 'success');
         }
       }
       this.renderUserProfileView();
     } catch (err) {
       console.warn('Error saving profile:', err);
-      if (window.showToast) window.showToast('✓ Profil berhasil diperbarui secara lokal.', 'success');
+      if (window.showToast) window.showToast('Gagal menyimpan profil ke database: ' + (err.message || 'Error server'), 'error');
     } finally {
       if (saveBtn) {
         saveBtn.disabled = false;
