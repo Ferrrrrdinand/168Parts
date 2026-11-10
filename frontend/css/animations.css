@@ -1,0 +1,233 @@
+/* =========================================================
+   168 Parts Surabaya - Animation & Celebration Effects
+   Smooth GPU-accelerated micro-interactions
+   ========================================================= */
+
+/* Confetti Fullscreen Overlay */
+#celebration-confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 99999;
+}
+
+/* Modal Pop-In & Spring Bounce */
+.modal-spring-enter {
+  animation: springModalEnter 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+}
+
+@keyframes springModalEnter {
+  0% {
+    opacity: 0;
+    transform: scale(0.7) translateY(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Animated Checkmark in Success Modal */
+.success-checkmark-circle {
+  width: 72px;
+  height: 72px;
+  background: #ecfdf5;
+  color: #059669;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  font-weight: 900;
+  margin: 0 auto 16px auto;
+  box-shadow: 0 6px 20px rgba(5, 150, 105, 0.25);
+  animation: checkmarkPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  position: relative;
+}
+
+.success-checkmark-circle::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  border-radius: 50%;
+  border: 2px dashed #10b981;
+  animation: checkmarkSpinRing 8s linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes checkmarkPop {
+  0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+  70% { transform: scale(1.18) rotate(10deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes checkmarkSpinRing {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Shimmer Light Sweeping on Reward Cards */
+.reward-card-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.reward-card-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  transform: skewX(-20deg);
+  animation: shimmerSweep 3s infinite 0.5s;
+}
+
+@keyframes shimmerSweep {
+  0% { left: -120%; }
+  35% { left: 180%; }
+  100% { left: 180%; }
+}
+
+/* 3D Coin Flip Animation */
+.coin-3d-spin {
+  display: inline-block;
+  animation: coinFlip3D 0.8s ease-in-out forwards;
+}
+
+@keyframes coinFlip3D {
+  0% { transform: rotateY(0deg) scale(1); }
+  50% { transform: rotateY(180deg) scale(1.35); filter: drop-shadow(0 4px 10px rgba(245, 158, 11, 0.6)); }
+  100% { transform: rotateY(360deg) scale(1); }
+}
+
+/* Voucher Applied Tag Pulse */
+.voucher-applied-pulse {
+  animation: voucherGlowPulse 1.2s ease-out forwards;
+}
+
+@keyframes voucherGlowPulse {
+  0% {
+    transform: scale(0.9);
+    box-shadow: 0 0 0 0 rgba(190, 18, 60, 0.7);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 12px rgba(190, 18, 60, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(190, 18, 60, 0);
+  }
+}
+
+/* Floating "HEMAT" Pill Notification */
+.floating-savings-pill {
+  position: fixed;
+  z-index: 10000;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  box-shadow: 0 8px 24px rgba(5, 150, 105, 0.35);
+  pointer-events: none;
+  animation: floatUpAndFade 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@keyframes floatUpAndFade {
+  0% {
+    opacity: 0;
+    transform: translateY(15px) scale(0.8);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0) scale(1.05);
+  }
+  75% {
+    opacity: 1;
+    transform: translateY(-25px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.9);
+  }
+}
+
+/* Fly to Cart Particle */
+.fly-to-cart-particle {
+  position: fixed;
+  z-index: 999999;
+  border-radius: 50%;
+  pointer-events: none;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 8px 20px rgba(190, 18, 60, 0.4);
+  border: 2px solid #ffffff;
+  transition: all 0.75s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Cart Badge Bounce on Receive */
+.cart-badge-bounce {
+  animation: cartBadgeBounce 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+@keyframes cartBadgeBounce {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.65); background: #10b981 !important; color: #fff !important; }
+  100% { transform: scale(1); }
+}
+
+/* Row Flash Highlight when calculation updates */
+.calc-row-highlight {
+  animation: rowHighlightGreen 1s ease-out;
+}
+
+@keyframes rowHighlightGreen {
+  0% { background-color: rgba(16, 185, 129, 0.25); border-radius: 4px; }
+  100% { background-color: transparent; }
+}
+
+/* Total Price Glow on change */
+.price-update-glow {
+  animation: priceGlow 0.8s ease-out;
+}
+
+@keyframes priceGlow {
+  0% { transform: scale(1.06); color: #059669; }
+  100% { transform: scale(1); }
+}
+
+/* Claim Button Sparkle */
+.btn-claim-sparkle {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-claim-sparkle::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.btn-claim-sparkle:active::after {
+  opacity: 1;
+}

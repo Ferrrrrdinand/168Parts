@@ -1398,7 +1398,7 @@ const PasarinApp = {
         ${p.discountPercent ? `<span class="fc-discount-tag">-${p.discountPercent}%</span>` : ''}
         <div class="pic">
           ${this.renderProductMedia(p, 'i lg')}
-          <button class="btn-quick-cart" onclick="event.stopPropagation(); if(window.PasarinCart) window.PasarinCart.addToCart('${p.id}', 1);" title="Tambah ke Keranjang" aria-label="Tambah ke Keranjang">
+          <button class="btn-quick-cart" onclick="event.stopPropagation(); if(window.PasarinCart) window.PasarinCart.addToCart('${p.id}', 1, null, this);" title="Tambah ke Keranjang" aria-label="Tambah ke Keranjang">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="9" cy="21" r="1"></circle>
               <circle cx="20" cy="21" r="1"></circle>
@@ -1436,7 +1436,7 @@ const PasarinApp = {
           <!-- Product Image Container -->
           <div class="pic">
             ${this.renderProductMedia(p, 'i lg')}
-            <button class="btn-quick-cart" onclick="event.stopPropagation(); if(window.PasarinCart) window.PasarinCart.addToCart('${p.id}', 1);" title="Tambah ke Keranjang" aria-label="Tambah ke Keranjang">
+            <button class="btn-quick-cart" onclick="event.stopPropagation(); if(window.PasarinCart) window.PasarinCart.addToCart('${p.id}', 1, null, this);" title="Tambah ke Keranjang" aria-label="Tambah ke Keranjang">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="9" cy="21" r="1"></circle>
                 <circle cx="20" cy="21" r="1"></circle>
@@ -1710,7 +1710,7 @@ const PasarinApp = {
           </div>
           <div class="im">
             ${this.renderProductMedia(p, 'i lg')}
-            <button class="btn-quick-cart" onclick="event.stopPropagation(); if(window.PasarinCart) window.PasarinCart.addToCart('${p.id}', 1);" title="Tambah ke Keranjang" aria-label="Tambah ke Keranjang">
+            <button class="btn-quick-cart" onclick="event.stopPropagation(); if(window.PasarinCart) window.PasarinCart.addToCart('${p.id}', 1, null, this);" title="Tambah ke Keranjang" aria-label="Tambah ke Keranjang">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="9" cy="21" r="1"></circle>
                 <circle cx="20" cy="21" r="1"></circle>
@@ -1870,16 +1870,16 @@ const PasarinApp = {
       }
     };
 
-    modal.querySelector('#modal-btn-add-cart').onclick = () => {
+    modal.querySelector('#modal-btn-add-cart').onclick = (e) => {
       if (window.PasarinCart) {
-        window.PasarinCart.addToCart(product.id, qty);
+        window.PasarinCart.addToCart(product.id, qty, null, e.currentTarget);
       }
       modal.classList.remove('active');
     };
 
-    modal.querySelector('#modal-btn-buy-now').onclick = async () => {
+    modal.querySelector('#modal-btn-buy-now').onclick = async (e) => {
       if (window.PasarinCart) {
-        await window.PasarinCart.addToCart(product.id, qty);
+        await window.PasarinCart.addToCart(product.id, qty, null, e.currentTarget);
         modal.classList.remove('active');
         window.PasarinCart.handleCheckoutClick();
       }
@@ -3185,6 +3185,12 @@ const PasarinApp = {
         this.renderPromoTickets();
         this.updatePromoBadgeCount();
 
+        // ✨ Animasi Sparkle saat klaim voucher promo
+        if (window.PasarinAnimations) {
+          const rect = btn ? btn.getBoundingClientRect() : { left: window.innerWidth / 2, top: 250 };
+          window.PasarinAnimations.launchMiniSparkle(rect.left + 30, rect.top + 15);
+        }
+
         if (window.showToast) {
           window.showToast(res.message || `✓ Berhasil klaim voucher "${cleanCode}" (${res.data.claimCount}/3)!`, 'success');
         }
@@ -3261,6 +3267,9 @@ const PasarinApp = {
 
     if (window.showToast) {
       if (claimedSuccess > 0) {
+        if (window.PasarinAnimations) {
+          window.PasarinAnimations.launchCheckoutCelebration();
+        }
         window.showToast(`🎉 Berhasil mengklaim ${claimedSuccess} voucher belanja ke akun Anda! (Maks 3 per voucher)`, 'success');
       } else {
         window.showToast('Seluruh voucher promo sudah mencapai batas maksimal klaim Anda (3/3).', 'info');

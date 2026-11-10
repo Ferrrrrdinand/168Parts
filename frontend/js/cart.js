@@ -18,6 +18,9 @@ const PasarinCart = {
 
   toggleUseCoins(checked) {
     this.useCoins = !!checked;
+    if (this.useCoins && window.PasarinAnimations) {
+      window.PasarinAnimations.triggerCoinRedeemed();
+    }
     this.renderCheckoutPage();
   },
 
@@ -74,7 +77,7 @@ const PasarinCart = {
     });
   },
 
-  async addToCart(productId, quantity = 1, variation = null) {
+  async addToCart(productId, quantity = 1, variation = null, originEl = null) {
     const qty = Math.max(1, parseInt(quantity, 10) || 1);
 
     // 1. Dapatkan data lengkap produk dari katalog atau item yang sudah ada
@@ -132,6 +135,14 @@ const PasarinCart = {
     this.saveCartState();
     this.updateCartBadge();
     this.animateCartBadge();
+
+    // 🛍️ Trigger Animasi Fly-to-Cart
+    if (window.PasarinAnimations) {
+      const srcEl = originEl || document.activeElement;
+      if (srcEl && (srcEl.tagName === 'BUTTON' || srcEl.closest('.btn-quick-cart') || srcEl.closest('.btn-add-cart') || srcEl.closest('.btn-buy-now'))) {
+        window.PasarinAnimations.flyToCart(srcEl, p.image);
+      }
+    }
 
     // 4. Tampilkan dialog notifikasi Shopee "Berhasil Ditambahkan ke Keranjang"
     this.showAddToCartSuccessModal(p, qty);
@@ -956,6 +967,18 @@ const PasarinCart = {
           discountType: data.data.discountType
         };
         this.renderCheckoutPage();
+
+        // 🎟️ Trigger Animasi Voucher Applied
+        if (window.PasarinAnimations) {
+          const discountStr = this.appliedVoucher.discountAmount 
+            ? this.formatRupiah(this.appliedVoucher.discountAmount) 
+            : (this.appliedVoucher.discountValue ? `${this.appliedVoucher.discountValue}%` : 'Diskon');
+          window.PasarinAnimations.triggerVoucherApplied(
+            document.getElementById('chk-applied-voucher-tag') || document.getElementById('chk-voucher-btn-select'),
+            discountStr
+          );
+        }
+
         if (window.showToast) {
           window.showToast(`🎉 Voucher / Kode Promo "${cleanCode}" berhasil digunakan!`, 'success');
         }
@@ -980,6 +1003,15 @@ const PasarinCart = {
           discountAmount: disc
         };
         this.renderCheckoutPage();
+
+        // 🎟️ Trigger Animasi Voucher Applied
+        if (window.PasarinAnimations) {
+          window.PasarinAnimations.triggerVoucherApplied(
+            document.getElementById('chk-applied-voucher-tag') || document.getElementById('chk-voucher-btn-select'),
+            this.formatRupiah(disc)
+          );
+        }
+
         if (window.showToast) {
           window.showToast(`🎉 Voucher / Kode Promo "${cleanCode}" berhasil digunakan!`, 'success');
         }
@@ -1425,19 +1457,19 @@ const PasarinCart = {
       : (window.PasarinPoints ? window.PasarinPoints.getPoints() : earned);
 
     dialog.innerHTML = `
-      <div class="pasarin-modal-card text-center" style="max-width: 440px; padding: 28px 24px; border-radius: 18px; text-align: center;">
-        <div style="width: 68px; height: 68px; background: #ecfdf5; color: #059669; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; margin: 0 auto 16px auto; box-shadow: 0 4px 14px rgba(5, 150, 105, 0.2);">✓</div>
-        <h3 style="margin-bottom: 6px; font-size: 18px; font-weight: 800; color: #0f172a;">Pesanan Berhasil Dibuat!</h3>
+      <div class="pasarin-modal-card text-center modal-spring-enter" style="max-width: 440px; padding: 28px 24px; border-radius: 18px; text-align: center;">
+        <div class="success-checkmark-circle">✓</div>
+        <h3 style="margin-bottom: 6px; font-size: 19px; font-weight: 800; color: #0f172a;">Pesanan Berhasil Dibuat!</h3>
         <p style="color: #64748b; font-size: 13px; margin-bottom: 16px; line-height: 1.5;">
           Terima kasih telah berbelanja di 168 Parts Surabaya. Pesanan Anda telah terverifikasi dan langsung diproses penjual.
         </p>
 
         <!-- Reward Poin Checkout Card (1 Poin tiap Rp1.000) -->
-        <div class="checkout-reward-point-card" style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1.5px solid #f59e0b; border-radius: 14px; padding: 13px 15px; margin-bottom: 16px; text-align: left; display: flex; align-items: center; gap: 12px; box-shadow: 0 3px 10px rgba(245, 158, 11, 0.15);">
-          <div style="width: 44px; height: 44px; background: #fbbf24; color: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);">🪙</div>
+        <div class="checkout-reward-point-card reward-card-shimmer" style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1.5px solid #f59e0b; border-radius: 14px; padding: 13px 15px; margin-bottom: 16px; text-align: left; display: flex; align-items: center; gap: 12px; box-shadow: 0 3px 10px rgba(245, 158, 11, 0.15);">
+          <div style="width: 44px; height: 44px; background: #fbbf24; color: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);" class="coin-3d-spin">🪙</div>
           <div style="flex: 1;">
             <div style="font-size: 11px; text-transform: uppercase; color: #92400e; font-weight: 800; letter-spacing: 0.5px;">Checkout Reward Poin</div>
-            <div style="font-size: 17px; font-weight: 800; color: #b45309;">+${earned.toLocaleString('id-ID')} Poin Didapatkan!</div>
+            <div style="font-size: 17px; font-weight: 800; color: #b45309;" id="modal-anim-earned-points">+${earned.toLocaleString('id-ID')} Poin Didapatkan!</div>
             <div style="font-size: 11.5px; color: #78350f; margin-top: 2px;">
               Dihitung 1 Poin per Rp1.000 belanja • Saldo: <b>${totalUserPoints.toLocaleString('id-ID')} Poin</b>
             </div>
@@ -1457,11 +1489,11 @@ const PasarinCart = {
           ` : ''}
           <div style="display: flex; justify-content: space-between;">
             <span style="color: #64748b;">Total Tagihan:</span>
-            <strong style="color: var(--primary); font-size: 15px;">${this.formatRupiah(order.totalAmount)}</strong>
+            <strong style="color: var(--primary); font-size: 16px;">${this.formatRupiah(order.totalAmount)}</strong>
           </div>
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <span style="color: #64748b;">Status:</span>
-            <span style="background: #fef3c7; color: #b45309; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">Sedang Diproses</span>
+            <span style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">✓ Sedang Diproses</span>
           </div>
         </div>
         <button class="btn-checkout-submit" style="width: 100%; justify-content: center;" onclick="document.getElementById('${dialogId}').classList.remove('active'); if (window.PasarinApp) window.PasarinApp.openOrdersModal();">
@@ -1471,6 +1503,11 @@ const PasarinCart = {
     `;
 
     dialog.classList.add('active');
+
+    // 🎊 Launch Confetti & Coin Cannon!
+    if (window.PasarinAnimations) {
+      window.PasarinAnimations.launchCheckoutCelebration();
+    }
   },
 
   /* GMaps Picker / Address Selector di Checkout */
