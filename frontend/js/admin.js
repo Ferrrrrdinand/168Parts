@@ -507,7 +507,9 @@ const AdminApp = {
     const filterStatus = document.getElementById('admin-order-status-filter')?.value || 'Semua';
 
     let list = this.orders;
-    if (filterStatus !== 'Semua') {
+    if (filterStatus === 'Retur') {
+      list = list.filter(o => o.returnStatus && o.returnStatus !== 'none');
+    } else if (filterStatus !== 'Semua') {
       list = list.filter(o => o.status === filterStatus);
     }
 
@@ -522,9 +524,38 @@ const AdminApp = {
         day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
       });
 
+      const arrivedDateFormatted = o.arrivedAt ? new Date(o.arrivedAt).toLocaleDateString('id-ID', {
+        day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+      }) : null;
+
+      let returnBadgeHtml = '';
+      if (o.returnStatus === 'pending') {
+        returnBadgeHtml = `
+          <button type="button" onclick="AdminApp.openReturnReviewModal('${o.id}')" style="margin-top:6px; background:#fff1f2; color:#be123c; border:1px solid #fecdd3; padding:4px 8px; border-radius:5px; font-size:11px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 3px rgba(190,18,60,0.15);">
+            <span>🔄</span>
+            <span>Review Bukti Retur</span>
+          </button>
+        `;
+      } else if (o.returnStatus === 'approved') {
+        returnBadgeHtml = `
+          <button type="button" onclick="AdminApp.openReturnReviewModal('${o.id}')" style="margin-top:4px; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; padding:2px 6px; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer; display:inline-block;">
+            ✅ Retur Disetujui
+          </button>
+        `;
+      } else if (o.returnStatus === 'rejected') {
+        returnBadgeHtml = `
+          <button type="button" onclick="AdminApp.openReturnReviewModal('${o.id}')" style="margin-top:4px; background:#f8fafc; color:#64748b; border:1px solid #cbd5e1; padding:2px 6px; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer; display:inline-block;">
+            ❌ Retur Ditolak
+          </button>
+        `;
+      }
+
       return `
         <tr>
-          <td><span style="font-weight:700; color:#1d3f0d;">${o.id}</span><br><small style="color:#94a3b8;">${dateFormatted}</small></td>
+          <td>
+            <span style="font-weight:700; color:#1d3f0d;">${o.id}</span>
+            <br><small style="color:#94a3b8;">${dateFormatted}</small>
+          </td>
           <td><b>${o.customerName || 'Pelanggan 168 Parts'}</b></td>
           <td style="font-size:12px; line-height:1.4;">${itemsText}</td>
           <td><b>Rp${Number(o.totalAmount || 0).toLocaleString('id-ID')}</b></td>
@@ -533,9 +564,12 @@ const AdminApp = {
             <select class="admin-select" style="font-size:11.5px; padding:4px 8px;" onchange="AdminApp.updateOrderStatus('${o.id}', this.value)">
               <option value="Sedang Diproses" ${o.status === 'Sedang Diproses' ? 'selected' : ''}>⏳ Diproses</option>
               <option value="Sedang Dikirim" ${o.status === 'Sedang Dikirim' ? 'selected' : ''}>🚚 Dikirim</option>
+              <option value="Sampai di Tujuan" ${o.status === 'Sampai di Tujuan' ? 'selected' : ''}>📦 Sampai di Tujuan</option>
               <option value="Selesai" ${o.status === 'Selesai' ? 'selected' : ''}>✅ Selesai</option>
               <option value="Dibatalkan" ${o.status === 'Dibatalkan' ? 'selected' : ''}>❌ Dibatalkan</option>
             </select>
+            ${arrivedDateFormatted ? `<small style="color:#059669; font-weight:700; display:block; margin-top:3px; font-size:10.5px;">✓ Tiba: ${arrivedDateFormatted}</small>` : ''}
+            ${returnBadgeHtml}
           </td>
           <td>
             <span style="font-size:12px; color:#64748b;">${o.paymentMethod || 'Transfer'}</span>
@@ -1024,12 +1058,177 @@ const AdminApp = {
       const data = await res.json();
       if (data.success) {
         const o = this.orders.find(x => x.id === orderId);
-        if (o) o.status = newStatus;
+        if (o) {
+          o.status = newStatus;
+          if (data.order && data.order.arrivedAt) {
+            o.arrivedAt = data.order.arrivedAt;
+          }
+        }
         this.showToast(`Status pesanan ${orderId} diubah ke: ${newStatus}`);
         this.renderOverviewRecent();
+        this.renderOrdersTable();
       }
     } catch (e) {
       console.error(e);
+    }
+  },
+
+  /* ---------------- ADMIN: REVIEW PENGEMBALIAN BARANG ---------------- */
+  async openReturnReviewModal(orderId) {
+    const modal = document.getElementById('admin-modal-return-review');
+    const body = document.getElementById('admin-return-review-body');
+    if (!modal || !body) return;
+
+    modal.classList.add('active');
+    body.innerHTML = `
+      <div style="text-align:center; padding:40px 20px; color:#64748b;">
+        <div style="font-size:28px; margin-bottom:8px;">⏳</div>
+        <div>Mengambil data bukti pengembalian dari database...</div>
+      </div>
+    `;
+
+    try {
+      const res = await this.authFetch(`/orders/${orderId}/return`);
+      const data = await res.json();
+      const ret = (data && data.success && data.data) ? data.data : null;
+
+      if (!ret) {
+        body.innerHTML = `
+          <div style="text-align:center; padding:30px 20px;">
+            <div style="font-size:32px; margin-bottom:8px;">⚠️</div>
+            <h4 style="color:#0f172a; margin-bottom:4px;">Belum Ada Pengajuan Retur</h4>
+            <p style="color:#64748b; font-size:13px;">Pelanggan belum mengajukan retur untuk pesanan ini.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const photoList = Array.isArray(ret.photos) ? ret.photos : [];
+      const dateFormatted = new Date(ret.createdAt || Date.now()).toLocaleDateString('id-ID', {
+        day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+
+      body.innerHTML = `
+        <!-- Ringkasan Info Pelanggan & Pesanan -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:16px 18px; margin-bottom:20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px; font-size:12.5px;">
+          <div>No. Pesanan: <b style="color:#be123c;">${ret.orderId}</b></div>
+          <div>Nama Pembeli: <b style="color:#0f172a;">${ret.userName || 'Pelanggan'}</b></div>
+          <div>Waktu Pengajuan: <b style="color:#0f172a;">${dateFormatted} WIB</b></div>
+          <div>Status Saat Ini: <b style="color:${ret.status === 'Disetujui' ? '#059669' : (ret.status === 'Ditolak' ? '#dc2626' : '#d97706')};">${ret.status}</b></div>
+        </div>
+
+        <!-- Alasan Pengembalian -->
+        <div style="margin-bottom:20px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:#0f172a; margin:0 0 6px 0;">Alasan Pengembalian dari Pembeli:</h4>
+          <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:12px 14px; font-size:13px; color:#1e293b; line-height:1.5;">
+            ${ret.reason}
+          </div>
+        </div>
+
+        <!-- Bukti Video Unboxing -->
+        <div style="margin-bottom:20px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:#0f172a; margin:0 0 6px 0;">
+            Bukti Video Unboxing & Pengetesan (Wajib 1 Video, Max 100MB):
+          </h4>
+          <div style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:8px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:24px;">🎥</span>
+              <div>
+                <div style="font-weight:700; font-size:13px; color:#0f172a;">${ret.video?.name || 'video_unboxing.mp4'}</div>
+                <div style="font-size:11.5px; color:#64748b;">Ukuran: ${ret.video?.size ? (ret.video.size / (1024 * 1024)).toFixed(1) + ' MB' : 'Terverifikasi'}</div>
+              </div>
+            </div>
+            ${ret.video?.data ? `
+              <a href="${ret.video.data}" download="${ret.video?.name || 'video.mp4'}" style="background:#ffffff; border:1px solid #cbd5e1; color:#0284c7; padding:4px 10px; border-radius:4px; font-size:11.5px; font-weight:700; text-decoration:none;">
+                ⬇️ Unduh Video
+              </a>
+            ` : ''}
+          </div>
+          ${ret.video?.data ? `
+            <div style="max-height:220px; overflow:hidden; border-radius:8px; border:1px solid #cbd5e1; background:#000;">
+              <video src="${ret.video.data}" controls style="width:100%; max-height:220px;"></video>
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- Bukti Foto (Min 2 Foto, Max 5 Foto) -->
+        <div style="margin-bottom:20px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:#0f172a; margin:0 0 6px 0;">
+            Bukti Foto Fisik & Segel Garansi (${photoList.length} Foto Diunggah):
+          </h4>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            ${photoList.map((p, idx) => `
+              <div style="border:1px solid #cbd5e1; border-radius:8px; overflow:hidden; width:110px; height:110px; background:#f8fafc; cursor:pointer;" onclick="window.open('${p.data || p.url || p}', '_blank')">
+                <img src="${p.data || p.url || p}" alt="Foto Bukti ${idx + 1}" style="width:100%; height:100%; object-fit:cover;" title="Klik untuk lihat resolusi penuh">
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Form Keputusan Review Admin -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:16px 18px; margin-top:20px;">
+          <label for="admin-review-notes" style="font-size:13px; font-weight:700; color:#0f172a; display:block; margin-bottom:6px;">
+            Catatan / Alasan Admin untuk Pembeli:
+          </label>
+          <textarea id="admin-review-notes" rows="2" placeholder="Cth: Segel utuh & video valid, silakan kirimkan sparepart ke alamat kami. Atau: Ditolak karena segel robek..." style="width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:8px 12px; font-size:12.5px; box-sizing:border-box; margin-bottom:14px;">${ret.adminNotes || ''}</textarea>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+            <button type="button" class="btn-secondary" onclick="AdminApp.closeReturnReviewModal()">Tutup</button>
+            
+            <div style="display:flex; gap:10px;">
+              <button type="button" onclick="AdminApp.submitReturnReview('${ret.id}', 'Ditolak')" style="background:#fee2e2; color:#be123c; border:1px solid #fecdd3; padding:8px 16px; border-radius:8px; font-weight:700; font-size:12.5px; cursor:pointer;">
+                ❌ Tolak Pengembalian
+              </button>
+              <button type="button" onclick="AdminApp.submitReturnReview('${ret.id}', 'Disetujui')" style="background:linear-gradient(135deg, #059669 0%, #047857 100%); color:#ffffff; border:none; padding:8px 18px; border-radius:8px; font-weight:800; font-size:12.5px; cursor:pointer; box-shadow:0 2px 8px rgba(5,150,105,0.3);">
+                ✅ Setujui Pengembalian
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    } catch (err) {
+      console.error(err);
+      body.innerHTML = `<div style="text-align:center; padding:30px; color:#dc2626;">Gagal memuat data pengembalian: ${err.message}</div>`;
+    }
+  },
+
+  closeReturnReviewModal() {
+    const modal = document.getElementById('admin-modal-return-review');
+    if (modal) modal.classList.remove('active');
+  },
+
+  async submitReturnReview(returnId, status) {
+    const notesInput = document.getElementById('admin-review-notes');
+    const notes = notesInput ? notesInput.value.trim() : '';
+
+    const confirmed = await this.confirmModal({
+      title: `${status === 'Disetujui' ? 'Setujui' : 'Tolak'} Pengembalian Barang?`,
+      message: `Apakah Anda yakin ingin memproses status pengembalian ini menjadi "${status}"?`,
+      subtext: `Status akan disimpan di database Supabase dan diperbarui di akun pembeli.`,
+      icon: status === 'Disetujui' ? '✅' : '❌',
+      confirmText: `Ya, ${status}`,
+      cancelText: 'Batal',
+      isDanger: status === 'Ditolak'
+    });
+
+    if (!confirmed) return;
+
+    try {
+      const res = await this.authFetch(`/orders/returns/${returnId}/review`, {
+        method: 'PUT',
+        body: JSON.stringify({ status, adminNotes: notes })
+      });
+      const data = await res.json();
+      if (data && data.success) {
+        this.showToast(`🎉 Pengajuan pengembalian berhasil di-${status.toLowerCase()}!`);
+        this.closeReturnReviewModal();
+        await this.loadAllDashboardData();
+      } else {
+        alert((data && data.message) || 'Gagal memperbarui status review.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Gagal memperbarui status review ke server.');
     }
   },
 

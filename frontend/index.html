@@ -981,6 +981,46 @@
     </div>
   </div>
 
+  <!-- ==================== VIEW 6: LANDING PAGE PENGEMBALIAN BARANG (#/order/return) ==================== -->
+  <div id="view-order-return" class="view">
+    <div class="return-page-bg" style="background:#f8fafc; min-height:85vh; padding:28px 0 70px;">
+      <div class="w" style="max-width:920px; margin:0 auto;">
+        
+        <!-- Breadcrumb Navigasi -->
+        <nav style="display:flex; align-items:center; gap:8px; font-size:13px; color:#64748b; margin-bottom:18px;">
+          <a href="#/" style="color:#64748b; text-decoration:none;">Beranda</a>
+          <span>&rsaquo;</span>
+          <a href="javascript:void(0)" onclick="if(window.PasarinApp) window.PasarinApp.openOrdersModal();" style="color:#64748b; text-decoration:none;">Pesanan Saya</a>
+          <span>&rsaquo;</span>
+          <span style="color:#be123c; font-weight:700;">Ajukan Pengembalian Barang</span>
+        </nav>
+
+        <!-- Header Banner Pengembalian -->
+        <div style="background:linear-gradient(135deg, #be123c 0%, #881337 100%); color:#ffffff; border-radius:14px; padding:24px 28px; box-shadow:0 8px 24px rgba(190,18,60,0.22); margin-bottom:24px; position:relative; overflow:hidden;">
+          <div style="position:relative; z-index:2;">
+            <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.2); padding:4px 12px; border-radius:20px; font-size:11.5px; font-weight:700; margin-bottom:10px;">
+              <span>🛡️</span>
+              <span>Garansi Tes Sparepart 168 Parts Surabaya</span>
+            </div>
+            <h1 style="font-size:22px; font-weight:800; margin:0 0 6px 0; color:#ffffff;">Formulir Pengajuan Pengembalian Barang</h1>
+            <p style="font-size:13px; margin:0; opacity:0.9; line-height:1.5; max-width:720px;">
+              Garansi pengetesan fungsi sebelum dipasang lem / baut. Wajib melampirkan 1 video unboxing & pengetesan (maks. 100 MB) serta minimal 2 foto fisik sparepart (maks. 5 MB/foto).
+            </p>
+          </div>
+        </div>
+
+        <!-- Wadah Konten Dinamis (Memuat info pesanan & form atau status pengajuan) -->
+        <div id="return-view-content">
+          <div style="text-align:center; padding:50px 20px; background:#ffffff; border-radius:12px; border:1px solid #e2e8f0;">
+            <div style="font-size:32px; margin-bottom:10px;">🔄</div>
+            <h3 style="color:#0f172a; font-size:16px;">Memuat data pesanan...</h3>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <!-- ==================== POP UP PROMO KETIKA MASUK (WELCOME MODAL) ==================== -->
   <div class="promo-modal-overlay" id="promo-modal-overlay">
     <div class="promo-modal-card">

@@ -130,11 +130,8 @@ class PromoModel {
       );
     }
 
-    // 3. Potong kuota global di tabel promos (tambah used_count)
-    await dbManager.query(
-      'UPDATE promos SET used_count = used_count + 1 WHERE UPPER(code) = ?',
-      [cleanCode]
-    );
+    // 3. Kuota global tidak dipotong saat klaim/melihat-lihat.
+    // Kuota HANYA dipotong saat pengguna menyelesaikan pesanan (checkout) di useVoucher().
 
     const updatedVoucher = await this.getUserVoucher(userId, cleanCode);
     const updatedPromo = await this.findByCode(cleanCode);
@@ -147,7 +144,7 @@ class PromoModel {
     };
   }
 
-  // Menggunakan 1 voucher saat checkout
+  // Menggunakan 1 voucher saat checkout pesanan selesai
   async useVoucher(userId, code) {
     if (!userId || !code) return false;
     const cleanCode = code.trim().toUpperCase();
@@ -158,9 +155,14 @@ class PromoModel {
         'UPDATE user_vouchers SET used_count = used_count + 1, updated_at = NOW() WHERE id = ?',
         [claim.id]
       );
-      return true;
     }
-    return false;
+
+    // Potong kuota global HANYA saat pesanan diselesaikan (checkout sukses)
+    await dbManager.query(
+      'UPDATE promos SET used_count = used_count + 1 WHERE UPPER(code) = ?',
+      [cleanCode]
+    );
+    return true;
   }
 
   async create(data) {

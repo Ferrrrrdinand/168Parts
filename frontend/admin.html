@@ -323,7 +323,9 @@
                 <option value="Semua">Semua Status</option>
                 <option value="Sedang Diproses">Sedang Diproses</option>
                 <option value="Sedang Dikirim">Sedang Dikirim</option>
+                <option value="Sampai di Tujuan">Sampai di Tujuan</option>
                 <option value="Selesai">Selesai</option>
+                <option value="Retur">🔄 Pengajuan Retur</option>
                 <option value="Dibatalkan">Dibatalkan</option>
               </select>
 
@@ -967,6 +969,24 @@
       <div class="confirm-modal-actions">
         <button type="button" class="btn-confirm-cancel" id="confirm-modal-btn-cancel">Batal</button>
         <button type="button" class="btn-confirm-proceed" id="confirm-modal-btn-ok">Ya, Logout Sekarang</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       6. MODAL DIALOG: REVIEW PENGEMBALIAN BARANG (RETUR)
+       ========================================================= -->
+  <div class="admin-modal-overlay" id="admin-modal-return-review" style="z-index: 5000;">
+    <div class="admin-modal-card" style="width: 720px; max-width: 95vw;">
+      <div class="admin-modal-header">
+        <h3 class="admin-modal-title" style="display:flex; align-items:center; gap:8px;">
+          <span>🔍</span>
+          <span>Review Pengajuan Pengembalian Barang</span>
+        </h3>
+        <button class="admin-modal-close" onclick="AdminApp.closeReturnReviewModal()" aria-label="Tutup">&times;</button>
+      </div>
+      <div class="admin-modal-body" id="admin-return-review-body" style="padding: 24px;">
+        <div style="text-align:center; padding:30px; color:#64748b;">Memuat data bukti retur...</div>
       </div>
     </div>
   </div>

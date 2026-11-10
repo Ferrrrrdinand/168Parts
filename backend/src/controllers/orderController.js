@@ -180,3 +180,165 @@ exports.updateOrderStatus = async (req, res) => {
     });
   }
 };
+
+/* ---------------- CONTROLLER PENGEMBALIAN BARANG ---------------- */
+exports.submitOrderReturn = async (req, res) => {
+  try {
+    const { id: orderId } = req.params;
+    const userId = req.user ? req.user.id : null;
+    const userName = req.user ? (req.user.name || req.user.username || 'Pelanggan') : 'Pelanggan';
+    const { reason, video, photos } = req.body;
+
+    // 1. Cek Pesanan
+    const order = await orderModel.findById(orderId);
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: `Pesanan dengan nomor ${orderId} tidak ditemukan.`
+      });
+    }
+
+    // 2. Validasi Video (Wajib 1 Video, Maksimal 100 MB)
+    if (!video || (!video.data && !video.name && !video.url)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Wajib mengunggah 1 video bukti unboxing / kerusakan barang!'
+      });
+    }
+
+    const videoSizeBytes = Number(video.size || 0);
+    const maxVideoBytes = 100 * 1024 * 1024; // 100 MB
+    if (videoSizeBytes > maxVideoBytes) {
+      return res.status(400).json({
+        success: false,
+        message: 'Ukuran video melebihi batas maksimal 100 MB. Mohon kompres atau pilih video dengan durasi lebih ringkas.'
+      });
+    }
+
+    // 3. Validasi Foto (Maksimal 5 Foto, Wajib Minimal 2 Foto, Maks 5 MB per foto)
+    const photoList = Array.isArray(photos) ? photos : [];
+    if (photoList.length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'Wajib mengunggah minimal 2 foto bukti kondisi fisik / kerusakan produk!'
+      });
+    }
+
+    if (photoList.length > 5) {
+      return res.status(400).json({
+        success: false,
+        message: 'Jumlah foto maksimal adalah 5 foto.'
+      });
+    }
+
+    const maxPhotoBytes = 5 * 1024 * 1024; // 5 MB
+    for (let i = 0; i < photoList.length; i++) {
+      const p = photoList[i];
+      const pSize = Number(p.size || 0);
+      if (pSize > maxPhotoBytes) {
+        return res.status(400).json({
+          success: false,
+          message: `Foto ke-${i + 1} (${p.name || ''}) melebihi batas maksimal 5 MB.`
+        });
+      }
+    }
+
+    // 4. Validasi Alasan Pengembalian
+    if (!reason || !reason.trim() || reason.trim().length < 5) {
+      return res.status(400).json({
+        success: false,
+        message: 'Mohon tuliskan alasan pengembalian barang secara jelas (minimal 5 karakter).'
+      });
+    }
+
+    // 5. Simpan ke database Supabase
+    const returnRecord = await orderModel.createReturn({
+      orderId,
+      userId: userId || order.userId,
+      userName,
+      reason: reason.trim(),
+      videoData: video,
+      photosData: photoList
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: 'Pengajuan pengembalian barang berhasil dikirim ke database! Tim Admin 168 Parts akan segera meninjau bukti Anda.',
+      data: returnRecord
+    });
+  } catch (error) {
+    console.error('Error submitOrderReturn:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal mengirim pengajuan pengembalian barang ke database.'
+    });
+  }
+};
+
+exports.getOrderReturn = async (req, res) => {
+  try {
+    const { id: orderId } = req.params;
+    const returnRecord = await orderModel.findReturnByOrderId(orderId);
+    return res.json({
+      success: true,
+      data: returnRecord
+    });
+  } catch (error) {
+    console.error('Error getOrderReturn:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal mengambil data pengembalian pesanan.'
+    });
+  }
+};
+
+exports.getAllReturns = async (req, res) => {
+  try {
+    const returns = await orderModel.findAllReturns();
+    return res.json({
+      success: true,
+      total: returns.length,
+      data: returns
+    });
+  } catch (error) {
+    console.error('Error getAllReturns:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal mengambil data seluruh pengembalian barang.'
+    });
+  }
+};
+
+exports.reviewReturn = async (req, res) => {
+  try {
+    const { returnId } = req.params;
+    const { status, adminNotes = '' } = req.body;
+
+    if (!status || !['Disetujui', 'Ditolak', 'Menunggu Review Admin'].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Status review pengembalian harus "Disetujui" atau "Ditolak".'
+      });
+    }
+
+    const updated = await orderModel.updateReturnReview(returnId, status, adminNotes);
+    if (!updated) {
+      return res.status(404).json({
+        success: false,
+        message: 'Data pengajuan pengembalian tidak ditemukan.'
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: `Pengajuan pengembalian berhasil di-${status.toLowerCase()}!`,
+      data: updated
+    });
+  } catch (error) {
+    console.error('Error reviewReturn:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memperbarui status review pengembalian barang.'
+    });
+  }
+};

@@ -250,6 +250,28 @@ const PasarinAPI = {
 
   async getMyOrders() {
     return this.request('/orders');
+  },
+
+  async submitOrderReturn(orderId, payload) {
+    return this.request(`/orders/${orderId}/return`, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  },
+
+  async getOrderReturn(orderId) {
+    return this.request(`/orders/${orderId}/return`);
+  },
+
+  async getAllReturns() {
+    return this.request('/orders/returns/all');
+  },
+
+  async reviewReturn(returnId, payload) {
+    return this.request(`/orders/returns/${returnId}/review`, {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    });
   }
 };
 

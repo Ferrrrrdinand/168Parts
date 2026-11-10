@@ -1500,6 +1500,7 @@ const PasarinApp = {
     const isCart = hash === '#/cart';
     const isCheckout = hash === '#/checkout';
     const isOrders = hash === '#/orders';
+    const isOrderReturn = hash.startsWith('#/order/return') || hash.startsWith('#/user/return');
     const isProfile = hash.startsWith('#/user/profile') || hash === '#/profile';
     const isChangePassword = hash.startsWith('#/user/password') || hash === '#/password';
 
@@ -1508,12 +1509,30 @@ const PasarinApp = {
     const cartView = document.getElementById('view-cart');
     const checkoutView = document.getElementById('view-checkout');
     const profileView = document.getElementById('view-profile');
+    const returnView = document.getElementById('view-order-return');
     const headerEl = document.querySelector('.hd');
     const cartHeaderTitle = document.getElementById('cart-header-title');
     const cartIconBtn = document.querySelector('.hd .cart');
     const searchSuggestions = document.querySelector('.hd .sb .sg');
 
-    if (isProfile || isChangePassword) {
+    if (isOrderReturn) {
+      if (homeView) homeView.classList.remove('active');
+      if (searchView) searchView.classList.remove('active');
+      if (cartView) cartView.classList.remove('active');
+      if (checkoutView) checkoutView.classList.remove('active');
+      if (profileView) profileView.classList.remove('active');
+      if (returnView) returnView.classList.add('active');
+      if (headerEl) headerEl.classList.remove('hd-cart-mode');
+      if (cartHeaderTitle) cartHeaderTitle.style.display = 'none';
+      if (cartIconBtn) cartIconBtn.style.display = 'flex';
+      if (searchSuggestions) searchSuggestions.style.display = 'flex';
+      document.title = 'Pengajuan Pengembalian Barang | 168 Parts Surabaya';
+
+      const urlParams = new URLSearchParams(hash.includes('?') ? hash.split('?')[1] : '');
+      const orderId = urlParams.get('id') || hash.replace('#/order/return', '').replace('#/user/return', '').replace(/[\/\?]/g, '').trim();
+      this.renderReturnLandingPage(orderId);
+    } else if (isProfile || isChangePassword) {
+      if (returnView) returnView.classList.remove('active');
       if (homeView) homeView.classList.remove('active');
       if (searchView) searchView.classList.remove('active');
       if (cartView) cartView.classList.remove('active');
@@ -1545,6 +1564,7 @@ const PasarinApp = {
         this.renderUserProfileView();
       }
     } else if (isCart) {
+      if (returnView) returnView.classList.remove('active');
       if (homeView) homeView.classList.remove('active');
       if (searchView) searchView.classList.remove('active');
       if (checkoutView) checkoutView.classList.remove('active');
@@ -1561,6 +1581,7 @@ const PasarinApp = {
       document.title = 'Keranjang Belanja | 168 Parts';
       if (window.PasarinCart) window.PasarinCart.renderCartPage();
     } else if (isCheckout) {
+      if (returnView) returnView.classList.remove('active');
       if (homeView) homeView.classList.remove('active');
       if (searchView) searchView.classList.remove('active');
       if (cartView) cartView.classList.remove('active');
@@ -1577,6 +1598,7 @@ const PasarinApp = {
       document.title = 'Checkout | 168 Parts';
       if (window.PasarinCart) window.PasarinCart.renderCheckoutPage();
     } else if (isSearch) {
+      if (returnView) returnView.classList.remove('active');
       if (homeView) homeView.classList.remove('active');
       if (cartView) cartView.classList.remove('active');
       if (checkoutView) checkoutView.classList.remove('active');
@@ -1589,6 +1611,7 @@ const PasarinApp = {
       document.title = 'Hasil Pencarian | 168 Parts';
       this.handleSearchRoute();
     } else {
+      if (returnView) returnView.classList.remove('active');
       if (searchView) searchView.classList.remove('active');
       if (cartView) cartView.classList.remove('active');
       if (checkoutView) checkoutView.classList.remove('active');
@@ -1928,26 +1951,96 @@ const PasarinApp = {
     const body = modal.querySelector('#orders-modal-body');
 
     if (res && res.success && res.data && res.data.length > 0) {
-      body.innerHTML = res.data.map(ord => `
-        <div class="order-history-card">
-          <div class="order-header-line">
-            <span><strong>No. Pesanan:</strong> ${ord.id}</span>
-            <span class="badge-status">${ord.status}</span>
-          </div>
-          <div class="order-items-list">
-            ${ord.items.map(it => `
-              <div class="order-item-row">
-                <span>${it.name} (${it.quantity}x)</span>
-                <strong>${this.formatRupiah(it.price * it.quantity)}</strong>
+      body.innerHTML = res.data.map(ord => {
+        const isArrived = (ord.status === 'Sampai di Tujuan' || ord.status === 'Selesai');
+        const arrivedDateText = ord.arrivedAt 
+          ? new Date(ord.arrivedAt).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
+          : new Date(ord.updatedAt || ord.createdAt).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+
+        let returnButtonHtml = '';
+        if (isArrived) {
+          if (ord.returnStatus === 'pending') {
+            returnButtonHtml = `
+              <button type="button" onclick="document.getElementById('${modalId}').classList.remove('active'); window.location.hash='#/order/return?id=${ord.id}';" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+                <span>⏳</span>
+                <span>Retur Sedang Ditinjau Admin &rsaquo;</span>
+              </button>
+            `;
+          } else if (ord.returnStatus === 'approved') {
+            returnButtonHtml = `
+              <button type="button" onclick="document.getElementById('${modalId}').classList.remove('active'); window.location.hash='#/order/return?id=${ord.id}';" style="background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+                <span>✅</span>
+                <span>Retur Disetujui (Lihat Detail) &rsaquo;</span>
+              </button>
+            `;
+          } else if (ord.returnStatus === 'rejected') {
+            returnButtonHtml = `
+              <button type="button" onclick="document.getElementById('${modalId}').classList.remove('active'); window.location.hash='#/order/return?id=${ord.id}';" style="background:#fff1f2; color:#be123c; border:1px solid #fecdd3; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+                <span>❌</span>
+                <span>Retur Ditolak (Lihat Alasan) &rsaquo;</span>
+              </button>
+            `;
+          } else {
+            returnButtonHtml = `
+              <button type="button" onclick="document.getElementById('${modalId}').classList.remove('active'); window.location.hash='#/order/return?id=${ord.id}';" style="background:#be123c; color:#ffffff; border:none; padding:7px 14px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(190,18,60,0.25);">
+                <span>🔄</span>
+                <span>Ajukan Pengembalian Barang</span>
+              </button>
+            `;
+          }
+        }
+
+        return `
+          <div class="order-history-card" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:16px; margin-bottom:14px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+            <div class="order-header-line" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid #f1f5f9;">
+              <div>
+                <span style="font-weight:800; color:#1e293b;">No. Pesanan:</span>
+                <span style="font-weight:700; color:#be123c;">${ord.id}</span>
               </div>
-            `).join('')}
+              <span class="badge-status" style="background:${isArrived ? '#ecfdf5' : '#eff6ff'}; color:${isArrived ? '#047857' : '#1d4ed8'}; border:1px solid ${isArrived ? '#a7f3d0' : '#bfdbfe'}; padding:3px 10px; border-radius:12px; font-size:11.5px; font-weight:700;">
+                ${isArrived ? '📦 ' + ord.status : '🚚 ' + ord.status}
+              </span>
+            </div>
+
+            <div class="order-items-list" style="margin-bottom:12px;">
+              ${(ord.items || []).map(it => `
+                <div class="order-item-row" style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px; color:#334155;">
+                  <span>${it.name} <span style="color:#64748b;">(x${it.quantity})</span></span>
+                  <strong>${this.formatRupiah(it.price * it.quantity)}</strong>
+                </div>
+              `).join('')}
+            </div>
+
+            <!-- Panel Pelacakan Status & Tanggal Sampai -->
+            ${isArrived ? `
+              <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:10px 14px; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+                <div>
+                  <div style="font-size:12.5px; font-weight:800; color:#15803d; display:flex; align-items:center; gap:6px;">
+                    <span>✅</span>
+                    <span>Pesanan Sudah Sampai di Tujuan</span>
+                  </div>
+                  <div style="font-size:11.5px; color:#166534; margin-top:2px;">
+                    Tiba pada: <b>${arrivedDateText} WIB</b>
+                  </div>
+                </div>
+                <div>
+                  ${returnButtonHtml}
+                </div>
+              </div>
+            ` : `
+              <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:8px 12px; margin-bottom:12px; font-size:11.5px; color:#64748b; display:flex; align-items:center; gap:6px;">
+                <span>🚚</span>
+                <span>Paket sedang dalam perjalanan ekspedisi ke alamat tujuan.</span>
+              </div>
+            `}
+
+            <div class="order-footer-line" style="display:flex; align-items:center; justify-content:space-between; pt:8px; border-top:1px dashed #e2e8f0; font-size:12px; color:#64748b;">
+              <small>Metode: <b>${ord.paymentMethod || 'Transfer'}</b> • ${new Date(ord.createdAt).toLocaleDateString('id-ID')}</small>
+              <div>Total: <strong style="color:#be123c; font-size:15px; font-weight:800;">${this.formatRupiah(ord.totalAmount)}</strong></div>
+            </div>
           </div>
-          <div class="order-footer-line">
-            <small>Metode: ${ord.paymentMethod} • ${new Date(ord.createdAt).toLocaleDateString('id-ID')}</small>
-            <div>Total: <strong style="color:var(--primary); font-size:15px;">${this.formatRupiah(ord.totalAmount)}</strong></div>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     } else {
       body.innerHTML = `
         <div style="text-align: center; padding: 40px 20px;">
@@ -1956,6 +2049,482 @@ const PasarinApp = {
           <p style="color: #64748b;">Pesanan yang Anda buat akan muncul di sini.</p>
         </div>
       `;
+    }
+  },
+
+  /* =========================================================
+     LANDING PAGE PENGEMBALIAN BARANG (#/order/return)
+     Syarat: 1 Video Wajib (Max 100MB), Min. 2 Foto Wajib (Max 5 Foto, Max 5MB/foto), Alasan
+     ========================================================= */
+  returnState: {
+    orderId: null,
+    video: null,
+    photos: [null, null, null, null, null],
+    reason: ''
+  },
+
+  async renderReturnLandingPage(orderId) {
+    const container = document.getElementById('return-view-content');
+    if (!container) return;
+
+    container.innerHTML = `
+      <div style="text-align:center; padding:50px 20px; background:#ffffff; border-radius:12px; border:1px solid #e2e8f0;">
+        <div style="font-size:32px; margin-bottom:10px;">⏳</div>
+        <h3 style="color:#0f172a; font-size:16px;">Memeriksa status pesanan & pengembalian...</h3>
+      </div>
+    `;
+
+    const ordersRes = await PasarinAPI.getMyOrders();
+    const orders = (ordersRes && ordersRes.success && ordersRes.data) ? ordersRes.data : [];
+    const order = orders.find(o => o.id === orderId) || (orders.length > 0 ? orders[0] : null);
+
+    if (!order) {
+      container.innerHTML = `
+        <div style="text-align:center; padding:50px 20px; background:#ffffff; border-radius:14px; border:1px solid #e2e8f0; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+          <div style="font-size:48px; margin-bottom:14px;">📦</div>
+          <h2 style="font-size:18px; font-weight:800; color:#0f172a; margin-bottom:8px;">Pesanan Tidak Ditemukan</h2>
+          <p style="font-size:13px; color:#64748b; margin-bottom:20px; max-width:440px; margin-left:auto; margin-right:auto;">
+            Pilih pesanan yang sudah berstatus <b>Sampai di Tujuan</b> dari riwayat pesanan Anda untuk mengajukan garansi retur sparepart.
+          </p>
+          <button type="button" onclick="PasarinApp.openOrdersModal()" style="background:#be123c; color:#ffffff; border:none; padding:10px 22px; border-radius:8px; font-weight:700; font-size:13px; cursor:pointer;">
+            Buka Riwayat Pesanan Saya
+          </button>
+        </div>
+      `;
+      return;
+    }
+
+    this.returnState.orderId = order.id;
+    this.returnState.video = null;
+    this.returnState.photos = [null, null, null, null, null];
+    this.returnState.reason = '';
+
+    const returnCheck = await PasarinAPI.getOrderReturn(order.id);
+    const existingReturn = (returnCheck && returnCheck.success && returnCheck.data) ? returnCheck.data : null;
+
+    if (existingReturn) {
+      this.renderReturnStatusCard(container, order, existingReturn);
+      return;
+    }
+
+    this.renderReturnForm(container, order);
+  },
+
+  renderReturnStatusCard(container, order, ret) {
+    const statusColor = ret.status === 'Disetujui' ? '#059669' : (ret.status === 'Ditolak' ? '#be123c' : '#d97706');
+    const statusBg = ret.status === 'Disetujui' ? '#ecfdf5' : (ret.status === 'Ditolak' ? '#fff1f2' : '#fef3c7');
+    const statusBorder = ret.status === 'Disetujui' ? '#a7f3d0' : (ret.status === 'Ditolak' ? '#fecdd3' : '#fde68a');
+
+    const photoList = Array.isArray(ret.photos) ? ret.photos : [];
+    const dateFormatted = new Date(ret.createdAt || Date.now()).toLocaleDateString('id-ID', {
+      day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+
+    container.innerHTML = `
+      <div style="background:#ffffff; border-radius:14px; border:1px solid #e2e8f0; padding:28px; box-shadow:0 4px 16px rgba(0,0,0,0.05); margin-bottom:24px;">
+        
+        <!-- Status Banner -->
+        <div style="background:${statusBg}; border:1px solid ${statusBorder}; border-radius:10px; padding:18px 20px; margin-bottom:24px; display:flex; align-items:flex-start; gap:14px;">
+          <div style="font-size:28px; line-height:1;">
+            ${ret.status === 'Disetujui' ? '✅' : (ret.status === 'Ditolak' ? '❌' : '⏳')}
+          </div>
+          <div>
+            <div style="font-size:16px; font-weight:800; color:${statusColor}; margin-bottom:4px;">
+              Status Pengajuan: ${ret.status}
+            </div>
+            <div style="font-size:13px; color:#475569; line-height:1.5;">
+              ${ret.status === 'Disetujui' 
+                ? 'Pengajuan pengembalian barang Anda telah disetujui oleh Admin. Silakan kemas sparepart dengan aman dan kirimkan ke pusat retur 168 Parts Surabaya.' 
+                : (ret.status === 'Ditolak'
+                  ? 'Pengajuan pengembalian belum dapat disetujui. Silakan periksa catatan dari tim verifikator garansi di bawah ini.'
+                  : 'Pengajuan pengembalian barang Anda telah masuk ke sistem database dan sedang diverifikasi oleh Tim Garansi 168 Parts.')}
+            </div>
+            ${ret.adminNotes ? `
+              <div style="margin-top:10px; background:#ffffff; border:1px dashed ${statusBorder}; border-radius:6px; padding:10px 14px; font-size:12.5px; color:#1e293b;">
+                <b>Catatan Admin 168 Parts:</b> ${ret.adminNotes}
+              </div>
+            ` : ''}
+          </div>
+        </div>
+
+        <!-- Rincian Pesanan -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:16px 20px; margin-bottom:24px;">
+          <h4 style="font-size:14px; font-weight:800; color:#0f172a; margin:0 0 10px 0;">Informasi Pesanan</h4>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; font-size:12.5px; color:#475569;">
+            <div>No. Pesanan: <b style="color:#0f172a;">${order.id}</b></div>
+            <div>Waktu Pengajuan: <b style="color:#0f172a;">${dateFormatted} WIB</b></div>
+            <div>Total Belanja: <b style="color:#be123c;">Rp${Number(order.totalAmount || 0).toLocaleString('id-ID')}</b></div>
+          </div>
+        </div>
+
+        <!-- Alasan Pengembalian -->
+        <div style="margin-bottom:24px;">
+          <h4 style="font-size:14px; font-weight:800; color:#0f172a; margin:0 0 8px 0;">Alasan Pengembalian dari Pembeli</h4>
+          <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:14px; font-size:13px; color:#334155; line-height:1.6;">
+            ${ret.reason}
+          </div>
+        </div>
+
+        <!-- Bukti Video -->
+        <div style="margin-bottom:24px;">
+          <h4 style="font-size:14px; font-weight:800; color:#0f172a; margin:0 0 8px 0;">Bukti Video Unboxing & Tes (1 Video):</h4>
+          <div style="background:#f1f5f9; border:1px solid #e2e8f0; border-radius:10px; padding:14px; display:inline-flex; align-items:center; gap:12px;">
+            <span style="font-size:24px;">🎥</span>
+            <div>
+              <div style="font-weight:700; font-size:13px; color:#0f172a;">${ret.video?.name || 'video_unboxing_garansi.mp4'}</div>
+              <div style="font-size:11.5px; color:#64748b;">Ukuran: ${ret.video?.size ? (ret.video.size / (1024*1024)).toFixed(1) + ' MB' : 'Terverifikasi'} • Format: Video</div>
+            </div>
+          </div>
+          ${ret.video?.data ? `
+            <div style="margin-top:10px; max-width:480px;">
+              <video src="${ret.video.data}" controls style="width:100%; border-radius:8px; border:1px solid #cbd5e1; max-height:260px; background:#000000;"></video>
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- Bukti Foto -->
+        <div style="margin-bottom:24px;">
+          <h4 style="font-size:14px; font-weight:800; color:#0f172a; margin:0 0 8px 0;">Bukti Foto Fisik Produk (${photoList.length} Foto):</h4>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            ${photoList.map((p, idx) => `
+              <div style="border:1px solid #e2e8f0; border-radius:8px; overflow:hidden; width:110px; height:110px; background:#f8fafc; display:flex; align-items:center; justify-content:center;">
+                <img src="${p.data || p.url || p}" alt="Foto Bukti ${idx+1}" style="width:100%; height:100%; object-fit:cover;">
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div style="display:flex; gap:12px; pt:12px; border-top:1px solid #f1f5f9;">
+          <button type="button" onclick="PasarinApp.openOrdersModal()" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; padding:10px 18px; border-radius:8px; font-weight:700; font-size:13px; cursor:pointer;">
+            &larr; Kembali ke Riwayat Pesanan
+          </button>
+        </div>
+
+      </div>
+    `;
+  },
+
+  renderReturnForm(container, order) {
+    const arrivedDateText = order.arrivedAt 
+      ? new Date(order.arrivedAt).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) + ' WIB'
+      : (order.updatedAt ? new Date(order.updatedAt).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }) : 'Hari Ini');
+
+    container.innerHTML = `
+      <form id="form-order-return" onsubmit="PasarinApp.handleSubmitReturn(event)" style="background:#ffffff; border-radius:14px; border:1px solid #e2e8f0; padding:28px; box-shadow:0 4px 16px rgba(0,0,0,0.05); margin-bottom:24px;">
+        
+        <!-- Kartu Rincian Pesanan yang Dikembalikan -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:18px 20px; margin-bottom:26px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+            <div>
+              <span style="font-size:12px; color:#64748b; font-weight:700; text-transform:uppercase;">Pesanan Terpilih</span>
+              <h3 style="font-size:16px; font-weight:800; color:#0f172a; margin:2px 0 0 0;">${order.id}</h3>
+            </div>
+            <div style="background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; font-size:12px; font-weight:800; padding:4px 12px; border-radius:20px;">
+              ✅ Sampai di Tujuan: ${arrivedDateText}
+            </div>
+          </div>
+
+          <div style="font-size:13px; color:#334155; border-top:1px dashed #cbd5e1; pt:10px; margin-top:10px;">
+            <b>Produk yang dibeli:</b>
+            <ul style="margin:6px 0 0 0; padding-left:20px; color:#475569; font-size:12.5px;">
+              ${(order.items || []).map(it => `<li>${it.name} (${it.quantity}x)</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+
+        <!-- 1. BAGIAN UPLOAD VIDEO (WAJIB, MAX 100 MB) -->
+        <div style="margin-bottom:28px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+            <label style="font-size:14px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:8px;">
+              <span>📹</span>
+              <span>1. Upload Video Bukti Unboxing & Tes Fungsi</span>
+              <span style="background:#fee2e2; color:#be123c; font-size:11px; font-weight:800; padding:2px 8px; border-radius:4px;">WAJIB (1 VIDEO)</span>
+            </label>
+            <span style="font-size:12px; color:#64748b;">Maksimal 100 MB</span>
+          </div>
+          <p style="font-size:12px; color:#64748b; margin:0 0 10px 0;">
+            Video unboxing utuh tanpa jeda/edit mulai dari paket bersegel dibuka hingga pengetesan sparepart (layar/baterai).
+          </p>
+
+          <div id="video-upload-area" style="border:2px dashed #cbd5e1; border-radius:12px; padding:24px; text-align:center; background:#f8fafc; transition:all 0.2s; cursor:pointer;" onclick="document.getElementById('input-return-video').click()">
+            <input type="file" id="input-return-video" accept="video/mp4,video/quicktime,video/webm,video/x-matroska,video/*" style="display:none;" onchange="PasarinApp.handleVideoSelect(this)">
+            
+            <div id="video-placeholder">
+              <div style="font-size:36px; margin-bottom:8px;">🎥</div>
+              <div style="font-size:13.5px; font-weight:700; color:#1e293b; margin-bottom:4px;">Klik untuk Memilih File Video</div>
+              <div style="font-size:11.5px; color:#64748b;">Format MP4, MOV, WebM, MKV (Maksimal 100 MB)</div>
+            </div>
+
+            <div id="video-preview-box" style="display:none; text-align:left;">
+              <div style="display:flex; align-items:center; justify-content:space-between; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:12px 16px;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                  <span style="font-size:26px;">🎬</span>
+                  <div>
+                    <div id="video-filename" style="font-weight:700; font-size:13px; color:#0f172a;">video.mp4</div>
+                    <div id="video-filesize" style="font-size:11.5px; color:#059669; font-weight:600;">0 MB • Siap diunggah</div>
+                  </div>
+                </div>
+                <button type="button" onclick="event.stopPropagation(); PasarinApp.removeVideo();" style="background:#fee2e2; color:#dc2626; border:none; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer;">
+                  Ganti Video
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. BAGIAN UPLOAD FOTO (MINIMAL 2 FOTO WAJIB, MAKS 5 FOTO, MAX 5 MB/FOTO) -->
+        <div style="margin-bottom:28px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+            <label style="font-size:14px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:8px;">
+              <span>📸</span>
+              <span>2. Upload Foto Bukti Kondisi Fisik Sparepart</span>
+              <span style="background:#fee2e2; color:#be123c; font-size:11px; font-weight:800; padding:2px 8px; border-radius:4px;">MINIMAL 2 FOTO (WAJIB)</span>
+            </label>
+            <span style="font-size:12px; color:#64748b;">Maksimal 5 Foto • Maks. 5 MB / foto</span>
+          </div>
+          <p style="font-size:12px; color:#64748b; margin:0 0 12px 0;">
+            Foto tampak depan, tampak belakang, label garansi toko, serta titik kerusakan / fleksibel.
+          </p>
+
+          <!-- 5 Slot Grid Foto -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:12px;">
+            ${[0, 1, 2, 3, 4].map(idx => `
+              <div class="return-photo-slot" id="slot-photo-${idx}" style="border:2px dashed ${idx < 2 ? '#fca5a5' : '#cbd5e1'}; background:#f8fafc; border-radius:10px; height:140px; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; overflow:hidden; cursor:pointer;" onclick="document.getElementById('input-photo-${idx}').click()">
+                <input type="file" id="input-photo-${idx}" accept="image/jpeg,image/png,image/webp,image/jpg" style="display:none;" onchange="PasarinApp.handlePhotoSelect(event, ${idx})">
+                
+                <div id="slot-empty-${idx}" style="text-align:center; padding:10px;">
+                  <div style="font-size:24px; margin-bottom:4px;">📷</div>
+                  <div style="font-size:11.5px; font-weight:700; color:#1e293b;">Foto ${idx + 1}</div>
+                  <div style="font-size:10px; color:${idx < 2 ? '#dc2626' : '#64748b'}; font-weight:${idx < 2 ? '700' : '400'};">
+                    ${idx < 2 ? '*Wajib' : 'Opsional'}
+                  </div>
+                </div>
+
+                <img id="slot-img-${idx}" src="" alt="Preview ${idx + 1}" style="display:none; width:100%; height:100%; object-fit:cover;">
+                
+                <button type="button" id="slot-del-${idx}" onclick="event.stopPropagation(); PasarinApp.removePhotoSlot(${idx});" style="display:none; position:absolute; top:6px; right:6px; background:rgba(0,0,0,0.65); color:#ffffff; border:none; border-radius:50%; width:24px; height:24px; font-size:12px; cursor:pointer; align-items:center; justify-content:center;">
+                  ✕
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- 3. BAGIAN ALASAN PENGEMBALIAN BARANG -->
+        <div style="margin-bottom:28px;">
+          <label for="ret-reason-textarea" style="font-size:14px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+            <span>✍️</span>
+            <span>3. Alasan Pengembalian Barang</span>
+            <span style="background:#fee2e2; color:#be123c; font-size:11px; font-weight:800; padding:2px 8px; border-radius:4px;">WAJIB</span>
+          </label>
+          <p style="font-size:12px; color:#64748b; margin:0 0 10px 0;">
+            Pilih kategori kendala atau tuliskan deskripsi lengkap alasan mengapa barang ingin dikembalikan:
+          </p>
+
+          <!-- Chips Kategori Cepat -->
+          <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+            ${[
+              'LCD Bergaris / Layar Blank',
+              'Touchscreen Tidak Responsif / Ghost Touch',
+              'Baterai Drop / Tidak Mengisi Daya',
+              'Salah Kirim Tipe Sparepart',
+              'Fisik Cacat / Fleksibel Sobek'
+            ].map(cat => `
+              <button type="button" onclick="PasarinApp.appendReasonTag('${cat}')" style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:20px; padding:5px 12px; font-size:11.5px; font-weight:600; color:#334155; cursor:pointer; transition:all 0.2s;">
+                + ${cat}
+              </button>
+            `).join('')}
+          </div>
+
+          <textarea id="ret-reason-textarea" rows="4" placeholder="Tuliskan secara lengkap detail kendala yang Anda alami saat pengujian sparepart..." required minlength="5" style="width:100%; border:1px solid #cbd5e1; border-radius:10px; padding:12px 14px; font-size:13px; line-height:1.5; color:#1e293b; outline:none; transition:border-color 0.2s; box-sizing:border-box;"></textarea>
+        </div>
+
+        <!-- Disclaimer & Tombol Kirim -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:14px 18px; margin-bottom:24px; font-size:12px; color:#64748b; line-height:1.5;">
+          ℹ️ Dengan mengirim pengajuan ini, Anda menyatakan bahwa segel garansi toko tidak rusak, plastik pelindung belum dilepas, dan sparepart belum dipasang lem.
+        </div>
+
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+          <button type="button" onclick="PasarinApp.openOrdersModal()" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; padding:12px 20px; border-radius:8px; font-weight:700; font-size:13px; cursor:pointer;">
+            &larr; Batal & Kembali
+          </button>
+
+          <button type="submit" id="btn-submit-return" style="background:linear-gradient(135deg, #be123c 0%, #9f1239 100%); color:#ffffff; border:none; padding:12px 28px; border-radius:8px; font-weight:800; font-size:14px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 14px rgba(190,18,60,0.35);">
+            <span>🚀</span>
+            <span>Kirim Pengajuan Pengembalian</span>
+          </button>
+        </div>
+
+      </form>
+    `;
+  },
+
+  handleVideoSelect(input) {
+    const file = input.files && input.files[0];
+    if (!file) return;
+
+    const maxBytes = 100 * 1024 * 1024; // 100 MB
+    if (file.size > maxBytes) {
+      alert(`Ukuran video (${(file.size / (1024 * 1024)).toFixed(1)} MB) melebihi batas maksimal 100 MB! Mohon pilih video yang lebih ringkas.`);
+      input.value = '';
+      this.returnState.video = null;
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.returnState.video = {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        data: e.target.result
+      };
+
+      const placeholder = document.getElementById('video-placeholder');
+      const previewBox = document.getElementById('video-preview-box');
+      const filename = document.getElementById('video-filename');
+      const filesize = document.getElementById('video-filesize');
+
+      if (placeholder) placeholder.style.display = 'none';
+      if (previewBox) previewBox.style.display = 'block';
+      if (filename) filename.textContent = file.name;
+      if (filesize) filesize.textContent = (file.size / (1024 * 1024)).toFixed(1) + ' MB • Siap diunggah';
+    };
+    reader.readAsDataURL(file);
+  },
+
+  removeVideo() {
+    this.returnState.video = null;
+    const input = document.getElementById('input-return-video');
+    if (input) input.value = '';
+    const placeholder = document.getElementById('video-placeholder');
+    const previewBox = document.getElementById('video-preview-box');
+    if (placeholder) placeholder.style.display = 'block';
+    if (previewBox) previewBox.style.display = 'none';
+  },
+
+  handlePhotoSelect(event, idx) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    const maxBytes = 5 * 1024 * 1024; // 5 MB
+    if (file.size > maxBytes) {
+      alert(`Ukuran foto (${(file.size / (1024 * 1024)).toFixed(1)} MB) melebihi batas maksimal 5 MB!`);
+      event.target.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.returnState.photos[idx] = {
+        name: file.name,
+        size: file.size,
+        data: e.target.result
+      };
+
+      const empty = document.getElementById(`slot-empty-${idx}`);
+      const img = document.getElementById(`slot-img-${idx}`);
+      const del = document.getElementById(`slot-del-${idx}`);
+      const slot = document.getElementById(`slot-photo-${idx}`);
+
+      if (empty) empty.style.display = 'none';
+      if (img) {
+        img.src = e.target.result;
+        img.style.display = 'block';
+      }
+      if (del) del.style.display = 'flex';
+      if (slot) slot.style.border = '2px solid #059669';
+    };
+    reader.readAsDataURL(file);
+  },
+
+  removePhotoSlot(idx) {
+    this.returnState.photos[idx] = null;
+    const input = document.getElementById(`input-photo-${idx}`);
+    if (input) input.value = '';
+
+    const empty = document.getElementById(`slot-empty-${idx}`);
+    const img = document.getElementById(`slot-img-${idx}`);
+    const del = document.getElementById(`slot-del-${idx}`);
+    const slot = document.getElementById(`slot-photo-${idx}`);
+
+    if (empty) empty.style.display = 'block';
+    if (img) {
+      img.src = '';
+      img.style.display = 'none';
+    }
+    if (del) del.style.display = 'none';
+    if (slot) slot.style.border = idx < 2 ? '2px dashed #fca5a5' : '2px dashed #cbd5e1';
+  },
+
+  appendReasonTag(tag) {
+    const textarea = document.getElementById('ret-reason-textarea');
+    if (!textarea) return;
+    if (textarea.value.trim()) {
+      textarea.value = textarea.value.trim() + ', ' + tag;
+    } else {
+      textarea.value = tag + ': ';
+    }
+    textarea.focus();
+  },
+
+  async handleSubmitReturn(event) {
+    event.preventDefault();
+
+    // 1. Validasi Video
+    if (!this.returnState.video || !this.returnState.video.data) {
+      alert('Wajib mengunggah 1 file video bukti unboxing & pengetesan! (Maksimal 100 MB)');
+      return;
+    }
+
+    // 2. Validasi Minimal 2 Foto
+    const validPhotos = this.returnState.photos.filter(p => p !== null && p.data);
+    if (validPhotos.length < 2) {
+      alert(`Wajib mengunggah minimal 2 foto bukti fisik produk! (Saat ini baru ada ${validPhotos.length} foto)`);
+      return;
+    }
+
+    // 3. Validasi Alasan
+    const textarea = document.getElementById('ret-reason-textarea');
+    const reasonText = textarea ? textarea.value.trim() : '';
+    if (!reasonText || reasonText.length < 5) {
+      alert('Mohon tuliskan alasan pengembalian barang secara lengkap (minimal 5 karakter).');
+      if (textarea) textarea.focus();
+      return;
+    }
+
+    const submitBtn = document.getElementById('btn-submit-return');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = '⏳ Mengirim ke Database...';
+    }
+
+    try {
+      const payload = {
+        reason: reasonText,
+        video: this.returnState.video,
+        photos: validPhotos
+      };
+
+      const res = await PasarinAPI.submitOrderReturn(this.returnState.orderId, payload);
+      if (res && res.success) {
+        alert('🎉 Pengajuan pengembalian barang berhasil dikirim ke database Supabase Cloud! Tim Admin 168 Parts akan segera meninjau bukti Anda.');
+        // Refresh landing page untuk menampilkan status card
+        this.renderReturnLandingPage(this.returnState.orderId);
+      } else {
+        alert((res && res.message) || 'Gagal mengirim pengajuan pengembalian.');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = '🚀 Kirim Pengajuan Pengembalian';
+        }
+      }
+    } catch (err) {
+      console.error('Error submitting return:', err);
+      alert('Terjadi kesalahan koneksi saat mengirim pengajuan pengembalian.');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '🚀 Kirim Pengajuan Pengembalian';
+      }
     }
   },
 
