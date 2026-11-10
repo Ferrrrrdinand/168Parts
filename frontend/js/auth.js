@@ -129,7 +129,7 @@ const PasarinAuth = {
         container.innerHTML = `
           <div class="user-dropdown-wrap">
             <button class="user-profile-btn" id="btn-user-profile" aria-label="Profil Pengguna">
-              <span class="user-avatar">${initials}</span>
+              ${this.currentUser.avatar ? `<img src="${this.currentUser.avatar}" alt="Avatar" class="user-avatar" style="object-fit:cover; width:22px; height:22px; border-radius:50%;">` : `<span class="user-avatar">${initials}</span>`}
               <span class="user-name">${this.currentUser.name}</span>
               <span class="user-badge">${this.currentUser.role === 'admin' ? 'Admin' : 'Member'}</span>
               <span class="user-badge points-pill" title="Poin Belanja Anda: ${formattedPoints} Poin (1 Poin tiap Rp1.000)">🪙 <span class="nav-points-val">${formattedPoints}</span></span>

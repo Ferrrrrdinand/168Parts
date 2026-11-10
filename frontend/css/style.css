@@ -186,52 +186,94 @@ main.w {
 }
 
 .user-profile-btn {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.18);
   border: 1px solid rgba(255, 255, 255, 0.35);
   color: #ffffff;
   padding: 3px 10px;
   border-radius: var(--radius-full);
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   font-size: 12px;
   font-weight: 600;
   backdrop-filter: blur(8px);
+  cursor: pointer;
   transition: var(--transition);
 }
 
 .user-profile-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.28);
+  border-color: rgba(255, 255, 255, 0.6);
 }
 
-.user-avatar {
-  background: #ffffff;
-  color: var(--primary);
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: 800;
+.hd .top .user-profile-btn span {
+  margin-right: 0 !important;
 }
 
-.user-name {
-  max-width: 110px;
+.user-avatar,
+.hd .top .user-profile-btn .user-avatar {
+  background: #ffffff !important;
+  color: #be123c !important;
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 50% !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 10px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+  flex-shrink: 0;
+}
+
+.user-name,
+.hd .top .user-profile-btn .user-name {
+  color: #ffffff !important;
+  max-width: 120px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-weight: 700 !important;
+  letter-spacing: 0.2px;
 }
 
-.user-badge {
-  background: #ffd54f;
-  color: #1e293b;
-  font-size: 9px;
-  font-weight: 800;
-  padding: 1px 6px;
-  border-radius: var(--radius-full);
+.user-badge,
+.hd .top .user-profile-btn .user-badge {
+  background: #ffd54f !important;
+  color: #78350f !important;
+  font-size: 9.5px !important;
+  font-weight: 800 !important;
+  padding: 2px 7px !important;
+  border-radius: var(--radius-full) !important;
   text-transform: uppercase;
+  letter-spacing: 0.3px;
+  line-height: 1.2;
+}
+
+.user-badge.points-pill,
+.hd .top .user-profile-btn .user-badge.points-pill {
+  background: #ffffff !important;
+  border: 1px solid #fef08a !important;
+  padding: 2px 8px !important;
+  border-radius: var(--radius-full) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.user-badge.points-pill .nav-points-val,
+.hd .top .user-profile-btn .user-badge.points-pill .nav-points-val {
+  color: #b45309 !important;
+  font-weight: 800 !important;
+  font-size: 11px !important;
+  letter-spacing: 0.3px;
+}
+
+.hd .top .user-profile-btn .user-caret {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-size: 11px;
 }
 
 .user-dropdown-menu {
