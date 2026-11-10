@@ -944,6 +944,40 @@ input:checked + .toggle-slider:after {
   }
 }
 
+@media (max-width: 640px) {
+  .admin-topbar {
+    padding: 10px 12px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .topbar-page-title {
+    font-size: 14px !important;
+  }
+  .topbar-right {
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .admin-profile-badge .admin-meta {
+    display: none;
+  }
+  .status-pill {
+    padding: 4px 8px;
+    font-size: 10.5px;
+  }
+  .admin-content {
+    padding: 14px 10px;
+  }
+  .admin-modal-card {
+    width: 95% !important;
+    max-width: 95vw !important;
+    border-radius: 14px !important;
+  }
+  .confirm-modal-card {
+    width: 95% !important;
+    padding: 24px 18px 20px !important;
+  }
+}
+
 /* =========================================================
    7. ADMIN AUTHENTICATION GATE (LOGIN ADMIN TUNGGAL)
    ========================================================= */

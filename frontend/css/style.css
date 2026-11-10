@@ -3194,29 +3194,169 @@ main.w {
   box-shadow: 0 5px 14px rgba(238, 77, 45, 0.4);
 }
 
+/* Mobile Responsive: Welcome Promo Modal */
 @media (max-width: 580px) {
-  .promo-modal-card {
-    max-height: 94vh;
+  .promo-modal-overlay {
+    padding: 8px !important;
   }
+  .promo-modal-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 92vh !important;
+    border-radius: 16px !important;
+  }
+  .promo-modal-header {
+    padding: 16px 16px 14px 16px !important;
+  }
+  .promo-modal-header h2 {
+    font-size: 16px !important;
+  }
+  .promo-modal-header p {
+    font-size: 11.5px !important;
+    line-height: 1.4 !important;
+  }
+  .custom-promo-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 10px 14px !important;
+    gap: 8px !important;
+  }
+  .custom-promo-input-box {
+    width: 100% !important;
+  }
+  .custom-promo-input-box input {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    font-size: 11.5px !important;
+    padding: 8px 10px 8px 34px !important;
+  }
+  .btn-custom-claim {
+    width: 100% !important;
+    padding: 10px !important;
+    font-size: 12.5px !important;
+    text-align: center !important;
+    justify-content: center !important;
+  }
+  .promo-tabs-bar {
+    padding: 8px 12px !important;
+    gap: 6px !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .promo-tabs-bar::-webkit-scrollbar {
+    display: none !important;
+  }
+  .promo-tab-item {
+    padding: 5px 12px !important;
+    font-size: 11px !important;
+  }
+  .promo-body {
+    padding: 10px 12px !important;
+    max-height: 52vh !important;
+    gap: 12px !important;
+  }
+  /* PROMO TICKET PADA MOBILE VIEW */
   .promo-ticket {
-    flex-direction: column;
+    flex-direction: column !important;
+    border-radius: 12px !important;
+    border: 1px solid #fecdd3 !important;
+    min-height: auto !important;
+    background: #ffffff !important;
+  }
+  .promo-ticket::before,
+  .promo-ticket::after {
+    display: none !important; /* Hilangkan notch cutout samping yang memotong teks di mobile */
   }
   .ticket-left {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1.5px dashed #fed7cc;
-    flex-direction: row;
-    gap: 8px;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1.5px dashed #fecdd3 !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    padding: 8px 14px !important;
+    gap: 8px !important;
+    text-align: left !important;
+    box-sizing: border-box !important;
+    background: #fff1f2 !important;
+  }
+  .ticket-left .ticket-icon {
+    font-size: 20px !important;
+    line-height: 1 !important;
+  }
+  .ticket-left .ticket-val {
+    font-size: 15px !important;
+    font-weight: 900 !important;
+    color: #be123c !important;
+  }
+  .ticket-left .ticket-type-lbl {
+    font-size: 10.5px !important;
+    font-weight: 700 !important;
+    color: #be123c !important;
+    background: rgba(190, 18, 60, 0.08) !important;
+    padding: 2px 7px !important;
+    border-radius: 4px !important;
+  }
+  .ticket-center {
+    padding: 12px 14px 8px 14px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .ticket-title {
+    font-size: 13.5px !important;
+    font-weight: 800 !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    line-height: 1.35 !important;
+  }
+  .ticket-desc {
+    font-size: 11.5px !important;
+    line-height: 1.4 !important;
+    margin: 4px 0 !important;
+  }
+  .ticket-meta {
+    font-size: 11px !important;
+    gap: 6px !important;
+    margin-top: 6px !important;
   }
   .ticket-right {
-    padding: 10px;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 8px 14px 12px 14px !important;
+    border-top: 1px dashed #f1f5f9 !important;
+    flex-direction: row !important;
+    gap: 8px !important;
+    align-items: stretch !important;
+  }
+  .ticket-right .btn-copy-code-direct {
+    flex: 1 !important;
+    padding: 8px 10px !important;
+    font-size: 11.5px !important;
+    text-align: center !important;
+  }
+  .ticket-right .btn-claim-voucher {
+    flex: 1.3 !important;
+    padding: 8px 10px !important;
+    font-size: 12px !important;
+    text-align: center !important;
   }
   .promo-modal-footer {
-    flex-direction: column;
-    align-items: stretch;
+    padding: 12px 14px !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+  .promo-dont-show {
+    justify-content: center !important;
+    font-size: 11.5px !important;
   }
   .btn-claim-all-promo {
-    width: 100%;
+    width: 100% !important;
+    padding: 11px !important;
+    font-size: 13px !important;
+    text-align: center !important;
   }
 }
 
@@ -6021,6 +6161,84 @@ button:disabled {
     width: 100px;
     padding-right: 14px;
     font-size: 13px;
+  }
+}
+
+/* Mobile Screens Optimization (< 640px) for Profile, Return Page & Modals */
+@media (max-width: 640px) {
+  /* 1. Shopee Profile & Ubah Password Mobile */
+  .shopee-profile-container {
+    gap: 16px !important;
+    margin-top: 0 !important;
+  }
+  .shopee-profile-sidebar {
+    padding: 12px 14px !important;
+    border-radius: 10px !important;
+  }
+  .profile-content-card {
+    padding: 16px 14px !important;
+    border-radius: 10px !important;
+  }
+  .profile-form-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px !important;
+    margin-bottom: 16px !important;
+  }
+  .profile-form-label {
+    width: 100% !important;
+    text-align: left !important;
+    padding-right: 0 !important;
+    font-size: 12.5px !important;
+    font-weight: 700 !important;
+    color: #475569 !important;
+  }
+  .profile-form-field {
+    width: 100% !important;
+  }
+  .profile-text-input {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 10px 12px !important;
+    font-size: 13px !important;
+  }
+  .btn-shopee-save-profile {
+    width: 100% !important;
+    text-align: center !important;
+    padding: 12px !important;
+    font-size: 13.5px !important;
+  }
+
+  /* 2. Riwayat Pesanan Modal Mobile */
+  .pasarin-modal-card {
+    width: 95% !important;
+    max-width: 95vw !important;
+    max-height: 90vh !important;
+    margin: 0 auto !important;
+    border-radius: 14px !important;
+  }
+  .pasarin-modal-header {
+    padding: 14px 16px !important;
+  }
+  .pasarin-modal-body {
+    padding: 12px 14px !important;
+  }
+  .order-history-card {
+    padding: 12px !important;
+    border-radius: 8px !important;
+  }
+
+  /* 3. Landing Page Pengembalian Barang Mobile */
+  .return-page-bg {
+    padding: 16px 0 50px !important;
+  }
+  #return-view-content > div,
+  #return-view-content form {
+    padding: 16px 14px !important;
+    border-radius: 10px !important;
+  }
+  .return-photo-slot {
+    height: 120px !important;
   }
 }
 

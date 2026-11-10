@@ -3872,19 +3872,19 @@ const PasarinApp = {
       }
 
       return `
-        <div class="promo-ticket" style="border: 1px solid #fecdd3; border-radius: 8px; margin-bottom: 12px; background:#fff; overflow:hidden;">
-          <div class="ticket-left" style="background:#fff1f2; border-right:1px dashed #f43f5e;">
+        <div class="promo-ticket">
+          <div class="ticket-left">
             <span class="ticket-icon">${p.icon}</span>
-            <span class="ticket-val" style="color:#be123c;">${p.valText}</span>
+            <span class="ticket-val">${p.valText}</span>
             <span class="ticket-type-lbl">${p.typeText}</span>
           </div>
           <div class="ticket-center">
-            <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px; flex-wrap:wrap;">
               <h4 class="ticket-title" title="${p.title}" style="margin:0;">${p.title}</h4>
               ${claimCount > 0 ? `<span style="background:#fee2e2; color:#be123c; font-size:10.5px; font-weight:800; padding:2px 7px; border-radius:10px;">Dimiliki: ${claimCount}x</span>` : ''}
             </div>
             <p class="ticket-desc">${p.desc}</p>
-            <div class="ticket-meta" style="font-size:11.5px; color:#64748b; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+            <div class="ticket-meta">
               <span>${p.minSpend}</span>
               <span>•</span>
               <span class="ticket-code-pill" onclick="PasarinApp.copyPromoCode('${p.code}', this)" title="Klik untuk salin kode voucher">
@@ -3896,8 +3896,8 @@ const PasarinApp = {
               <span style="color:#475569; font-weight:600;">Maks. 3 voucher/akun</span>
             </div>
           </div>
-          <div class="ticket-right" style="display:flex; flex-direction:column; gap:6px; align-items:center; justify-content:center; padding:12px;">
-            <button class="btn-copy-code-direct" onclick="PasarinApp.copyPromoCode('${p.code}', this)" style="background:#f1f5f9; color:#1e293b; border:1px solid #cbd5e1; border-radius:6px; padding:4px 8px; font-size:11.5px; font-weight:700; cursor:pointer; width:100%; transition:all 0.2s;">
+          <div class="ticket-right">
+            <button class="btn-copy-code-direct" onclick="PasarinApp.copyPromoCode('${p.code}', this)" style="background:#f1f5f9; color:#1e293b; border:1px solid #cbd5e1; border-radius:6px; padding:6px 10px; font-size:11.5px; font-weight:700; cursor:pointer; width:100%; transition:all 0.2s;">
               📋 Salin Kode
             </button>
             ${claimBtnHtml}

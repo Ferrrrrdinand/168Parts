@@ -41,3 +41,4 @@ migrate().catch(err => {
   console.error('❌ Gagal migrasi:', err.message);
   process.exit(1);
 });
+
