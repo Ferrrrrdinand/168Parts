@@ -1086,7 +1086,7 @@
     </button>
 
     <!-- Tombol Chat Shopee Style -->
-    <button class="docked-action-btn dock-btn-chat" id="btn-dock-chat" onclick="if(window.showToast) window.showToast('Fitur Chat 168 Parts siap menghubungkan Anda dengan Penjual!', 'info');" title="Chat dengan Penjual" aria-label="Chat dengan Penjual">
+    <button class="docked-action-btn dock-btn-chat" id="btn-dock-chat" onclick="window.PasarinChatBot ? window.PasarinChatBot.toggleChat() : null;" title="Chat Customer Care 168 Parts (AI Assistant 24/7)" aria-label="Chat Customer Care 168 Parts">
       <span class="dock-icon">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
           <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
@@ -1106,6 +1106,7 @@
   <script src="js/auth.js"></script>
   <script src="js/cart.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/chatbot.js"></script>
   <script src="js/sensor.js"></script>
 </body>
 </html>
