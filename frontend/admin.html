@@ -264,8 +264,9 @@
               </select>
             </div>
 
-            <button class="btn-primary" onclick="AdminApp.openAddModal()">
-              <span>+ Tambah Produk</span>
+            <button class="btn-primary" onclick="AdminApp.openAddModal()" style="display:inline-flex; align-items:center; gap:8px;">
+              <span style="background:rgba(255,255,255,0.22); width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:15px; font-weight:900; line-height:1;">+</span>
+              <span>Tambah Produk Baru</span>
             </button>
           </div>
 
@@ -808,13 +809,19 @@
             </div>
           </div>
 
-          <div class="form-group" style="margin-top:8px; display:flex; align-items:center; gap:10px;">
+          <div class="form-group" style="margin-top:14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:22px; line-height:1;">⚡</span>
+              <div>
+                <label for="f-prod-flash" style="font-size:13px; font-weight:700; color:#1e293b; cursor:pointer; display:block;">
+                  Masukkan ke Banner & Jadwal Flash Sale
+                </label>
+                <small style="color:#64748b; font-size:11.5px;">Produk akan otomatis tampil pada promo Flash Sale beranda toko</small>
+              </div>
+            </div>
             <label class="toggle-switch">
               <input type="checkbox" id="f-prod-flash">
               <span class="toggle-slider"></span>
-            </label>
-            <label for="f-prod-flash" style="font-size:13px; font-weight:700; color:#1e293b; cursor:pointer;">
-              ⚡ Masukkan ke Banner & Jadwal Flash Sale
             </label>
           </div>
         </div>

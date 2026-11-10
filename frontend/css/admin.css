@@ -511,25 +511,28 @@ body {
   cursor: pointer;
 }
 
+.btn-primary,
 .btn-admin-primary {
-  background: var(--admin-primary);
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 700;
-  padding: 9px 18px;
-  border-radius: var(--radius-sm);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(29, 63, 13, 0.25);
+  background: #be123c !important;
+  color: #ffffff !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  padding: 9px 18px !important;
+  border-radius: var(--radius-sm) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  border: none !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 4px 12px rgba(190, 18, 60, 0.25) !important;
 }
 
+.btn-primary:hover,
 .btn-admin-primary:hover {
-  background: var(--admin-primary-dark);
-  transform: translateY(-1px);
+  background: #9f1239 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 16px rgba(190, 18, 60, 0.35) !important;
 }
 
 /* Table Responsive */
@@ -626,8 +629,9 @@ body {
 .toggle-switch {
   position: relative;
   display: inline-block;
-  width: 36px;
-  height: 20px;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
 }
 
 .toggle-switch input {
@@ -641,28 +645,61 @@ body {
   cursor: pointer;
   inset: 0;
   background-color: #cbd5e1;
-  transition: 0.3s;
-  border-radius: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 999px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
 }
 
+/* Knob slider bulat */
 .toggle-slider:before {
   position: absolute;
   content: "";
-  height: 14px;
-  width: 14px;
+  height: 18px;
+  width: 18px;
   left: 3px;
   bottom: 3px;
-  background-color: white;
-  transition: 0.3s;
+  background-color: #ffffff;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+  z-index: 2;
 }
 
+/* Icon saat belum aktif (OFF) */
+.toggle-slider:after {
+  content: "✕";
+  position: absolute;
+  right: 8px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #64748b;
+  opacity: 0.8;
+  line-height: 1;
+  pointer-events: none;
+  transition: all 0.25s ease;
+  z-index: 1;
+}
+
+/* Saat aktif (ON) */
 input:checked + .toggle-slider {
-  background-color: var(--admin-primary);
+  background-color: #be123c !important; /* Soft Red Brand 168 Parts */
+  box-shadow: 0 2px 8px rgba(190, 18, 60, 0.35);
 }
 
 input:checked + .toggle-slider:before {
-  transform: translateX(16px);
+  transform: translateX(20px);
+}
+
+/* Icon saat aktif (ON) */
+input:checked + .toggle-slider:after {
+  content: "✓";
+  left: 8px;
+  right: auto;
+  color: #ffffff;
+  opacity: 1;
+  font-size: 11px;
 }
 
 .action-btns {
