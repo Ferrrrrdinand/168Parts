@@ -11,11 +11,18 @@ class UserModel {
     return { salt, hash };
   }
 
-  // Verifikasi kecocokan password
+  // Verifikasi kecocokan password dengan proteksi Constant-Time (Timing-Safe)
   verifyPassword(password, salt, hash) {
-    if (!salt || !hash) return false;
-    const verifyHash = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
-    return hash === verifyHash;
+    if (!salt || !hash || !password) return false;
+    try {
+      const verifyHash = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
+      const hashBuf = Buffer.from(hash, 'hex');
+      const verifyBuf = Buffer.from(verifyHash, 'hex');
+      if (hashBuf.length !== verifyBuf.length) return false;
+      return crypto.timingSafeEqual(hashBuf, verifyBuf);
+    } catch (e) {
+      return false;
+    }
   }
 
   // Buat token JWT sederhana (Base64 URL-safe signed token)
