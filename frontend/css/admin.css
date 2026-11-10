@@ -629,7 +629,19 @@ body {
 }
 
 .admin-table tr:hover td {
-  background: #fbfdff;
+  background: #f8fafc;
+}
+
+.btn-customer-detail {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-customer-detail:hover {
+  background: #f0f9ff !important;
+  border-color: #38bdf8 !important;
+  color: #0369a1 !important;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.18) !important;
+  transform: translateY(-1px);
 }
 
 /* Product row elements */

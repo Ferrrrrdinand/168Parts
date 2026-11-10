@@ -1359,8 +1359,8 @@ const AdminApp = {
 
       const isBuyer = c.role !== 'admin';
       const roleBadge = isBuyer
-        ? `<span style="background:rgba(217,119,6,0.12); color:#b45309; border:1px solid rgba(217,119,6,0.3); font-size:10px; font-weight:800; padding:2px 7px; border-radius:12px; display:inline-flex; align-items:center; gap:3px;">⭐ MEMBER 168</span>`
-        : `<span style="background:rgba(190,18,60,0.12); color:#be123c; border:1px solid rgba(190,18,60,0.3); font-size:10px; font-weight:800; padding:2px 7px; border-radius:12px; display:inline-flex; align-items:center; gap:3px;">🛡️ ADMIN</span>`;
+        ? `<span style="background:rgba(217,119,6,0.1); color:#b45309; border:1px solid rgba(217,119,6,0.25); font-size:10px; font-weight:800; padding:2px 7px; border-radius:12px; display:inline-flex; align-items:center; gap:3px; white-space:nowrap;">⭐ MEMBER 168</span>`
+        : `<span style="background:rgba(190,18,60,0.1); color:#be123c; border:1px solid rgba(190,18,60,0.25); font-size:10px; font-weight:800; padding:2px 7px; border-radius:12px; display:inline-flex; align-items:center; gap:3px; white-space:nowrap;">🛡️ ADMIN</span>`;
 
       const pointsFormatted = Number(c.points || 0).toLocaleString('id-ID');
       const ordersCount = Number(c.totalOrders || 0);
@@ -1371,63 +1371,74 @@ const AdminApp = {
         : '-';
 
       const phoneDisplay = c.phone
-        ? `<a href="https://wa.me/${c.phone.replace(/[^0-9]/g, '')}" target="_blank" rel="noopener noreferrer" style="color:#059669; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:4px;" title="Chat via WhatsApp">
+        ? `<a href="https://wa.me/${c.phone.replace(/[^0-9]/g, '')}" target="_blank" rel="noopener noreferrer" style="color:#059669; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:4px; background:#ecfdf5; border:1px solid #a7f3d0; padding:2px 8px; border-radius:12px; font-size:11.5px; width:fit-content; white-space:nowrap; transition:all 0.15s ease;" title="Chat via WhatsApp">
             <span>💬</span> <span>${c.phone}</span>
           </a>`
-        : `<span style="color:#94a3b8; font-style:italic;">Belum diatur</span>`;
+        : `<span style="color:#94a3b8; font-size:11.5px; font-style:italic;">Belum ada WhatsApp</span>`;
 
       const addressDisplay = c.address
-        ? `<div style="max-width:220px; font-size:12px; color:#475569; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${c.address}">📍 ${c.address}</div>`
-        : `<span style="color:#94a3b8; font-size:12px; font-style:italic;">-</span>`;
+        ? `<div style="max-width:210px; font-size:12px; color:#334155; line-height:1.4; display:flex; align-items:flex-start; gap:4px;" title="${c.address}">
+            <span style="flex-shrink:0;">📍</span>
+            <span style="overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">${c.address}</span>
+          </div>`
+        : `<span style="color:#94a3b8; font-size:11.5px; font-style:italic; background:#f8fafc; border:1px dashed #cbd5e1; padding:2px 8px; border-radius:6px; display:inline-block; white-space:nowrap;">Belum diatur</span>`;
 
       const orderBadge = ordersCount > 0
-        ? `<span style="background:#ecfdf5; color:#047857; font-weight:800; padding:3px 9px; border-radius:12px; font-size:11.5px; border:1px solid #a7f3d0;">🛍️ ${ordersCount} Pesanan</span>`
-        : `<span style="background:#f1f5f9; color:#64748b; font-weight:600; padding:3px 9px; border-radius:12px; font-size:11.5px;">Belum Belanja</span>`;
+        ? `<span style="background:#ecfdf5; color:#047857; font-weight:800; padding:4px 10px; border-radius:20px; font-size:11.5px; border:1px solid #a7f3d0; white-space:nowrap; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 2px rgba(4,120,87,0.06);">
+            <span>🛍️</span> <span>${ordersCount} Pesanan</span>
+          </span>`
+        : `<span style="background:#f8fafc; color:#94a3b8; font-weight:600; padding:3px 9px; border-radius:12px; font-size:11.5px; border:1px solid #e2e8f0; white-space:nowrap;">Belum Belanja</span>`;
+
+      const avatarMarkup = c.avatar
+        ? `<img src="${c.avatar}" alt="${c.name || 'User'}" style="width:38px; height:38px; border-radius:50%; object-fit:cover; border:2px solid #e2e8f0; flex-shrink:0; box-shadow:0 2px 5px rgba(0,0,0,0.06);" onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/identicon/svg?seed=${c.id}';">`
+        : `<div style="width:38px; height:38px; border-radius:50%; background:${color}; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; flex-shrink:0; box-shadow:0 2px 6px rgba(0,0,0,0.12); letter-spacing:0.5px;">${initials}</div>`;
 
       return `
         <tr style="border-bottom:1px solid var(--admin-border); transition:background 0.15s ease;">
-          <td style="padding:14px 16px;">
+          <td style="padding:14px 16px; white-space:nowrap;">
             <div style="display:flex; align-items:center; gap:12px;">
-              <div style="width:38px; height:38px; border-radius:50%; background:${color}; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; flex-shrink:0; box-shadow:0 2px 6px rgba(0,0,0,0.15);">
-                ${initials}
-              </div>
-              <div style="display:flex; flex-direction:column; gap:3px;">
-                <div style="display:flex; align-items:center; gap:6px;">
-                  <span style="font-weight:800; color:#0f172a; font-size:13px;">${c.name}</span>
-                  ${roleBadge}
+              ${avatarMarkup}
+              <div style="display:flex; flex-direction:column; gap:4px; min-width:0;">
+                <div style="font-weight:800; color:#0f172a; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${c.name}">
+                  ${c.name || 'Pengguna 168'}
                 </div>
-                <span style="font-size:11px; color:#64748b; font-family:monospace;">ID: ${c.id}</span>
+                <div style="display:inline-flex; align-items:center; gap:6px; white-space:nowrap;">
+                  ${roleBadge}
+                  <span style="font-size:11px; color:#64748b; font-family:ui-monospace, monospace; background:#f1f5f9; padding:1px 6px; border-radius:4px;" title="ID: ${c.id}">@${c.username || (c.id ? c.id.slice(0, 14) : 'user')}</span>
+                </div>
               </div>
             </div>
           </td>
-          <td style="padding:14px 16px;">
-            <div style="display:flex; flex-direction:column; gap:3px; font-size:12px;">
-              <span style="color:#1e293b; font-weight:600;">✉️ ${c.email}</span>
+          <td style="padding:14px 16px; white-space:nowrap;">
+            <div style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
+              <span style="color:#0f172a; font-weight:600; display:inline-flex; align-items:center; gap:5px;" title="${c.email}">
+                <span style="font-size:13px;">✉️</span> <span>${c.email}</span>
+              </span>
               ${phoneDisplay}
             </div>
           </td>
           <td style="padding:14px 16px;">
             ${addressDisplay}
           </td>
-          <td style="padding:14px 16px;">
-            <div style="display:inline-flex; align-items:center; gap:5px; background:#fffbeb; border:1px solid #fef3c7; color:#b45309; padding:4px 10px; border-radius:20px; font-weight:800; font-size:12px;">
+          <td style="padding:14px 16px; text-align:center; white-space:nowrap;">
+            <div style="display:inline-flex; align-items:center; gap:5px; background:linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border:1px solid #fde68a; color:#b45309; padding:4px 12px; border-radius:20px; font-weight:800; font-size:12px; white-space:nowrap; box-shadow:0 1px 2px rgba(217,119,6,0.08);">
               <span>🪙</span>
-              <span>${pointsFormatted} Poin</span>
+              <span style="white-space:nowrap;">${pointsFormatted} Poin</span>
             </div>
           </td>
-          <td style="padding:14px 16px;">
+          <td style="padding:14px 16px; text-align:center; white-space:nowrap;">
             ${orderBadge}
           </td>
-          <td style="padding:14px 16px;">
-            <span style="font-weight:800; color:#be123c; font-size:13px;">${spentFormatted}</span>
+          <td style="padding:14px 16px; text-align:right; white-space:nowrap;">
+            <span style="font-weight:800; color:${ordersCount > 0 ? '#be123c' : '#94a3b8'}; font-size:13px; font-family:ui-monospace, monospace; white-space:nowrap;">${spentFormatted}</span>
           </td>
-          <td style="padding:14px 16px; font-size:12px; color:#64748b;">
+          <td style="padding:14px 16px; text-align:center; font-size:12px; color:#64748b; font-weight:600; white-space:nowrap;">
             ${createdDate}
           </td>
-          <td style="padding:14px 16px; text-align:right;">
-            <button type="button" class="btn-secondary" style="padding:6px 12px; font-size:12px; font-weight:700; display:inline-flex; align-items:center; gap:5px;" onclick="AdminApp.openCustomerDetailModal('${c.id}')">
+          <td style="padding:14px 16px; text-align:right; white-space:nowrap;">
+            <button type="button" class="btn-customer-detail" style="background:#ffffff; color:#0284c7; border:1px solid #bae6fd; padding:6px 12px; font-size:12px; font-weight:700; border-radius:8px; display:inline-flex; align-items:center; gap:5px; cursor:pointer; white-space:nowrap; transition:all 0.15s ease; box-shadow:0 1px 2px rgba(2,132,199,0.08);" onmouseover="this.style.background='#f0f9ff'; this.style.borderColor='#38bdf8'; this.style.transform='translateY(-1px)';" onmouseout="this.style.background='#ffffff'; this.style.borderColor='#bae6fd'; this.style.transform='none';" onclick="AdminApp.openCustomerDetailModal('${c.id}')">
               <span>🔍</span>
-              <span>Detail Akun</span>
+              <span style="white-space:nowrap;">Detail Akun</span>
             </button>
           </td>
         </tr>
