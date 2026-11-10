@@ -15,93 +15,115 @@
 </head>
 <body>
 
-  <!-- ==================== ANIMASI SHOPPING LOADING SCREEN ==================== -->
+  <!-- ==================== ANIMASI 168 PARTS MODERN HIGH-TECH LOADING SCREEN ==================== -->
   <div id="shopping-loader" class="shopping-loader-overlay">
     <div class="shopping-loader-card">
-      <div class="shopping-anim-stage">
-        <!-- Running Ground Track -->
-        <svg class="ground-track-svg" viewBox="0 0 160 20" aria-hidden="true">
-          <line x1="0" y1="14" x2="160" y2="14" stroke="#e2e8f0" stroke-width="3" stroke-linecap="round" stroke-dasharray="10 12" class="track-dash"/>
-        </svg>
+      <!-- 168 Parts Hub Stage -->
+      <div class="loader-hub-stage">
+        <!-- Glowing Pulse Rings -->
+        <div class="hub-pulse-ring ring-1"></div>
+        <div class="hub-pulse-ring ring-2"></div>
 
-        <!-- Smooth Parabolic Items Jumping into Cart (168 Parts Spareparts) -->
-        <div class="item-arc item-1" title="LCD Screen"><span class="item-emoji">📱</span></div>
-        <div class="item-arc item-2" title="Baterai Li-ion"><span class="item-emoji">🔋</span></div>
-        <div class="item-arc item-3" title="IC & Chipset"><span class="item-emoji">⚡</span></div>
-        <div class="item-arc item-4" title="Lem & Perekat"><span class="item-emoji">🧪</span></div>
+        <!-- Rotating High-Tech Orbit Rings -->
+        <div class="hub-orbit-spinner"></div>
+        <div class="hub-orbit-dashed"></div>
 
-        <!-- Smooth Rolling Cart with Suspension & Spoke Wheels (Soft Red Theme) -->
-        <div class="cart-chassis-wrap">
-          <svg class="cart-svg-pro" viewBox="0 0 96 80" fill="none" aria-hidden="true">
-            <!-- Dynamic Ground Shadow -->
-            <ellipse cx="48" cy="74" rx="34" ry="4" fill="#0f172a" class="cart-ground-shadow"/>
+        <!-- Center Emblem 168 Parts -->
+        <div class="hub-center-emblem">
+          <div class="emblem-inner">
+            <span class="emblem-num">168</span>
+            <span class="emblem-sub">PARTS</span>
+          </div>
+        </div>
 
-            <!-- Basket Fill & Border -->
-            <path d="M22 18h58l-8 32H30L22 18z" fill="url(#cartBasketGrad)" stroke="#be123c" stroke-width="3.5" stroke-linejoin="round"/>
-            
-            <!-- Basket Inner Wireframe -->
-            <path d="M36 22v24M48 22v24M60 22v24M25 32h49M27 42h43" stroke="#e11d48" stroke-width="1.6" stroke-linecap="round" stroke-opacity="0.35"/>
-
-            <!-- Cart Tubular Chassis & Handle -->
-            <path d="M10 12h12l10 40h40l8-26H26" stroke="#be123c" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M8 12h8" stroke="#e11d48" stroke-width="4.8" stroke-linecap="round"/>
-
-            <!-- Wheel Struts -->
-            <path d="M34 52l-3 10M68 52l3 10" stroke="#be123c" stroke-width="3.2" stroke-linecap="round"/>
-
-            <!-- Rotating Spoke Wheel 1 (Rear) -->
-            <g class="wheel-group wheel-rear" transform="translate(31, 64)">
-              <circle cx="0" cy="0" r="7.5" fill="#be123c" stroke="#9f1239" stroke-width="2"/>
-              <circle cx="0" cy="0" r="2.8" fill="#ffffff"/>
-              <line x1="0" y1="-7.5" x2="0" y2="7.5" stroke="#ffffff" stroke-width="1.4"/>
-              <line x1="-7.5" y1="0" x2="7.5" y2="0" stroke="#ffffff" stroke-width="1.4"/>
-            </g>
-
-            <!-- Rotating Spoke Wheel 2 (Front) -->
-            <g class="wheel-group wheel-front" transform="translate(71, 64)">
-              <circle cx="0" cy="0" r="7.5" fill="#be123c" stroke="#9f1239" stroke-width="2"/>
-              <circle cx="0" cy="0" r="2.8" fill="#ffffff"/>
-              <line x1="0" y1="-7.5" x2="0" y2="7.5" stroke="#ffffff" stroke-width="1.4"/>
-              <line x1="-7.5" y1="0" x2="7.5" y2="0" stroke="#ffffff" stroke-width="1.4"/>
-            </g>
-
-            <defs>
-              <linearGradient id="cartBasketGrad" x1="22" y1="18" x2="80" y2="50" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#be123c" stop-opacity="0.25"/>
-                <stop offset="1" stop-color="#f43f5e" stop-opacity="0.10"/>
-              </linearGradient>
-            </defs>
-          </svg>
+        <!-- Floating Precision Sparepart Badges -->
+        <div class="floating-orbit-badge badge-lcd" title="LCD & Layar HP">
+          <span>📱</span>
+          <span>LCD</span>
+        </div>
+        <div class="floating-orbit-badge badge-battery" title="Baterai Original">
+          <span>🔋</span>
+          <span>Baterai</span>
+        </div>
+        <div class="floating-orbit-badge badge-tools" title="Alat Servis & IC">
+          <span>⚙️</span>
+          <span>Tools</span>
         </div>
       </div>
 
+      <!-- Info & Progress Details -->
       <div class="shopping-loader-info">
         <div class="brand-chip" style="background: rgba(190, 18, 60, 0.08); color: #be123c;">
           <span class="chip-dot" style="background: #be123c;"></span>
-          <span>168 Parts Official</span>
+          <span>168 Parts Surabaya • Official</span>
         </div>
-        <h3 class="shopping-title">Memuat Katalog 168 Parts<span class="animated-dots">...</span></h3>
-        <p class="shopping-subtitle">Pusat Sparepart & Alat Servis HP Surabaya • Ready Stock</p>
+        <h3 class="shopping-title">Pusat Sparepart & Alat Servis<span class="animated-dots">...</span></h3>
+        <p class="shopping-subtitle" id="loader-status-text">Menyiapkan katalog resmi & promo terbaik...</p>
         
+        <!-- Live Progress Track & Percentage -->
         <div class="shopping-progress-track">
-          <div class="shopping-progress-bar"></div>
+          <div class="shopping-progress-bar" id="loader-progress-bar"></div>
+        </div>
+        <div class="loader-percentage-row">
+          <span class="loader-pct-val" id="loader-pct-number">0%</span>
+          <span class="loader-pct-label">Memuat Data</span>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    // Fail-safe auto dismiss: loader pasti tertutup dalam 1.5 detik
+    // Smooth Realtime Progress Bar & Auto Dismiss
     (function() {
-      function dismiss() {
-        var el = document.getElementById('shopping-loader');
-        if (el && !el.classList.contains('fade-out')) {
-          el.classList.add('fade-out');
-          setTimeout(function() { if (el && el.parentNode) el.parentNode.removeChild(el); }, 500);
+      var pct = 0;
+      var bar = document.getElementById('loader-progress-bar');
+      var num = document.getElementById('loader-pct-number');
+      var status = document.getElementById('loader-status-text');
+      var overlay = document.getElementById('shopping-loader');
+      var isDismissed = false;
+
+      var interval = setInterval(function() {
+        if (!isDismissed && pct < 88) {
+          pct += Math.floor(Math.random() * 8 + 4);
+          if (pct > 88) pct = 88;
+          if (bar) bar.style.width = pct + '%';
+          if (num) num.textContent = pct + '%';
+          if (status) {
+            if (pct > 55) status.textContent = 'Memuat 60+ sparepart & alat servis HP...';
+            else if (pct > 25) status.textContent = 'Menghubungkan Database Supabase Cloud...';
+          }
         }
-      }
-      window.addEventListener('load', function() { setTimeout(dismiss, 900); });
-      setTimeout(dismiss, 1600);
+      }, 55);
+
+      window.dismissShoppingLoader = function() {
+        if (isDismissed) return;
+        isDismissed = true;
+        clearInterval(interval);
+        pct = 100;
+        if (bar) bar.style.width = '100%';
+        if (num) num.textContent = '100%';
+        if (status) status.textContent = 'Katalog Siap! Selamat berbelanja.';
+
+        setTimeout(function() {
+          if (overlay && !overlay.classList.contains('fade-out')) {
+            overlay.classList.add('fade-out');
+            setTimeout(function() {
+              if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            }, 550);
+          }
+        }, 300);
+      };
+
+      window.addEventListener('load', function() {
+        setTimeout(window.dismissShoppingLoader, 500);
+      });
+
+      // Fail-safe dismiss maksimal 2.2 detik jika koneksi lambat
+      setTimeout(function() {
+        if (typeof window.dismissShoppingLoader === 'function') {
+          window.dismissShoppingLoader();
+        }
+      }, 2200);
     })();
   </script>
 

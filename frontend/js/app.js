@@ -82,14 +82,16 @@ const PasarinApp = {
   },
 
   hideShoppingLoader() {
-    const loader = document.getElementById('shopping-loader');
-    if (loader && !loader.classList.contains('fade-out')) {
-      setTimeout(() => {
+    if (typeof window.dismissShoppingLoader === 'function') {
+      window.dismissShoppingLoader();
+    } else {
+      const loader = document.getElementById('shopping-loader');
+      if (loader && !loader.classList.contains('fade-out')) {
         loader.classList.add('fade-out');
         setTimeout(() => {
           if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
         }, 500);
-      }, 700);
+      }
     }
   },
 

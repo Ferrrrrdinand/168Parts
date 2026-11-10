@@ -231,3 +231,283 @@
 .btn-claim-sparkle:active::after {
   opacity: 1;
 }
+
+/* ==================== 168 PARTS MODERN HIGH-TECH LOADER ==================== */
+.shopping-loader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: radial-gradient(circle at center, #ffffff 0%, #fff1f2 100%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.5s ease;
+  opacity: 1;
+  visibility: visible;
+}
+
+.shopping-loader-overlay.fade-out {
+  opacity: 0 !important;
+  transform: scale(1.04) !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.shopping-loader-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 440px;
+  width: 90%;
+  padding: 36px 24px;
+  position: relative;
+}
+
+/* Hub Stage */
+.loader-hub-stage {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Glowing Pulse Rings */
+.hub-pulse-ring {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(190, 18, 60, 0.12);
+  pointer-events: none;
+}
+
+.hub-pulse-ring.ring-1 {
+  width: 135px;
+  height: 135px;
+  animation: hubPulseRing 2.4s ease-out infinite;
+}
+
+.hub-pulse-ring.ring-2 {
+  width: 135px;
+  height: 135px;
+  animation: hubPulseRing 2.4s ease-out infinite 1.2s;
+}
+
+@keyframes hubPulseRing {
+  0% { transform: scale(0.7); opacity: 0.8; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* Rotating Orbit Rings */
+.hub-orbit-spinner {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: #be123c;
+  border-right-color: #f43f5e;
+  animation: spinClockwise 1.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+  box-shadow: 0 0 16px rgba(190, 18, 60, 0.25);
+}
+
+.hub-orbit-dashed {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 2px dashed rgba(190, 18, 60, 0.22);
+  animation: spinCounterClockwise 12s linear infinite;
+}
+
+@keyframes spinClockwise {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes spinCounterClockwise {
+  0% { transform: rotate(360deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* Center Emblem 168 Parts */
+.hub-center-emblem {
+  position: relative;
+  z-index: 10;
+  width: 82px;
+  height: 82px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #be123c 0%, #9f1239 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 28px rgba(190, 18, 60, 0.38), 0 0 0 4px rgba(255, 255, 255, 0.95);
+  animation: emblemFloat 3s ease-in-out infinite;
+}
+
+@keyframes emblemFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.emblem-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.emblem-num {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 26px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+
+.emblem-sub {
+  font-size: 8.5px;
+  font-weight: 800;
+  color: #ffe4e6;
+  letter-spacing: 1.5px;
+  margin-top: 3px;
+}
+
+/* Floating Orbit Badges (LCD, Battery, Tools) */
+.floating-orbit-badge {
+  position: absolute;
+  z-index: 12;
+  background: #ffffff;
+  border: 1px solid rgba(190, 18, 60, 0.15);
+  border-radius: 999px;
+  padding: 4px 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #881337;
+  box-shadow: 0 6px 16px rgba(190, 18, 60, 0.14);
+}
+
+.badge-lcd {
+  top: 6px;
+  left: -8px;
+  animation: floatOrbit1 3.2s ease-in-out infinite;
+}
+
+.badge-battery {
+  top: 18px;
+  right: -12px;
+  animation: floatOrbit2 3.5s ease-in-out infinite 0.5s;
+}
+
+.badge-tools {
+  bottom: 6px;
+  left: 20px;
+  animation: floatOrbit3 3.8s ease-in-out infinite 1s;
+}
+
+@keyframes floatOrbit1 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(4px, -6px); }
+}
+
+@keyframes floatOrbit2 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-5px, 5px); }
+}
+
+@keyframes floatOrbit3 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(5px, 4px); }
+}
+
+/* Info Details */
+.shopping-loader-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.brand-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: rgba(190, 18, 60, 0.08) !important;
+  color: #be123c !important;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.chip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #be123c !important;
+  animation: dotBlink 1.4s ease infinite;
+}
+
+.shopping-title {
+  font-size: 17px !important;
+  font-weight: 800 !important;
+  color: #0f172a !important;
+  margin: 4px 0 0 0 !important;
+}
+
+.shopping-subtitle {
+  font-size: 12.5px !important;
+  color: #64748b !important;
+  margin: 0 !important;
+  min-height: 18px;
+}
+
+/* Progress Track & Percentage Row */
+.shopping-progress-track {
+  width: 240px !important;
+  height: 6px !important;
+  background: #f1f5f9 !important;
+  border-radius: 999px !important;
+  overflow: hidden !important;
+  margin-top: 14px !important;
+  position: relative !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+}
+
+.shopping-progress-bar {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  width: 0%;
+  border-radius: 999px !important;
+  background: linear-gradient(90deg, #be123c 0%, #f43f5e 60%, #fda4af 100%) !important;
+  box-shadow: 0 0 12px rgba(190, 18, 60, 0.45) !important;
+  transition: width 0.25s ease !important;
+  animation: none !important;
+}
+
+.loader-percentage-row {
+  display: flex;
+  justify-content: space-between;
+  width: 240px;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.loader-pct-val {
+  color: #be123c;
+  font-weight: 800;
+}
+
