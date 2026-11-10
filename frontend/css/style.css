@@ -1329,7 +1329,7 @@ main.w {
   height: 150px;
   border-radius: var(--radius-sm);
   overflow: hidden;
-  background: #f8fafc;
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1510,7 +1510,7 @@ main.w {
 /* Product Pic Container */
 .cd .pic {
   height: 185px;
-  background: #fafafa;
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2376,7 +2376,8 @@ main.w {
   align-items: center;
   justify-content: center;
   color: var(--primary);
-  background: #f8fafc;
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
   overflow: hidden;
   box-shadow: var(--shadow-xs);
 }
