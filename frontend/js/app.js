@@ -3187,12 +3187,6 @@ const PasarinApp = {
         this.renderPromoTickets();
         this.updatePromoBadgeCount();
 
-        // ✨ Animasi Sparkle saat klaim voucher promo
-        if (window.PasarinAnimations) {
-          const rect = btn ? btn.getBoundingClientRect() : { left: window.innerWidth / 2, top: 250 };
-          window.PasarinAnimations.launchMiniSparkle(rect.left + 30, rect.top + 15);
-        }
-
         if (window.showToast) {
           window.showToast(res.message || `✓ Berhasil klaim voucher "${cleanCode}" (${res.data.claimCount}/3)!`, 'success');
         }

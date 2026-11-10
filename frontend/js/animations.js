@@ -104,88 +104,13 @@ const PasarinAnimations = {
     render();
   },
 
-  // 2. 🎟️ ANIMASI SAAT MENGGUNAKAN PROMO / VOUCHER
+  // 2. 🎟️ ANIMASI VOUCHER (Dihilangkan sesuai permintaan user)
   triggerVoucherApplied(targetElement, discountText = 'Diskon') {
-    // 1. Tag Pulse Effect
-    if (targetElement) {
-      targetElement.classList.remove('voucher-applied-pulse');
-      void targetElement.offsetWidth; // reflow
-      targetElement.classList.add('voucher-applied-pulse');
-    }
-
-    // 2. Floating Savings Pill
-    const rect = targetElement ? targetElement.getBoundingClientRect() : { left: window.innerWidth / 2, top: 200, width: 0 };
-    const pill = document.createElement('div');
-    pill.className = 'floating-savings-pill';
-    pill.innerHTML = `<span>🎉</span> <span>Hemat ${discountText}!</span> <span>🎟️</span>`;
-    pill.style.left = `${Math.max(20, rect.left + rect.width / 2 - 80)}px`;
-    pill.style.top = `${Math.max(80, rect.top - 20)}px`;
-    document.body.appendChild(pill);
-
-    setTimeout(() => {
-      if (pill && pill.parentNode) pill.parentNode.removeChild(pill);
-    }, 1800);
-
-    // 3. Highlight kalkulasi voucher row
-    const voucherRow = document.getElementById('chk-calc-voucher-row');
-    if (voucherRow) {
-      voucherRow.classList.remove('calc-row-highlight');
-      void voucherRow.offsetWidth;
-      voucherRow.classList.add('calc-row-highlight');
-    }
-
-    // 4. Mini Confetti Sparkle di sekitar voucher
-    this.launchMiniSparkle(rect.left + rect.width / 2, rect.top);
+    // No-op: Dihilangkan agar tampilan tetap bersih & profesional tanpa efek floating/sparkle
   },
 
-  // Sparkle mini untuk voucher dan klaim promo
   launchMiniSparkle(x, y) {
-    const canvas = this.initConfettiCanvas();
-    const ctx = this.confettiCtx;
-    const sparkles = [];
-    const colors = ['#be123c', '#fbbf24', '#10b981', '#f43f5e'];
-
-    for (let i = 0; i < 28; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 8 + 3;
-      sparkles.push({
-        x: x || window.innerWidth / 2,
-        y: y || window.innerHeight / 2,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed - 2,
-        size: Math.random() * 5 + 3,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        alpha: 1,
-        life: 0.95
-      });
-    }
-
-    const anim = () => {
-      let alive = false;
-      for (let s of sparkles) {
-        s.x += s.vx;
-        s.y += s.vy;
-        s.vy += 0.25;
-        s.alpha *= s.life;
-
-        if (s.alpha > 0.05) {
-          alive = true;
-          ctx.save();
-          ctx.globalAlpha = s.alpha;
-          ctx.fillStyle = s.color;
-          ctx.beginPath();
-          ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.restore();
-        }
-      }
-
-      if (alive) {
-        requestAnimationFrame(anim);
-      }
-    };
-
-    anim();
+    // No-op
   },
 
   // 3. 🪙 ANIMASI PENUKARAN KOIN (COIN 3D FLIP)

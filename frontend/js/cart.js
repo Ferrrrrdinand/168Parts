@@ -968,17 +968,6 @@ const PasarinCart = {
         };
         this.renderCheckoutPage();
 
-        // 🎟️ Trigger Animasi Voucher Applied
-        if (window.PasarinAnimations) {
-          const discountStr = this.appliedVoucher.discountAmount 
-            ? this.formatRupiah(this.appliedVoucher.discountAmount) 
-            : (this.appliedVoucher.discountValue ? `${this.appliedVoucher.discountValue}%` : 'Diskon');
-          window.PasarinAnimations.triggerVoucherApplied(
-            document.getElementById('chk-applied-voucher-tag') || document.getElementById('chk-voucher-btn-select'),
-            discountStr
-          );
-        }
-
         if (window.showToast) {
           window.showToast(`🎉 Voucher / Kode Promo "${cleanCode}" berhasil digunakan!`, 'success');
         }
@@ -1003,14 +992,6 @@ const PasarinCart = {
           discountAmount: disc
         };
         this.renderCheckoutPage();
-
-        // 🎟️ Trigger Animasi Voucher Applied
-        if (window.PasarinAnimations) {
-          window.PasarinAnimations.triggerVoucherApplied(
-            document.getElementById('chk-applied-voucher-tag') || document.getElementById('chk-voucher-btn-select'),
-            this.formatRupiah(disc)
-          );
-        }
 
         if (window.showToast) {
           window.showToast(`🎉 Voucher / Kode Promo "${cleanCode}" berhasil digunakan!`, 'success');
