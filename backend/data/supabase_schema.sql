@@ -118,6 +118,8 @@ ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.carts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.banners ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.chat_rooms ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.chat_messages ENABLE ROW LEVEL SECURITY;
 
 -- Policy read & write publik untuk API backend & uji coba
 DROP POLICY IF EXISTS "Public access products" ON public.products;
@@ -137,6 +139,12 @@ CREATE POLICY "Public access carts" ON public.carts FOR ALL USING (true) WITH CH
 
 DROP POLICY IF EXISTS "Public access banners" ON public.banners;
 CREATE POLICY "Public access banners" ON public.banners FOR ALL USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public access chat_rooms" ON public.chat_rooms;
+CREATE POLICY "Public access chat_rooms" ON public.chat_rooms FOR ALL USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public access chat_messages" ON public.chat_messages;
+CREATE POLICY "Public access chat_messages" ON public.chat_messages FOR ALL USING (true) WITH CHECK (true);
 
 -- ========================================================
 -- DATA AWAL (SEEDING PROMOS)

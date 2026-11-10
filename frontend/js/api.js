@@ -272,6 +272,37 @@ const PasarinAPI = {
       method: 'PUT',
       body: JSON.stringify(payload)
     });
+  },
+
+  // Chat Live & Customer Service Endpoints
+  async initChatRoom(payload) {
+    return this.request('/chats/rooms/init', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  },
+
+  async getChatRooms(params = {}) {
+    const qs = new URLSearchParams(params).toString();
+    return this.request(`/chats/rooms${qs ? '?' + qs : ''}`);
+  },
+
+  async getChatMessages(roomId, asAdmin = false) {
+    return this.request(`/chats/rooms/${encodeURIComponent(roomId)}/messages?asAdmin=${asAdmin ? 'true' : 'false'}`);
+  },
+
+  async sendChatMessage(roomId, payload) {
+    return this.request(`/chats/rooms/${encodeURIComponent(roomId)}/messages`, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  },
+
+  async updateChatRoomStatus(roomId, status) {
+    return this.request(`/chats/rooms/${encodeURIComponent(roomId)}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status })
+    });
   }
 };
 

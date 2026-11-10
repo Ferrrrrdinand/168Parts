@@ -241,6 +241,7 @@ const AdminApp = {
     await this.fetchProducts();
     await this.fetchOrders();
     await this.fetchCustomers();
+    await this.fetchChatRooms();
     await this.fetchPromos();
     await this.fetchBanners();
     this.updateStats();
@@ -250,6 +251,7 @@ const AdminApp = {
     this.renderPromosTable();
     this.populateBannerForm();
     this.renderOverviewRecent();
+    this.initChatPolling();
   },
 
   bindEvents() {
@@ -335,10 +337,15 @@ const AdminApp = {
         products: '📦 Manajemen & Katalog Produk',
         orders: '📑 Daftar Pesanan & Pengiriman',
         customers: '👥 Data Akun Pelanggan & Member 168',
+        chat: '💬 Live Chat Customer Care & Manajemen Obrolan',
         banners: '🎨 Pengaturan & Desain Banner Toko',
         promos: '🎟️ Kelola Voucher & Kode Promo'
       };
       titleEl.textContent = titles[tabName] || 'Dashboard Admin';
+    }
+
+    if (tabName === 'chat') {
+      this.fetchChatRooms();
     }
 
     if (tabName === 'banners') {
@@ -2396,6 +2403,468 @@ const AdminApp = {
       toast.style.opacity = '0';
       setTimeout(() => toast.style.display = 'none', 300);
     }, 2800);
+  },
+
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  },
+
+  /* =========================================================
+     LIVE CHAT CUSTOMER CARE & MANAGED CHAT ROOMS
+     ========================================================= */
+  chatRooms: [],
+  activeChatRoom: null,
+  activeChatRoomId: null,
+  activeChatMessages: [],
+  chatFilter: 'all',
+  chatSearchQuery: '',
+  chatPollInterval: null,
+
+  initChatPolling() {
+    if (this.chatPollInterval) clearInterval(this.chatPollInterval);
+    this.chatPollInterval = setInterval(() => {
+      this.pollChatRoomsQuietly();
+    }, 3500);
+  },
+
+  async pollChatRoomsQuietly() {
+    try {
+      const res = await this.authFetch('/chats/rooms');
+      const data = await res.json();
+      if (data && data.success) {
+        this.chatRooms = data.rooms || [];
+        this.updateChatBadge(data.summary);
+        // Jika sedang di tab chat, refresh list room & stats
+        if (this.currentTab === 'chat') {
+          this.renderChatRoomsList();
+          this.updateChatStats(data.summary);
+          // Jika ada room yang sedang aktif dibuka, refresh pesannya
+          if (this.activeChatRoomId) {
+            this.pollActiveRoomMessages();
+          }
+        }
+      }
+    } catch (e) {
+      // offline silent
+    }
+  },
+
+  updateChatBadge(summary) {
+    const badge = document.getElementById('badge-chat-count');
+    if (!badge) return;
+    const count = summary ? (summary.needsAdmin || summary.totalUnread || 0) : 0;
+    if (count > 0) {
+      badge.textContent = count;
+      badge.style.display = 'inline-block';
+    } else {
+      badge.style.display = 'none';
+    }
+  },
+
+  updateChatStats(summary) {
+    if (!summary) return;
+    const elTotal = document.getElementById('chat-stat-total');
+    const elNeeds = document.getElementById('chat-stat-needs-admin');
+    const elHandling = document.getElementById('chat-stat-handling');
+    const elAi = document.getElementById('chat-stat-ai');
+    if (elTotal) elTotal.textContent = summary.total || 0;
+    if (elNeeds) elNeeds.textContent = summary.needsAdmin || 0;
+    if (elHandling) elHandling.textContent = summary.handling || 0;
+    if (elAi) elAi.textContent = summary.aiActive || 0;
+  },
+
+  async fetchChatRooms() {
+    try {
+      const res = await this.authFetch('/chats/rooms');
+      const data = await res.json();
+      if (data && data.success) {
+        this.chatRooms = data.rooms || [];
+        this.updateChatStats(data.summary);
+        this.updateChatBadge(data.summary);
+        this.renderChatRoomsList();
+      }
+    } catch (e) {
+      console.warn('Gagal memuat rooms chat:', e.message);
+    }
+  },
+
+  filterChatRooms(filter) {
+    this.chatFilter = filter;
+    document.querySelectorAll('.admin-chat-filter-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-filter') === filter);
+    });
+    this.renderChatRoomsList();
+  },
+
+  handleChatSearch() {
+    const input = document.getElementById('admin-chat-search');
+    this.chatSearchQuery = (input ? input.value : '').toLowerCase().trim();
+    this.renderChatRoomsList();
+  },
+
+  renderChatRoomsList() {
+    const container = document.getElementById('admin-chat-rooms-list');
+    if (!container) return;
+
+    let list = this.chatRooms;
+
+    if (this.chatFilter !== 'all') {
+      list = list.filter(r => r.status === this.chatFilter);
+    }
+
+    if (this.chatSearchQuery) {
+      list = list.filter(r => {
+        const name = (r.customerName || '').toLowerCase();
+        const email = (r.customerEmail || '').toLowerCase();
+        const phone = (r.customerPhone || '').toLowerCase();
+        const msg = (r.lastMessage || '').toLowerCase();
+        return name.includes(this.chatSearchQuery) ||
+               email.includes(this.chatSearchQuery) ||
+               phone.includes(this.chatSearchQuery) ||
+               msg.includes(this.chatSearchQuery);
+      });
+    }
+
+    if (list.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center; padding:40px 20px; color:#94a3b8; font-size:13px;">
+          <div style="font-size:28px; margin-bottom:8px;">📭</div>
+          <div style="font-weight:700; color:#475569;">Tidak ada percakapan</div>
+          <div style="font-size:12px; margin-top:4px;">Tidak ada obrolan dengan filter saat ini.</div>
+        </div>
+      `;
+      return;
+    }
+
+    const avatarColors = ['#be123c', '#0284c7', '#059669', '#d97706', '#7c3aed', '#db2777', '#475569'];
+
+    container.innerHTML = list.map((r, idx) => {
+      const color = avatarColors[idx % avatarColors.length];
+      const initials = (r.customerName || 'U').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+      const isActive = r.id === this.activeChatRoomId;
+      
+      let statusTag = '';
+      if (r.status === 'needs_admin') {
+        statusTag = `<span class="admin-chat-status-pill needs_admin">⚠️ Butuh Admin</span>`;
+      } else if (r.status === 'admin_handling') {
+        statusTag = `<span class="admin-chat-status-pill admin_handling">👨‍💻 Ditangani</span>`;
+      } else if (r.status === 'resolved') {
+        statusTag = `<span class="admin-chat-status-pill resolved">✅ Selesai</span>`;
+      } else {
+        statusTag = `<span class="admin-chat-status-pill ai_active">🤖 AI Bot</span>`;
+      }
+
+      const timeFmt = r.lastMessageAt
+        ? new Date(r.lastMessageAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+        : '';
+
+      const unreadBadge = Number(r.unreadAdmin || 0) > 0
+        ? `<span class="admin-chat-unread-badge">${r.unreadAdmin}</span>`
+        : '';
+
+      return `
+        <div class="admin-chat-room-item ${isActive ? 'active' : ''}" onclick="AdminApp.openChatRoom('${r.id}')">
+          <div class="admin-chat-room-avatar" style="background:${color};">
+            ${initials}
+          </div>
+          <div class="admin-chat-room-info">
+            <div class="admin-chat-room-top">
+              <span class="admin-chat-room-name">${r.customerName}</span>
+              <span class="admin-chat-room-time">${timeFmt}</span>
+            </div>
+            <div class="admin-chat-room-preview">${r.lastMessage || 'Percakapan baru'}</div>
+            <div class="admin-chat-room-bottom">
+              ${statusTag}
+              ${unreadBadge}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  },
+
+  async openChatRoom(roomId) {
+    this.activeChatRoomId = roomId;
+    this.renderChatRoomsList();
+
+    const feed = document.getElementById('admin-chat-messages-feed');
+    const form = document.getElementById('admin-chat-input-form');
+    const templates = document.getElementById('admin-chat-quick-templates');
+
+    if (feed) {
+      feed.innerHTML = `
+        <div style="text-align:center; padding:40px; color:#94a3b8;">
+          <div style="font-size:24px; margin-bottom:8px;">⏳</div>
+          <div>Memuat percakapan...</div>
+        </div>
+      `;
+    }
+
+    try {
+      const res = await this.authFetch(`/chats/rooms/${encodeURIComponent(roomId)}/messages?asAdmin=true`);
+      const data = await res.json();
+      if (!data || !data.success) {
+        if (feed) feed.innerHTML = `<div style="text-align:center; padding:30px; color:#ef4444;">Gagal memuat pesan.</div>`;
+        return;
+      }
+
+      this.activeChatRoom = data.room;
+      this.activeChatMessages = data.messages || [];
+
+      // Render Header
+      this.renderActiveChatHeader();
+      // Render Messages
+      this.renderActiveChatMessages();
+      // Show Quick Templates & Input
+      if (form) form.style.display = 'flex';
+      if (templates) {
+        templates.style.display = 'flex';
+        this.renderQuickReplyTemplates();
+      }
+
+      const textarea = document.getElementById('admin-chat-textarea');
+      if (textarea) textarea.focus();
+
+      // Update room status to handling if it was needs_admin
+      if (data.room.status === 'needs_admin') {
+        this.setChatRoomStatus(roomId, 'admin_handling', false);
+      }
+    } catch (e) {
+      console.error('Error openChatRoom:', e);
+    }
+  },
+
+  renderActiveChatHeader() {
+    const header = document.getElementById('admin-chat-header');
+    if (!header || !this.activeChatRoom) return;
+
+    const r = this.activeChatRoom;
+    let statusBadge = '';
+    if (r.status === 'needs_admin') {
+      statusBadge = `<span class="admin-chat-status-pill needs_admin" style="font-size:11px;">⚠️ Butuh Respon Admin</span>`;
+    } else if (r.status === 'admin_handling') {
+      statusBadge = `<span class="admin-chat-status-pill admin_handling" style="font-size:11px;">👨‍💻 Ditangani Admin</span>`;
+    } else if (r.status === 'resolved') {
+      statusBadge = `<span class="admin-chat-status-pill resolved" style="font-size:11px;">✅ Selesai</span>`;
+    } else {
+      statusBadge = `<span class="admin-chat-status-pill ai_active" style="font-size:11px;">🤖 AI Bot Aktif</span>`;
+    }
+
+    const phoneLink = r.customerPhone
+      ? `<a href="https://wa.me/${r.customerPhone.replace(/[^0-9]/g, '')}" target="_blank" rel="noopener noreferrer" style="color:#059669; font-weight:700; font-size:12px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; background:#ecfdf5; border:1px solid #a7f3d0; padding:2px 8px; border-radius:12px;" title="Chat via WhatsApp">
+          <span>💬</span> <span>${r.customerPhone}</span>
+        </a>`
+      : '';
+
+    header.innerHTML = `
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="width:42px; height:42px; border-radius:50%; background:#be123c; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; box-shadow:0 2px 6px rgba(190,18,60,0.25);">
+          ${(r.customerName || 'U').slice(0, 2).toUpperCase()}
+        </div>
+        <div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <strong style="color:#0f172a; font-size:14px;">${r.customerName}</strong>
+            ${statusBadge}
+          </div>
+          <div style="font-size:11.5px; color:#64748b; margin-top:2px; display:flex; align-items:center; gap:8px;">
+            <span>${r.customerEmail || 'Guest / Non-login'}</span>
+            ${phoneLink}
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button type="button" class="btn-secondary" style="padding:6px 12px; font-size:11.5px; font-weight:700;" onclick="AdminApp.setChatRoomStatus('${r.id}', 'resolved')" title="Tandai masalah selesai">
+          <span>✅ Tandai Selesai</span>
+        </button>
+        <button type="button" class="btn-secondary" style="padding:6px 12px; font-size:11.5px; font-weight:700;" onclick="AdminApp.setChatRoomStatus('${r.id}', 'ai_active')" title="Kembalikan ke Asisten AI">
+          <span>🤖 Alihkan ke AI</span>
+        </button>
+      </div>
+    `;
+  },
+
+  renderActiveChatMessages() {
+    const feed = document.getElementById('admin-chat-messages-feed');
+    if (!feed) return;
+
+    if (this.activeChatMessages.length === 0) {
+      feed.innerHTML = `
+        <div style="text-align:center; padding:30px; color:#94a3b8; font-size:13px;">
+          Belum ada pesan dalam obrolan ini.
+        </div>
+      `;
+      return;
+    }
+
+    feed.innerHTML = this.activeChatMessages.map(m => {
+      const timeFmt = new Date(m.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+      if (m.senderType === 'admin') {
+        return `
+          <div style="display:flex; justify-content:flex-end; margin-bottom:4px;">
+            <div style="max-width:75%; background:#be123c; color:#ffffff; padding:10px 14px; border-radius:14px 14px 2px 14px; box-shadow:0 2px 8px rgba(190,18,60,0.25);">
+              <div style="font-size:10.5px; font-weight:800; color:#fecdd3; margin-bottom:3px; display:flex; align-items:center; gap:4px;">
+                <span>🛡️ ${m.senderName || 'Admin 168 Parts'}</span>
+              </div>
+              <div style="font-size:13px; line-height:1.45; white-space:pre-wrap;">${this.escapeHtml(m.message)}</div>
+              <span style="font-size:10px; color:#fecdd3; display:block; text-align:right; margin-top:4px;">${timeFmt} ✓</span>
+            </div>
+          </div>
+        `;
+      }
+
+      if (m.senderType === 'bot') {
+        return `
+          <div style="display:flex; justify-content:flex-start; margin-bottom:4px;">
+            <div style="max-width:75%; background:#fffbeb; border:1px solid #fef3c7; color:#1e293b; padding:10px 14px; border-radius:14px 14px 14px 2px; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+              <div style="font-size:10.5px; font-weight:800; color:#b45309; margin-bottom:3px; display:flex; align-items:center; gap:4px;">
+                <span>🤖 AI AUTO-REPLY</span>
+              </div>
+              <div style="font-size:13px; line-height:1.45; white-space:pre-wrap;">${this.escapeHtml(m.message)}</div>
+              <span style="font-size:10px; color:#94a3b8; display:block; text-align:left; margin-top:4px;">${timeFmt}</span>
+            </div>
+          </div>
+        `;
+      }
+
+      // Pesan User / Pelanggan
+      return `
+        <div style="display:flex; justify-content:flex-start; margin-bottom:4px;">
+          <div style="max-width:75%; background:#ffffff; border:1px solid #e2e8f0; color:#0f172a; padding:10px 14px; border-radius:14px 14px 14px 2px; box-shadow:0 1px 4px rgba(0,0,0,0.04);">
+            <div style="font-size:10.5px; font-weight:800; color:#0284c7; margin-bottom:3px; display:flex; align-items:center; gap:4px;">
+              <span>👤 ${m.senderName || 'Pelanggan'}</span>
+            </div>
+            <div style="font-size:13px; line-height:1.45; white-space:pre-wrap;">${this.escapeHtml(m.message)}</div>
+            <span style="font-size:10px; color:#94a3b8; display:block; text-align:left; margin-top:4px;">${timeFmt}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    feed.scrollTop = feed.scrollHeight;
+  },
+
+  renderQuickReplyTemplates() {
+    const templatesEl = document.getElementById('admin-chat-quick-templates');
+    if (!templatesEl) return;
+
+    const quickReplies = [
+      'Halo kak, produk ini ready stock kualitas original siap kirim hari ini ya!',
+      'Pesanan Anda sedang diproses tim packing kami dan resi pengiriman akan segera terupdate.',
+      'Untuk sparepart LCD kami berikan Garansi Tes 7 Hari segel utuh sebelum dipasang lem.',
+      'Bisa tolong infokan tipe lengkap ponsel atau kirimkan foto sparepart lamanya kak?',
+      'Baik kak, kami bantu koordinasikan dengan pihak kurir agar paket segera diprioritaskan.'
+    ];
+
+    templatesEl.innerHTML = quickReplies.map(text => `
+      <button type="button" class="btn-quick-reply-pill" onclick="AdminApp.insertQuickReply('${text.replace(/'/g, "\\'")}')">
+        ${text.slice(0, 38)}...
+      </button>
+    `).join('');
+  },
+
+  insertQuickReply(text) {
+    const textarea = document.getElementById('admin-chat-textarea');
+    if (!textarea) return;
+    textarea.value = text;
+    textarea.focus();
+  },
+
+  handleAdminChatKeydown(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      this.sendAdminChatMessage(event);
+    }
+  },
+
+  async sendAdminChatMessage(event) {
+    if (event) event.preventDefault();
+    if (!this.activeChatRoomId) return;
+
+    const textarea = document.getElementById('admin-chat-textarea');
+    if (!textarea) return;
+
+    const text = textarea.value.trim();
+    if (!text) return;
+
+    textarea.value = '';
+
+    try {
+      const res = await this.authFetch(`/chats/rooms/${encodeURIComponent(this.activeChatRoomId)}/messages`, {
+        method: 'POST',
+        body: JSON.stringify({
+          text,
+          senderType: 'admin',
+          senderName: 'Admin 168 Parts'
+        })
+      });
+
+      const data = await res.json();
+      if (data && data.success && data.message) {
+        this.activeChatMessages.push(data.message);
+        this.renderActiveChatMessages();
+        if (data.room) {
+          this.activeChatRoom = data.room;
+          this.renderActiveChatHeader();
+        }
+        this.fetchChatRooms();
+      } else {
+        this.showToast('Gagal mengirim pesan chat.', true);
+      }
+    } catch (e) {
+      this.showToast('Kesalahan jaringan: ' + e.message, true);
+    }
+  },
+
+  async setChatRoomStatus(roomId, newStatus, showToastMsg = true) {
+    try {
+      const res = await this.authFetch(`/chats/rooms/${encodeURIComponent(roomId)}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status: newStatus })
+      });
+      const data = await res.json();
+      if (data && data.success) {
+        if (this.activeChatRoom && this.activeChatRoom.id === roomId) {
+          this.activeChatRoom.status = newStatus;
+          this.renderActiveChatHeader();
+        }
+        this.fetchChatRooms();
+        if (showToastMsg) {
+          const labels = {
+            resolved: 'Percakapan ditandai Selesai ✅',
+            admin_handling: 'Percakapan dialihkan ke Admin 👨‍💻',
+            ai_active: 'Percakapan dikembalikan ke AI Bot 🤖'
+          };
+          this.showToast(labels[newStatus] || 'Status obrolan diperbarui.');
+        }
+      }
+    } catch (e) {
+      console.error('Error setChatRoomStatus:', e);
+    }
+  },
+
+  async pollActiveRoomMessages() {
+    if (!this.activeChatRoomId) return;
+    try {
+      const res = await this.authFetch(`/chats/rooms/${encodeURIComponent(this.activeChatRoomId)}/messages?asAdmin=true`);
+      const data = await res.json();
+      if (data && data.success && data.messages) {
+        // Cek jika jumlah pesan bertambah
+        if (data.messages.length !== this.activeChatMessages.length) {
+          this.activeChatMessages = data.messages;
+          this.renderActiveChatMessages();
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
   }
 };
 

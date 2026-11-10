@@ -9,6 +9,9 @@ const PasarinChatBot = {
   isTyping: false,
   messages: [],
   unreadCount: 0,
+  roomId: null,
+  pollTimer: null,
+  roomStatus: 'ai_active',
   STORAGE_KEY: 'pasarin_chatbot_history_v1',
 
   init() {
@@ -16,6 +19,7 @@ const PasarinChatBot = {
     this.loadHistory();
     this.bindEvents();
     this.updateUnreadBadge();
+    this.syncWithBackendRoom();
 
     // Pastikan tombol dock chat membuka chatbot
     const dockChatBtn = document.getElementById('btn-dock-chat');
@@ -24,6 +28,128 @@ const PasarinChatBot = {
         e.preventDefault();
         this.toggleChat();
       };
+    }
+  },
+
+  async syncWithBackendRoom() {
+    let storedRoomId = localStorage.getItem('168_chat_room_id');
+    const user = window.PasarinAuth?.currentUser;
+    if (!storedRoomId) {
+      storedRoomId = user ? `room_${user.id}` : `room_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+      localStorage.setItem('168_chat_room_id', storedRoomId);
+    }
+    this.roomId = storedRoomId;
+
+    try {
+      if (window.PasarinAPI && typeof window.PasarinAPI.initChatRoom === 'function') {
+        const res = await window.PasarinAPI.initChatRoom({
+          roomId: this.roomId,
+          userId: user ? user.id : null,
+          customerName: user ? (user.name || user.username) : 'Pelanggan 168',
+          customerEmail: user ? user.email : null,
+          customerPhone: user ? user.phone : null
+        });
+
+        if (res && res.success) {
+          if (res.room) {
+            this.roomStatus = res.room.status;
+            this.updateHeaderStatusBadge();
+          }
+          if (res.messages && res.messages.length > 0) {
+            // Sinkronkan pesan dari server
+            this.messages = res.messages.map(m => ({
+              id: m.id,
+              sender: m.senderType,
+              senderName: m.senderName,
+              text: m.message,
+              actions: m.actions,
+              timestamp: new Date(m.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+            }));
+            this.saveHistory();
+            this.renderMessages();
+            this.scrollToBottom();
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Chat init offline fallback:', e.message);
+    }
+
+    // Mulai polling berkala pesan admin
+    this.startPolling();
+  },
+
+  startPolling() {
+    if (this.pollTimer) clearInterval(this.pollTimer);
+    this.pollTimer = setInterval(() => {
+      this.pollLiveMessages();
+    }, 3500);
+  },
+
+  async pollLiveMessages() {
+    if (!this.roomId || !window.PasarinAPI || typeof window.PasarinAPI.getChatMessages !== 'function') return;
+    try {
+      const res = await window.PasarinAPI.getChatMessages(this.roomId, false);
+      if (res && res.success && res.messages) {
+        if (res.room && res.room.status !== this.roomStatus) {
+          this.roomStatus = res.room.status;
+          this.updateHeaderStatusBadge();
+        }
+
+        // Cek jika ada pesan baru yang belum ada di local
+        let hasNew = false;
+        res.messages.forEach(m => {
+          const exists = this.messages.some(localMsg => localMsg.id === m.id);
+          if (!exists) {
+            this.messages.push({
+              id: m.id,
+              sender: m.senderType,
+              senderName: m.senderName,
+              text: m.message,
+              actions: m.actions,
+              timestamp: new Date(m.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+            });
+            hasNew = true;
+            if (m.senderType === 'admin') {
+              if (!this.isOpen) {
+                this.unreadCount++;
+                this.updateUnreadBadge();
+              }
+            }
+          }
+        });
+
+        if (hasNew) {
+          this.saveHistory();
+          this.renderMessages();
+          this.scrollToBottom();
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+  },
+
+  updateHeaderStatusBadge() {
+    const badgeEl = document.getElementById('chatbot-bot-badge');
+    const subtitleEl = document.getElementById('chatbot-subtitle');
+    if (!badgeEl) return;
+
+    if (this.roomStatus === 'admin_handling') {
+      badgeEl.textContent = '🛡️ ADMIN AKTIF';
+      badgeEl.style.background = '#10b981';
+      badgeEl.style.color = '#ffffff';
+      if (subtitleEl) subtitleEl.textContent = '👨‍💻 Terhubung langsung dengan Admin CS 168 Parts';
+    } else if (this.roomStatus === 'needs_admin') {
+      badgeEl.textContent = '⏳ MENUNGGU ADMIN';
+      badgeEl.style.background = '#f59e0b';
+      badgeEl.style.color = '#ffffff';
+      if (subtitleEl) subtitleEl.textContent = '💬 Pesan diteruskan ke Admin CS (Online)';
+    } else {
+      badgeEl.textContent = 'AI BOT';
+      badgeEl.style.background = '';
+      badgeEl.style.color = '';
+      if (subtitleEl) subtitleEl.textContent = '⚡ Balas Otomatis Seketika • 24/7';
     }
   },
 
@@ -47,9 +173,9 @@ const PasarinChatBot = {
             <div class="chatbot-header-info">
               <div class="chatbot-title">
                 <span>Customer Care 168</span>
-                <span class="chatbot-bot-badge">AI BOT</span>
+                <span class="chatbot-bot-badge" id="chatbot-bot-badge">AI BOT</span>
               </div>
-              <div class="chatbot-subtitle">⚡ Balas Otomatis Seketika • 24/7</div>
+              <div class="chatbot-subtitle" id="chatbot-subtitle">⚡ Balas Otomatis Seketika • 24/7</div>
             </div>
           </div>
           <div class="chatbot-header-actions">
@@ -85,12 +211,12 @@ const PasarinChatBot = {
 
         <!-- Quick Suggestion Pills -->
         <div class="chatbot-quick-pills" id="chatbot-quick-pills">
+          <button type="button" class="chat-pill" style="background:#fff1f2; color:#be123c; border-color:#fecdd3; font-weight:800;" onclick="PasarinChatBot.sendQuickPrompt('Hubungi Admin CS')">👨‍💻 Hubungi Admin CS</button>
           <button type="button" class="chat-pill" onclick="PasarinChatBot.sendQuickPrompt('Cek Status Pesanan')">📦 Status Pesanan</button>
           <button type="button" class="chat-pill" onclick="PasarinChatBot.sendQuickPrompt('Tanya Stok LCD & Baterai')">🔍 Stok LCD & Baterai</button>
           <button type="button" class="chat-pill" onclick="PasarinChatBot.sendQuickPrompt('Voucher & Promo Diskon')">🎟️ Promo & Voucher</button>
           <button type="button" class="chat-pill" onclick="PasarinChatBot.sendQuickPrompt('Lokasi Toko & Jam Buka')">📍 Lokasi & Jam Buka</button>
           <button type="button" class="chat-pill" onclick="PasarinChatBot.sendQuickPrompt('Syarat Garansi & Retur Barang')">🔄 Garansi & Retur</button>
-          <button type="button" class="chat-pill" onclick="PasarinChatBot.sendQuickPrompt('Hubungi Admin WhatsApp')">👨‍🔧 Kontak WhatsApp</button>
         </div>
 
         <!-- Footer Input Bar -->
@@ -240,7 +366,7 @@ const PasarinChatBot = {
     this.handleSend();
   },
 
-  handleSend(event) {
+  async handleSend(event) {
     if (event) event.preventDefault();
     const input = document.getElementById('chatbot-input');
     if (!input) return;
@@ -264,28 +390,56 @@ const PasarinChatBot = {
     this.renderMessages();
     this.scrollToBottom();
 
+    // Kirim pesan user ke backend
+    this.sendToBackend(userText, 'user');
+
     // Trigger auto-reply dengan efek mengetik
     this.triggerAutoReply(userText);
+  },
+
+  async sendToBackend(text, senderType, actions = null, status = null) {
+    if (!this.roomId || !window.PasarinAPI || typeof window.PasarinAPI.sendChatMessage !== 'function') return;
+    try {
+      await window.PasarinAPI.sendChatMessage(this.roomId, {
+        text,
+        senderType,
+        actions,
+        status
+      });
+    } catch (e) {
+      console.warn('Gagal sinkron chat ke backend:', e.message);
+    }
   },
 
   triggerAutoReply(userQuery) {
     this.setTyping(true);
 
-    // Variasi waktu berpikir natural (600ms - 900ms)
-    const delay = Math.floor(Math.random() * 300) + 600;
+    // Variasi waktu berpikir natural (500ms - 800ms)
+    const delay = Math.floor(Math.random() * 300) + 500;
 
     setTimeout(() => {
       const botResponse = this.generateResponse(userQuery);
       this.setTyping(false);
 
-      this.messages.push({
+      const botMsg = {
         id: 'msg-' + Date.now(),
         sender: 'bot',
         text: botResponse.text,
         html: botResponse.html || null,
         timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
         actions: botResponse.actions || null
-      });
+      };
+
+      this.messages.push(botMsg);
+
+      if (botResponse.isEscalatedToAdmin) {
+        this.roomStatus = 'needs_admin';
+        this.updateHeaderStatusBadge();
+        // Tandai ke backend bahwa room butuh bantuan Admin
+        this.sendToBackend(botResponse.text, 'bot', botResponse.actions, 'needs_admin');
+      } else {
+        this.sendToBackend(botResponse.text, 'bot', botResponse.actions);
+      }
 
       this.saveHistory();
       this.renderMessages();
@@ -320,6 +474,7 @@ const PasarinChatBot = {
 
     container.innerHTML = this.messages.map(m => {
       const isUser = m.sender === 'user';
+      const isAdmin = m.sender === 'admin';
 
       if (isUser) {
         return `
@@ -327,6 +482,24 @@ const PasarinChatBot = {
             <div class="chat-bubble chat-bubble-user">
               <div class="chat-text">${this.escapeHtml(m.text)}</div>
               <span class="chat-time">${m.timestamp}</span>
+            </div>
+          </div>
+        `;
+      }
+
+      if (isAdmin) {
+        return `
+          <div class="chat-msg chat-msg-admin" style="display:flex; align-items:flex-start; gap:8px; margin-bottom:8px;">
+            <div style="width:30px; height:30px; border-radius:50%; background:#be123c; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; flex-shrink:0; box-shadow:0 2px 6px rgba(190,18,60,0.3);">
+              🛡️
+            </div>
+            <div class="chat-bubble chat-bubble-admin" style="background:#fff1f2; border:1px solid #fecdd3; color:#1e293b; border-radius:14px 14px 14px 2px; padding:10px 14px; max-width:82%; box-shadow:0 1px 4px rgba(0,0,0,0.04);">
+              <div style="font-size:10px; font-weight:800; color:#be123c; margin-bottom:4px; display:flex; align-items:center; gap:5px;">
+                <span>🛡️ ADMIN CS 168 PARTS</span>
+                <span style="background:#be123c; color:#fff; font-size:9px; padding:1px 5px; border-radius:6px;">OFFICIAL</span>
+              </div>
+              <div class="chat-text" style="font-size:12.5px; line-height:1.45;">${this.formatBotText(m.text)}</div>
+              <span class="chat-time" style="font-size:10px; color:#94a3b8; display:block; text-align:right; margin-top:4px;">${m.timestamp}</span>
             </div>
           </div>
         `;
@@ -445,13 +618,14 @@ const PasarinChatBot = {
       };
     }
 
-    // 6. KONTAK ADMIN / WHATSAPP / SERVIS
-    if (q.includes('admin') || q.includes('cs') || q.includes('wa') || q.includes('whatsapp') || q.includes('telepon') || q.includes('hp') || q.includes('nomor') || q.includes('hubungi') || q.includes('manusia') || q.includes('orang') || q.includes('servis')) {
+    // 6. KONTAK ADMIN / WHATSAPP / SERVIS / MINTA BANTUAN MANUSIA
+    if (q.includes('admin') || q.includes('cs') || q.includes('wa') || q.includes('whatsapp') || q.includes('telepon') || q.includes('hp') || q.includes('nomor') || q.includes('hubungi') || q.includes('manusia') || q.includes('orang') || q.includes('servis') || q.includes('staf') || q.includes('tolong') || q.includes('bantuan')) {
       return {
-        text: `👨‍🔧 **Terhubung Langsung dengan Admin & Teknisi 168 Parts:**\n\nIngin berbicara langsung dengan staf kami atau konsultasi kerusakan ponsel?\n\nWhatsApp Resmi: **+62 811-2233-4455**\nEmail: **support@168parts.com**\n\nTim teknisi kami siap memandu Anda memilih tipe sparepart yang presisi!`,
+        isEscalatedToAdmin: true,
+        text: `👨‍💼 **Pertanyaan Anda Telah Diteruskan ke Admin 168 Parts!**\n\nAdmin Customer Service kami sedang standby di Admin Panel dan akan segera membalas langsung di ruang obrolan ini.\n\nMohon ditunggu sebentar ya kak, kami sedang menyiapkan respon terbaik untuk Anda... 🙏`,
         actions: [
-          { label: 'Buka Chat WhatsApp Resmi', icon: '💬', action: "window.open('https://wa.me/6281122334455?text=Halo%20Admin%20168%20Parts,%20saya%20ingin%20tanya%20seputar%20sparepart', '_blank')", isPrimary: true },
-          { label: 'Kembali Belanja', icon: '🛒', action: 'PasarinChatBot.closeChat();' }
+          { label: 'Chat Langsung via WhatsApp', icon: '💬', action: `window.open('https://wa.me/6281122334455?text=Halo%20Admin%20168%20Parts,%20saya%20butuh%20bantuan%20mengenai:%20${encodeURIComponent(userQuery)}', '_blank')` },
+          { label: 'Lihat Semua Sparepart', icon: '📦', action: "window.location.hash='#/search'; PasarinChatBot.closeChat();" }
         ]
       };
     }
@@ -473,14 +647,14 @@ const PasarinChatBot = {
       };
     }
 
-    // 8. DEFAULT / GENERAL SMART FALLBACK
+    // 8. KETIKA AI MENTOK / TIDAK MEMILIKI JAWABAN SPESIFIK -> OTOMATIS TERUSKAN KE ADMIN TOKO!
     return {
-      text: `Terima kasih atas pertanyaannya! 🤖\n\nSebagai Asisten Otomatis 168 Parts Surabaya, saya dapat langsung membantu Anda dengan beberapa pilihan cepat berikut:`,
+      isEscalatedToAdmin: true,
+      text: `👨‍💼 **Pertanyaan Anda Telah Diteruskan ke Admin 168 Parts!**\n\nAsisten otomatis belum memiliki jawaban spesifik untuk pertanyaan Anda:\n*"${this.escapeHtml(userQuery)}"* \n\nTenang kak, percakapan ini **sudah otomatis masuk ke antrean Live Chat Admin Customer Service 168 Parts** 🛡️.\nAdmin kami sedang online dan akan membalas langsung di ruang obrolan ini. Mohon ditunggu sebentar ya kak... 🙏`,
       actions: [
-        { label: 'Status & Lacak Pesanan', icon: '📦', action: "PasarinChatBot.sendQuickPrompt('Cek Status Pesanan')" },
-        { label: 'Cari Stok LCD / Baterai', icon: '🔍', action: "PasarinChatBot.sendQuickPrompt('Tanya Stok LCD & Baterai')" },
-        { label: 'Klaim Voucher Promo', icon: '🎟', action: "PasarinApp.openPromoModal(); PasarinChatBot.closeChat();" },
-        { label: 'Chat Langsung ke WhatsApp', icon: '💬', action: "window.open('https://wa.me/6281122334455?text=Halo%20Admin%20168%20Parts,%20saya%20ingin%20tanya%20produk', '_blank')" }
+        { label: 'Hubungi WhatsApp Cadangan', icon: '💬', action: `window.open('https://wa.me/6281122334455?text=Halo%20Admin%20168%20Parts,%20saya%20ingin%20tanya:%20${encodeURIComponent(userQuery)}', '_blank')` },
+        { label: 'Buka Katalog Sparepart', icon: '🔍', action: "window.location.hash='#/search'; PasarinChatBot.closeChat();" },
+        { label: 'Cek Status Pesanan', icon: '📦', action: "PasarinChatBot.sendQuickPrompt('Cek Status Pesanan')" }
       ]
     };
   },

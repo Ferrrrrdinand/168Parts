@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light only">
   <title>Admin Dashboard & Seller Centre | 168 Parts Surabaya</title>
-  <link rel="stylesheet" href="css/admin.css?v=2.8">
+  <link rel="stylesheet" href="css/admin.css?v=3.0">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231d3f0d'><rect width='24' height='24' rx='6'/><text x='12' y='16' font-size='12' font-weight='900' fill='white' text-anchor='middle'>P</text></svg>">
 </head>
 <body>
@@ -93,6 +93,12 @@
         <span class="nav-icon">👥</span>
         <span>Data Pelanggan</span>
         <span class="nav-badge" id="badge-customer-count">0</span>
+      </button>
+
+      <button class="sidebar-nav-item" data-tab="chat">
+        <span class="nav-icon">💬</span>
+        <span>Chat Pelanggan (Live)</span>
+        <span class="nav-badge" id="badge-chat-count" style="background:#ef4444; color:#fff; display:none; padding:2px 7px; border-radius:10px; font-weight:800; font-size:11px;">0</span>
       </button>
 
       <div class="menu-category-title">Pemasaran & Sistem</div>
@@ -470,6 +476,118 @@
                 <tr><td colspan="8" style="text-align:center; padding:30px; color:#94a3b8;">Memuat data akun pelanggan...</td></tr>
               </tbody>
             </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           TAB 3.5: LIVE CHAT PELANGGAN & PUSAT PERCAKAPAN
+           ========================================================= -->
+      <section class="admin-tab-pane" id="pane-chat">
+        
+        <!-- Chat KPI Summary Cards -->
+        <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); margin-bottom: 20px;">
+          <div class="kpi-card">
+            <div class="kpi-info">
+              <span class="kpi-label">Total Percakapan</span>
+              <span class="kpi-value" id="chat-stat-total">0</span>
+              <span class="kpi-sub">Seluruh room chat</span>
+            </div>
+            <div style="font-size:30px; background:#fef2f2; width:52px; height:52px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#be123c;">💬</div>
+          </div>
+
+          <div class="kpi-card" style="border-left: 4px solid #f59e0b;">
+            <div class="kpi-info">
+              <span class="kpi-label">Menunggu Respon Admin</span>
+              <span class="kpi-value" id="chat-stat-needs-admin" style="color:#d97706;">0</span>
+              <span class="kpi-sub">⚠️ Butuh respon cepat</span>
+            </div>
+            <div style="font-size:30px; background:#fffbeb; width:52px; height:52px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#d97706;">⏳</div>
+          </div>
+
+          <div class="kpi-card" style="border-left: 4px solid #0284c7;">
+            <div class="kpi-info">
+              <span class="kpi-label">Sedang Ditangani</span>
+              <span class="kpi-value" id="chat-stat-handling" style="color:#0284c7;">0</span>
+              <span class="kpi-sub">Admin sedang aktif membalas</span>
+            </div>
+            <div style="font-size:30px; background:#f0f9ff; width:52px; height:52px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#0284c7;">👨‍💻</div>
+          </div>
+
+          <div class="kpi-card" style="border-left: 4px solid #10b981;">
+            <div class="kpi-info">
+              <span class="kpi-label">Dijawab AI Bot</span>
+              <span class="kpi-value" id="chat-stat-ai" style="color:#059669;">0</span>
+              <span class="kpi-sub">Otomatisasi 24/7</span>
+            </div>
+            <div style="font-size:30px; background:#ecfdf5; width:52px; height:52px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#059669;">🤖</div>
+          </div>
+        </div>
+
+        <!-- Chat Workspace 2-Column Split -->
+        <div class="admin-chat-layout" style="display:flex; height: 720px; max-height: calc(100vh - 240px); background:#ffffff; border:1px solid var(--admin-border); border-radius:var(--radius-md); overflow:hidden; box-shadow:var(--shadow-sm);">
+          
+          <!-- LEFT SIDEBAR: Daftar Pelanggan Chat -->
+          <div class="admin-chat-sidebar" style="width: 360px; min-width: 310px; max-width: 400px; border-right: 1px solid var(--admin-border); display:flex; flex-direction:column; background:#f8fafc;">
+            <!-- Search & Filters -->
+            <div style="padding: 14px 16px; border-bottom: 1px solid var(--admin-border); background:#ffffff;">
+              <div style="position:relative; margin-bottom: 10px;">
+                <input type="text" id="admin-chat-search" class="admin-input" placeholder="Cari nama, email, atau isi chat..." style="width:100%; padding-left:34px; font-size:12.5px;" oninput="AdminApp.handleChatSearch()">
+                <span style="position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:13px; color:#94a3b8; pointer-events:none;">🔍</span>
+              </div>
+              
+              <!-- Filter Tabs -->
+              <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:2px;">
+                <button type="button" class="admin-chat-filter-btn active" data-filter="all" onclick="AdminApp.filterChatRooms('all')">Semua</button>
+                <button type="button" class="admin-chat-filter-btn" data-filter="needs_admin" onclick="AdminApp.filterChatRooms('needs_admin')">⚠️ Butuh Admin</button>
+                <button type="button" class="admin-chat-filter-btn" data-filter="admin_handling" onclick="AdminApp.filterChatRooms('admin_handling')">Ditangani</button>
+                <button type="button" class="admin-chat-filter-btn" data-filter="resolved" onclick="AdminApp.filterChatRooms('resolved')">Selesai</button>
+              </div>
+            </div>
+
+            <!-- List Percakapan -->
+            <div id="admin-chat-rooms-list" style="flex:1; overflow-y:auto;">
+              <div style="text-align:center; padding:40px 20px; color:#94a3b8; font-size:13px;">
+                <div style="font-size:24px; margin-bottom:8px;">⏳</div>
+                <div>Memuat antrean chat pelanggan...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT MAIN: Ruang Chat Aktif -->
+          <div class="admin-chat-main" id="admin-chat-main-area" style="flex:1; display:flex; flex-direction:column; background:#ffffff; min-width:0;">
+            <!-- Header Chat Aktif -->
+            <div id="admin-chat-header" style="padding: 12px 20px; border-bottom: 1px solid var(--admin-border); display:flex; align-items:center; justify-content:space-between; background:#ffffff; min-height: 64px; flex-shrink:0;">
+              <div style="color:#94a3b8; font-size:13px; display:flex; align-items:center; gap:8px;">
+                <span>👈</span>
+                <span>Pilih salah satu chat pelanggan di sisi kiri untuk membalas pesan secara langsung.</span>
+              </div>
+            </div>
+
+            <!-- Pesan Obrolan Feed -->
+            <div id="admin-chat-messages-feed" style="flex:1; overflow-y:auto; padding: 20px; background:#fbfcfe; display:flex; flex-direction:column; gap:12px;">
+              <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#94a3b8; padding:20px;">
+                <div style="font-size:46px; margin-bottom:12px;">💬</div>
+                <div style="font-weight:800; color:#0f172a; font-size:16px;">Live Webchat Customer Care 168 Parts</div>
+                <div style="font-size:13px; max-width:360px; text-align:center; margin-top:8px; line-height:1.5; color:#64748b;">
+                  Kelola dan balas pertanyaan pelanggan secara realtime. Jika AI Bot tidak memiliki jawaban, percakapan otomatis masuk ke antrean <b>⚠️ Butuh Respon Admin</b> di sini.
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Reply Templates Bar -->
+            <div id="admin-chat-quick-templates" style="padding: 8px 16px; background:#f8fafc; border-top:1px solid var(--admin-border); display:none; gap:6px; overflow-x:auto; flex-shrink:0;">
+              <!-- Quick reply buttons will be generated here -->
+            </div>
+
+            <!-- Form Balasan Admin -->
+            <form id="admin-chat-input-form" onsubmit="AdminApp.sendAdminChatMessage(event)" style="padding: 14px 20px; border-top:1px solid var(--admin-border); background:#ffffff; display:none; gap:10px; align-items:flex-end; flex-shrink:0;">
+              <textarea id="admin-chat-textarea" rows="2" placeholder="Ketik balasan admin ke pelanggan... (Tekan Enter untuk langsung kirim, Shift+Enter untuk baris baru)" style="flex:1; border:1px solid #cbd5e1; border-radius:8px; padding:10px 14px; font-size:13px; font-family:inherit; resize:none; outline:none; transition:border-color 0.2s;" onkeydown="AdminApp.handleAdminChatKeydown(event)"></textarea>
+              <button type="submit" class="btn-primary" style="padding: 10px 22px; font-weight:800; font-size:13px; display:inline-flex; align-items:center; gap:6px; height:46px; border-radius:8px; background:#be123c; color:#fff; border:none; cursor:pointer; box-shadow:0 2px 6px rgba(190,18,60,0.3); transition:all 0.15s ease;">
+                <span>Kirim</span>
+                <span>➤</span>
+              </button>
+            </form>
           </div>
         </div>
       </section>
@@ -1124,7 +1242,7 @@
     </div>
   </div>
 
-  <script src="js/api.js?v=2.8"></script>
-  <script src="js/admin.js?v=2.8"></script>
+  <script src="js/api.js?v=3.0"></script>
+  <script src="js/admin.js?v=3.0"></script>
 </body>
 </html>
