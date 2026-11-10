@@ -130,139 +130,79 @@ class ProductModel {
     return productPayload;
   }
 
-  // READ ALL: Mengambil Semua Produk dari Database Lokal / Cloud
+  // READ ALL: Mengambil Semua Produk dari Database Cloud PostgreSQL
   async findAll(filter = {}) {
-    if (dbManager.isConnected && dbManager.supabaseClient && !dbManager.pgPool) {
-      try {
-        let query = dbManager.supabaseClient.from('products').select('*');
-        if (filter.q && filter.q.trim()) {
-          const kw = filter.q.trim();
-          query = query.or(`name.ilike.%${kw}%,description.ilike.%${kw}%,category.ilike.%${kw}%,shop_name.ilike.%${kw}%`);
-        }
-        if (filter.category && filter.category !== 'Semua') {
-          query = query.eq('category', filter.category);
-        }
-        if (filter.minPrice) query = query.gte('price', Number(filter.minPrice));
-        if (filter.maxPrice) query = query.lte('price', Number(filter.maxPrice));
-        if (filter.rating) query = query.gte('rating', Number(filter.rating));
-        if (filter.location) query = query.ilike('location', `%${filter.location}%`);
-        if (filter.shopType) query = query.eq('shop_type', filter.shopType);
+    let sql = 'SELECT * FROM products WHERE 1=1';
+    const params = [];
 
-        if (filter.sort === 'price_asc') query = query.order('price', { ascending: true });
-        else if (filter.sort === 'price_desc') query = query.order('price', { ascending: false });
-        else if (filter.sort === 'top_sales') query = query.order('sold_count', { ascending: false });
-        else if (filter.sort === 'rating') query = query.order('rating', { ascending: false });
-        else if (filter.sort === 'latest') query = query.order('created_at', { ascending: false });
-        else query = query.order('is_flash_sale', { ascending: false }).order('id', { ascending: true });
-
-        if (filter.limit) {
-          const limit = parseInt(filter.limit, 10);
-          const offset = parseInt(filter.offset, 10) || 0;
-          query = query.range(offset, offset + limit - 1);
-        }
-
-        const { data, error } = await query;
-        if (!error && data) {
-          return data.map(r => this.formatProductRow(r));
-        }
-      } catch (err) {
-        console.warn('⚠️ Supabase findAll error:', err.message);
-      }
+    if (filter.q && filter.q.trim()) {
+      const kw = `%${filter.q.trim()}%`;
+      sql += ' AND (name LIKE ? OR description LIKE ? OR category LIKE ? OR shop_name LIKE ?)';
+      params.push(kw, kw, kw, kw);
     }
 
-    if (dbManager.isConnected) {
-      let sql = 'SELECT * FROM products WHERE 1=1';
-      const params = [];
-
-      if (filter.q && filter.q.trim()) {
-        const kw = `%${filter.q.trim()}%`;
-        sql += ' AND (name LIKE ? OR description LIKE ? OR category LIKE ? OR shop_name LIKE ?)';
-        params.push(kw, kw, kw, kw);
-      }
-
-      if (filter.category && filter.category !== 'Semua') {
-        sql += ' AND category = ?';
-        params.push(filter.category);
-      }
-
-      if (filter.minPrice) {
-        sql += ' AND price >= ?';
-        params.push(Number(filter.minPrice));
-      }
-
-      if (filter.maxPrice) {
-        sql += ' AND price <= ?';
-        params.push(Number(filter.maxPrice));
-      }
-
-      if (filter.rating) {
-        sql += ' AND rating >= ?';
-        params.push(Number(filter.rating));
-      }
-
-      if (filter.location) {
-        sql += ' AND location LIKE ?';
-        params.push(`%${filter.location}%`);
-      }
-
-      if (filter.shopType) {
-        sql += ' AND shop_type = ?';
-        params.push(filter.shopType);
-      }
-
-      // Pengurutan
-      if (filter.sort === 'price_asc') {
-        sql += ' ORDER BY price ASC';
-      } else if (filter.sort === 'price_desc') {
-        sql += ' ORDER BY price DESC';
-      } else if (filter.sort === 'top_sales') {
-        sql += ' ORDER BY sold_count DESC';
-      } else if (filter.sort === 'rating') {
-        sql += ' ORDER BY rating DESC';
-      } else if (filter.sort === 'latest') {
-        sql += ' ORDER BY created_at DESC';
-      } else {
-        sql += ' ORDER BY is_flash_sale DESC, id ASC';
-      }
-
-      if (filter.limit) {
-        const limit = parseInt(filter.limit, 10);
-        const offset = parseInt(filter.offset, 10) || 0;
-        sql += ' LIMIT ? OFFSET ?';
-        params.push(limit, offset);
-      }
-
-      const rows = await dbManager.query(sql, params);
-      return (rows || []).map(r => this.formatProductRow(r));
+    if (filter.category && filter.category !== 'Semua') {
+      sql += ' AND category = ?';
+      params.push(filter.category);
     }
 
-    return [];
+    if (filter.minPrice) {
+      sql += ' AND price >= ?';
+      params.push(Number(filter.minPrice));
+    }
+
+    if (filter.maxPrice) {
+      sql += ' AND price <= ?';
+      params.push(Number(filter.maxPrice));
+    }
+
+    if (filter.rating) {
+      sql += ' AND rating >= ?';
+      params.push(Number(filter.rating));
+    }
+
+    if (filter.location) {
+      sql += ' AND location LIKE ?';
+      params.push(`%${filter.location}%`);
+    }
+
+    if (filter.shopType) {
+      sql += ' AND shop_type = ?';
+      params.push(filter.shopType);
+    }
+
+    // Pengurutan
+    if (filter.sort === 'price_asc') {
+      sql += ' ORDER BY price ASC';
+    } else if (filter.sort === 'price_desc') {
+      sql += ' ORDER BY price DESC';
+    } else if (filter.sort === 'top_sales') {
+      sql += ' ORDER BY sold_count DESC';
+    } else if (filter.sort === 'rating') {
+      sql += ' ORDER BY rating DESC';
+    } else if (filter.sort === 'latest') {
+      sql += ' ORDER BY created_at DESC';
+    } else {
+      sql += ' ORDER BY is_flash_sale DESC, id ASC';
+    }
+
+    if (filter.limit) {
+      const limit = parseInt(filter.limit, 10);
+      const offset = parseInt(filter.offset, 10) || 0;
+      sql += ' LIMIT ? OFFSET ?';
+      params.push(limit, offset);
+    }
+
+    const rows = await dbManager.query(sql, params);
+    return (rows || []).map(r => this.formatProductRow(r));
   }
 
   // READ ONE: Mengambil 1 Produk Berdasarkan ID
   async findById(id) {
-    if (dbManager.isConnected && dbManager.supabaseClient && !dbManager.pgPool) {
-      try {
-        const { data, error } = await dbManager.supabaseClient
-          .from('products')
-          .select('*')
-          .or(`id.eq.${id},slug.eq.${id}`)
-          .maybeSingle();
-        if (!error && data) {
-          return this.formatProductRow(data);
-        }
-      } catch (err) {
-        console.warn('⚠️ Supabase findById error:', err.message);
-      }
+    const rows = await dbManager.query('SELECT * FROM products WHERE id = ? OR slug = ? LIMIT 1', [id, id]);
+    if (rows && rows.length > 0) {
+      return this.formatProductRow(rows[0]);
     }
-
-    if (dbManager.isConnected) {
-      const rows = await dbManager.query('SELECT * FROM products WHERE id = ? OR slug = ? LIMIT 1', [id, id]);
-      if (rows && rows.length > 0) {
-        return this.formatProductRow(rows[0]);
-      }
-    }
-
     return null;
   }
 
@@ -335,44 +275,15 @@ class ProductModel {
   // DELETE: Menghapus Produk dari Database Lokal (CRUD - D)
   async delete(id) {
     let deleted = false;
-    if (dbManager.isConnected && dbManager.supabaseClient && !dbManager.pgPool) {
-      try {
-        const { error } = await dbManager.supabaseClient.from('products').delete().eq('id', id);
-        if (!error) deleted = true;
-      } catch (err) {
-        console.warn('⚠️ Supabase delete error:', err.message);
-      }
-    } else if (dbManager.isConnected) {
-      const res = await dbManager.query('DELETE FROM products WHERE id = ?', [id]);
-      if (res && res[0] && res[0].affectedRows > 0) deleted = true;
-    }
-
+    const res = await dbManager.query('DELETE FROM products WHERE id = ?', [id]);
+    if (res && res[0] && res[0].affectedRows > 0) deleted = true;
     return deleted;
   }
 
   // FLASH SALE
   async findFlashSale() {
-    if (dbManager.isConnected && dbManager.supabaseClient && !dbManager.pgPool) {
-      try {
-        const { data, error } = await dbManager.supabaseClient
-          .from('products')
-          .select('*')
-          .eq('is_flash_sale', true)
-          .order('flash_sale_sold', { ascending: false })
-          .limit(12);
-        if (!error && data) {
-          return data.map(r => this.formatProductRow(r));
-        }
-      } catch (err) {
-        console.warn('⚠️ Supabase findFlashSale error:', err.message);
-      }
-    }
-
-    if (dbManager.isConnected) {
-      const rows = await dbManager.query('SELECT * FROM products WHERE is_flash_sale = true ORDER BY flash_sale_sold DESC LIMIT 12');
-      return (rows || []).map(r => this.formatProductRow(r));
-    }
-    return [];
+    const rows = await dbManager.query('SELECT * FROM products WHERE is_flash_sale = true ORDER BY flash_sale_sold DESC LIMIT 12');
+    return (rows || []).map(r => this.formatProductRow(r));
   }
 }
 

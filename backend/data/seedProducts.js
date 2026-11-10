@@ -15,7 +15,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 38,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=500&auto=format&fit=crop&q=80",
     "description": "LCD Touchscreen iPhone 11 kualitas Incell High Quality. Support True Tone (bisa dipindah via programmer JC V1SE), sensitivitas sentuhan 100% responsif, kontras warna mendekati original bawaan. Garansi tes 7 hari sebelum dipasang lem.",
     "specs": [
       "Kompatibilitas: Apple iPhone 11 (6.1 inch)",
@@ -38,7 +38,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=500&auto=format&fit=crop&q=80",
     "description": "LCD OLED GX iPhone X / XS. Warna pekat OLED, bezel tipis presisi, hemat daya baterai. Pilihan terbaik teknisi HP untuk pergantian layar pecah.",
     "specs": [
       "Tipe: Hard OLED GX Display",
@@ -62,7 +62,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 21,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1603891128711-11b4b03bb138?w=500&auto=format&fit=crop&q=80",
     "description": "LCD iPhone 12 dan 12 Pro JK OLED. Presisi sudut frame dan konektor soket 100% pas. Layar tajam dan respons multi sentuh sangat stabil.",
     "specs": [
       "Kompatibel: iPhone 12 / 12 Pro (6.1 inch)",
@@ -85,7 +85,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 52,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500&auto=format&fit=crop&q=80",
     "description": "LCD Samsung A50 (A505F / A505G). Kualitas kontras bagus, pengaturan kecerahan (brightness) berfungsi normal. Sudah satu set touchscreen.",
     "specs": [
       "Model: Samsung Galaxy A50 SM-A505F",
@@ -108,7 +108,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=500&auto=format&fit=crop&q=80",
     "description": "Layar LCD Samsung A51 A515F fullset touchscreen. Presisi lubang kamera tengah (punch hole), bezel tipis rapi.",
     "specs": [
       "Model: Samsung Galaxy A51 (SM-A515)",
@@ -131,7 +131,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 67,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&auto=format&fit=crop&q=80",
     "description": "LCD Xiaomi Redmi Note 8 kualitas OEM. Warna jernih tajam, respon sentuhan lancar tanpa ghost touch. Sangat diminati teknisi servis.",
     "specs": [
       "Model: Redmi Note 8 (M1908C3JH)",
@@ -153,7 +153,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1580910051074-3eb694886505?w=500&auto=format&fit=crop&q=80",
     "description": "LCD Fullset Redmi Note 9. Presisi lubang kamera depan samping, flexibel tebal tidak mudah sobek saat pemasangan.",
     "specs": [
       "Model: Redmi Note 9",
@@ -176,7 +176,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 85,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=500&auto=format&fit=crop&q=80",
     "description": "LCD Oppo A3s / A5 / Realme C1. Produk terlaris di Shopee 168part. Kaca tebal anti gores, frame presisi.",
     "specs": [
       "Kompatibel: Oppo A3s (CPH1803, CPH1853), Realme C1",
@@ -198,7 +198,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=500&auto=format&fit=crop&q=80",
     "description": "Layar LCD Vivo Y12 / Y15 / Y17 / Y11 / Y3. Kualitas OEM Diamond/Crown, kontras warna tajam dan sentuhan responsif.",
     "specs": [
       "Kompatibel: Vivo Y12, Y15, Y17, Y11 2019",
@@ -221,7 +221,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 49,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1619725002198-6a689b72f41d?w=500&auto=format&fit=crop&q=80",
     "description": "Baterai iPhone 11 kapasitas 3110mAh Original Foxconn OEM. Kondisi baru 0 cycle count, cell baterai padat anti kembung, daya tahan awet seharian.",
     "specs": [
       "Kapasitas: 3110 mAh",
@@ -244,7 +244,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1584006682522-dc17d6c0d9ac?w=500&auto=format&fit=crop&q=80",
     "description": "Baterai cadangan iPhone X kapasitas standar original 2716mAh. Dilengkapi IC proteksi ganda mencegah overheat dan overcharge.",
     "specs": [
       "Kapasitas: 2716 mAh",
@@ -267,7 +267,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 78,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1591488320449-011701bb6704?w=500&auto=format&fit=crop&q=80",
     "description": "Baterai Xiaomi BN53 untuk Redmi Note 9 Pro dan Note 9S. Kapasitas murni 5020 mAh mendukung Fast Charging 33W.",
     "specs": [
       "Kode Baterai: BN53",
@@ -290,7 +290,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1585338107529-13afc5f02586?w=500&auto=format&fit=crop&q=80",
     "description": "Baterai Samsung Galaxy A50, A30, A30s, A20. Kapasitas 4000mAh original equipment manufacturer. Awet dan stabil.",
     "specs": [
       "Kode: EB-BA505ABU",
@@ -314,7 +314,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 90,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1616401784845-180882ba9ba8?w=500&auto=format&fit=crop&q=80",
     "description": "Baterai Oppo A3s BLP673. Paling laris untuk servis pergantian baterai drop atau kembung. Daya simpan stabil.",
     "specs": [
       "Kode: BLP673",
@@ -336,7 +336,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=500&auto=format&fit=crop&q=80",
     "description": "Baterai Vivo B-K3 kapasitas jumbo 5000mAh. Untuk Vivo Y12, Y15, Y17. Plug and play presisi tanpa modifikasi soket.",
     "specs": [
       "Kode: B-K3",
@@ -359,7 +359,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 110,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&auto=format&fit=crop&q=80",
     "description": "IC WTR2965 solusi utama masalah sinyal bulat (no service), searching, atau no baseband pada Xiaomi Redmi Note 5, Note 7, Oppo A3s, Vivo Y91, Samsung.",
     "specs": [
       "Tipe: RF Intermediate Frequency Transceiver",
@@ -382,7 +382,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1555680202-c86f0e12f086?w=500&auto=format&fit=crop&q=80",
     "description": "IC Power Management PM8953. Digunakan untuk mengatasi HP mati total (matot), konsumsi arus boros, short vph pwr.",
     "specs": [
       "Model: PM8953 (0VV)",
@@ -404,7 +404,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=500&auto=format&fit=crop&q=80",
     "description": "IC Cas / Charger SMB1351. Solusi HP tidak bisa dicas, suhu baterai terlalu tinggi/rendah, fake charging.",
     "specs": [
       "Model: SMB1351",
@@ -426,7 +426,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1629654297299-c8506221ca97?w=500&auto=format&fit=crop&q=80",
     "description": "IC Audio WCD9335 untuk memperbaiki masalah speaker mati, mic tidak berfungsi, nada dering hening pada HP chipset Snapdragon.",
     "specs": [
       "Model: WCD9335",
@@ -449,7 +449,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 16,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=500&auto=format&fit=crop&q=80",
     "description": "Blower Quick 857DW+ merupakan standar emas teknisi HP profesional. Aliran angin spiral helikopter lembut, suhu stabil akurat, elemen pemanas awet.",
     "specs": [
       "Konsumsi Daya: 580 Watt",
@@ -472,7 +472,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=500&auto=format&fit=crop&q=80",
     "description": "Solder station WEMON 936A anti-statis ESD Safe. Panas super cepat, mata solder runcing presisi untuk jumper komponen mikro HP.",
     "specs": [
       "Daya: 60 Watt",
@@ -496,7 +496,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 25,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=500&auto=format&fit=crop&q=80",
     "description": "Sunshine DT-17N Multimeter digital otomatis terbaik untuk teknisi HP. Ukur buzzer short sangat responsif tanpa delay, ukur tegangan DC volt & diode presisi.",
     "specs": [
       "Tipe: True RMS Auto Range Multitester",
@@ -519,7 +519,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1581092162384-8987c1d64718?w=500&auto=format&fit=crop&q=80",
     "description": "Matras pemanas CPB 998 untuk melunakkan lem LCD dan touchscreen HP atau iPad/tablet tanpa merusak frame atau polarizer.",
     "specs": [
       "Ukuran: 30 x 17 cm (Bisa untuk iPad mini)",
@@ -541,7 +541,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500&auto=format&fit=crop&q=80",
     "description": "Pasta flux premium 2UUL Mr.Flux 01. Bebas asap pekat, daya lekat timah sempurna, no-clean (tidak meninggalkan kerak gosong di papan PCB).",
     "specs": [
       "Isi: 10cc Spuit Jarum",
@@ -564,7 +564,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 98,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=500&auto=format&fit=crop&q=80",
     "description": "Timah pasta Mechanic XG-50 titik leleh 183°C. Sangat disukai teknisi untuk cetak kaki IC BGA CPU EMMC dan soket baterai.",
     "specs": [
       "Kandungan: Sn63% Pb37%",
@@ -587,7 +587,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1504270997636-07ddfbd48945?w=500&auto=format&fit=crop&q=80",
     "description": "Kawat timah solder super halus diameter 0.3mm khusus untuk jumper jalur HP putus, pasang konektor LCD, dan jumper IC.",
     "specs": [
       "Diameter: 0.3 mm",
@@ -610,7 +610,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 120,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=500&auto=format&fit=crop&q=80",
     "description": "Gootwick CP-2015 asli Jepang. Menyerap sisa timah di papan motherboard HP dengan bersih tanpa merusak jalur tembaga pad.",
     "specs": [
       "Lebar Pita: 2.0 mm",
@@ -633,7 +633,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 155,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500&auto=format&fit=crop&q=80",
     "description": "Lem LANRUI I9 warna hitam pekat 50ml. Lem andalan teknisi HP Surabaya. Kering elastis, anti bocor cahaya backlight LCD, daya rekat kuat tahan lama.",
     "specs": [
       "Warna: Hitam Pekat (Black)",
@@ -656,7 +656,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1616401784845-180882ba9ba8?w=500&auto=format&fit=crop&q=80",
     "description": "Lem T-7000 Zhanlida hitam 50ml. Cocok untuk lem backdoor kaca, frame LCD, dan touch screen handphone.",
     "specs": [
       "Warna: Hitam",
@@ -678,7 +678,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1585338107529-13afc5f02586?w=500&auto=format&fit=crop&q=80",
     "description": "Lem B-7000 bening transparan. Sangat cocok untuk pemasangan LCD putih atau kaca kamera agar tidak meninggalkan noda warna.",
     "specs": [
       "Warna: Bening / Transparan",
@@ -701,7 +701,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 82,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500&auto=format&fit=crop&q=80",
     "description": "Falcon 530 spray pembersih PCB mesin HP, soket cas, dan kotoran debu. Cepat mengering tanpa meninggalkan residu basah.",
     "specs": [
       "Isi: 550 ml Botol Kaleng Semprot",
@@ -724,7 +724,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 58,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=500&auto=format&fit=crop&q=80",
     "description": "Kaca tutup belakang iPhone 11 model Big Hole (lubang kamera besar). Pemasangan mudah tidak perlu bongkar lensa kamera ataupun mesin.",
     "specs": [
       "Tipe: Big Hole (Lubang Kamera Besar)",
@@ -746,7 +746,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1603891128711-11b4b03bb138?w=500&auto=format&fit=crop&q=80",
     "description": "Backdoor kaca iPhone 12/12 Pro Big Hole. Kaca presisi dengan finishing matte frosted tahan sidik jari.",
     "specs": [
       "Model: iPhone 12 / 12 Pro",
@@ -769,7 +769,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 85,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500&auto=format&fit=crop&q=80",
     "description": "Tutup casing belakang Samsung Galaxy A50 SM-A505. Sudah termasuk kaca lensa kamera dan perekat adhesive bawaan siap pasang.",
     "specs": [
       "Kompatibel: Samsung Galaxy A50",
@@ -791,7 +791,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&auto=format&fit=crop&q=80",
     "description": "Backdoor kaca Xiaomi Redmi Note 8. Kaca mengkilap gradasi hologram persis aslinya. Sudah ada lem sekeliling frame.",
     "specs": [
       "Model: Redmi Note 8",
@@ -813,7 +813,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=500&auto=format&fit=crop&q=80",
     "description": "Alat programmer teknisi iPhone JCID V1SE WiFi. Untuk memindahkan data True Tone layar tanpa LCD lama, reset battery health 100%, dan perbaikan Face ID.",
     "specs": [
       "Merk: JCID V1SE WiFi Edition",
@@ -836,7 +836,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 28,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=500&auto=format&fit=crop&q=80",
     "description": "Kabel konektor power supply iBoot box. Menyalakan mesin iPhone (6 s.d. 14 Pro Max) dan berbagai HP Android tanpa baterai terpasang.",
     "specs": [
       "Kompatibel: iPhone 6 - 14 Pro Max + Android Multi Soket",
@@ -858,7 +858,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=500&auto=format&fit=crop&q=80",
     "description": "Alat pelacak kapasitor short / konsleting pada papan PCB handphone. Menghancurkan kapasitor konslet dalam hitungan 1 detik.",
     "specs": [
       "Tipe: Short Circuit Detector Power Box",
@@ -881,7 +881,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 60,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1530124566582-a618bc2615dc?w=500&auto=format&fit=crop&q=80",
     "description": "Pinset paduan titanium Relife RT-11C. Anti karat, non-magnetik, ujung 0.15mm sanggup menjepit kawat jumper super halus atau IC kecil tanpa slip.",
     "specs": [
       "Bahan: Titanium Alloy Super Ringan",
@@ -903,7 +903,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=500&auto=format&fit=crop&q=80",
     "description": "Set obeng QianLi Mega-Idea kepala baja S2 magnetic kuat. Mata obeng presisi anti slek pada baut iPhone bintang 0.8, Y 0.6, plus 1.5, dan standoff.",
     "specs": [
       "Isi: 5 Pcs Obeng (Pentalobe 0.8, Tri-wing Y0.6, Phillips +1.5, Standoff 2.5, Torx T2)",
@@ -924,7 +924,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=500&auto=format&fit=crop&q=80",
     "description": "Tang kop karet penyedot LCD handphone. Membuka layar LCD iPhone dan Android dengan aman tanpa resiko flek pada LCD.",
     "specs": [
       "Tipe: Dual Suction Plier Grip",
@@ -946,7 +946,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 75,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=500&auto=format&fit=crop&q=80",
     "description": "Papan konektor cas Type-C Samsung A50 (A505F). Komplit dengan mic telepon dan jack audio 3.5mm. Support Fast Charging Original.",
     "specs": [
       "Kompatibel: Samsung Galaxy A50",
@@ -968,7 +968,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80",
     "description": "Board charger Redmi Note 8. Solusi port USB longgar, tidak bisa cas, atau suara mikrofon kresek-kresek.",
     "specs": [
       "Model: Redmi Note 8",
@@ -990,7 +990,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=500&auto=format&fit=crop&q=80",
     "description": "Fleksibel dock charging port iPhone 11. Sudah include mic bawah dan konektor antena sinyal seluler.",
     "specs": [
       "Model: iPhone 11",
@@ -1012,7 +1012,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=500&auto=format&fit=crop&q=80",
     "description": "Fleksibel switch tombol daya dan volume Oppo A3s. Memperbaiki tombol mendem, keras ditekan, atau tidak merespon.",
     "specs": [
       "Kompatibel: Oppo A3s & Realme C1",
@@ -1034,7 +1034,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 65,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&auto=format&fit=crop&q=80",
     "description": "Plat BGA Stencil AMAOE lubang persegi anti melengkung saat dipanasi blower uap. Presisi tinggi untuk reballing CPU Qualcomm & EMMC.",
     "specs": [
       "Merk: AMAOE Original",
@@ -1056,7 +1056,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=500&auto=format&fit=crop&q=80",
     "description": "Pasta solder flux thixotropic LANRUI K9 original 168part Surabaya. Sangat efektif untuk penyolderan mikro PCB HP, perbaikan jalur jumper fingerprint, soket baterai, port charger tail plug, dan kaki IC BGA.",
     "specs": [
       "Merk: LANRUI K9 Original",
@@ -1080,7 +1080,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 38,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=500&auto=format&fit=crop&q=80",
     "description": "Mata pisau scraper JTXTOOLS CK-2 khusus pembersih lem hitam/lem keras di sekeliling IC CPU dan eMMC HP. Mata pisau ultra tipis dan lentur, aman tidak merusak lapisan jalur motherboard.",
     "specs": [
       "Merk: JTXTOOLS CK-2 Original 168part",
@@ -1103,7 +1103,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=500&auto=format&fit=crop&q=80",
     "description": "Sensor sidik jari under-display optical fingerprint sensor Samsung Galaxy A50 SM-A505F. Baca sidik jari cepat akurat, 100% presisi bawaan pabrik.",
     "specs": [
       "Kompatibilitas: Samsung Galaxy A50 (SM-A505)",
@@ -1127,7 +1127,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 75,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=500&auto=format&fit=crop&q=80",
     "description": "Casing tutup belakang Vivo Y12, Y15, Y17. Sudah include tombol volume on/off dan kaca pelindung kamera belakang. Presisi rapat tanpa celah.",
     "specs": [
       "Kompatibel: Vivo Y12 / Y15 / Y17 / Y11 2019",
@@ -1149,7 +1149,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500&auto=format&fit=crop&q=80",
     "description": "Kaca pelindung lensa kamera belakang Samsung Galaxy A50 lengkap dengan ring frame dan lem perekat adhesive. Mengatasi hasil foto buram akibat kaca kamera retak/baret.",
     "specs": [
       "Bahan: Real Tempered Glass Bening",
@@ -1172,7 +1172,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 55,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=500&auto=format&fit=crop&q=80",
     "description": "Set 2 pcs kaca lensa kamera belakang iPhone 11. Kaca kristal sapphire bening anti gores, tidak menimbulkan pantulan flare saat memotret dengan flash.",
     "specs": [
       "Kompatibilitas: Apple iPhone 11 (Dual Camera)",
@@ -1194,7 +1194,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80",
     "description": "Modul buzzer speaker musik bawah (loudspeaker / ringer) Samsung Galaxy A50. Suara nyaring, bass bulat, mengatasi speaker kresek atau mati suara total.",
     "specs": [
       "Kompatibel: Samsung Galaxy A50 A505F",
@@ -1216,7 +1216,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=500&auto=format&fit=crop&q=80",
     "description": "Modul speaker telinga atas (earpiece) iPhone 11 komplit dengan flex kabel sensor kedekatan (proximity sensor) dan microphone depan.",
     "specs": [
       "Model: iPhone 11",
@@ -1238,7 +1238,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500&auto=format&fit=crop&q=80",
     "description": "Tempat kartu SIM card tray Samsung Galaxy A50 A505. Triple slot (Dual Nano SIM + 1 Slot Micro SD). Presisi rapat dengan warna frame housing.",
     "specs": [
       "Kompatibel: Samsung Galaxy A50",
@@ -1260,7 +1260,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1603891128711-11b4b03bb138?w=500&auto=format&fit=crop&q=80",
     "description": "Baki kartu SIM tray iPhone 11 single slot. Dilengkapi karet seal pelindung debu dan air (waterproof rubber ring) seperti bawaan aslinya.",
     "specs": [
       "Model: Apple iPhone 11",
@@ -1283,7 +1283,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 42,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1555680202-c86f0e12f086?w=500&auto=format&fit=crop&q=80",
     "description": "IC Power PMI632-502-00 Qualcomm. Mengatasi kendala HP mati total, konsumsi arus gantung 0.05A saat dinyalakan, dan masalah pengisian daya.",
     "specs": [
       "Model: PMI632 502 00 Qualcomm",
@@ -1305,7 +1305,7 @@ module.exports = [
     "shopName": "168 Parts Surabaya",
     "shopType": "Star+",
     "isFlashSale": false,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=500&auto=format&fit=crop&q=80",
     "description": "Kabel fleksibel tombol switch power daya dan volume Samsung Galaxy A50. Saklar klik empuk dan responsif mengembalikan fungsi tombol yang rusak/robek.",
     "specs": [
       "Kompatibel: Samsung Galaxy A50 (A505F, A505G)",
@@ -1328,7 +1328,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 70,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=500&auto=format&fit=crop&q=80",
     "description": "Fleksibel saklar switch tombol power dan volume Vivo Y12 / Y15 / Y17 / Y11. Bahan tembaga lentur berkualitas tidak mudah patah saat ditekuk.",
     "specs": [
       "Model: Vivo Y12 / Y15 / Y17",
@@ -1351,7 +1351,7 @@ module.exports = [
     "shopType": "Star+",
     "isFlashSale": true,
     "flashSaleSold": 35,
-    "image": "images/product-placeholder.svg",
+    "image": "https://images.unsplash.com/photo-1580910051074-3eb694886505?w=500&auto=format&fit=crop&q=80",
     "description": "LCD Touchscreen Xiaomi Poco X3 Pro & Poco X3 NFC kualitas Incell High Refresh Rate 120Hz. Layar tajam, bezel bawah tipis, lubang kamera punch hole pas di tengah.",
     "specs": [
       "Kompatibilitas: Xiaomi Poco X3 NFC / Poco X3 Pro",

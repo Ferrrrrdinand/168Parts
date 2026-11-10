@@ -518,7 +518,7 @@ const AdminApp = {
         <tr>
           <td>
             <div class="prod-cell">
-              <img src="${(p.image && !p.image.includes('unsplash.com')) ? p.image : 'images/product-placeholder.svg'}" alt="${p.name}" class="prod-thumb" onerror="this.src='images/product-placeholder.svg'">
+              <img src="${p.image || 'images/product-placeholder.svg'}" alt="${p.name}" class="prod-thumb" onerror="this.src='images/product-placeholder.svg'">
               <div class="prod-meta">
                 <span class="prod-name" title="${p.name}">${p.name}</span>
                 <span class="prod-id">${p.id}</span>
@@ -988,7 +988,7 @@ const AdminApp = {
     document.getElementById('f-prod-shop').value = p.shopName || '168 Parts Surabaya';
     document.getElementById('f-prod-location').value = p.location || 'Kota Surabaya';
     document.getElementById('f-prod-flash').checked = !!p.isFlashSale;
-    document.getElementById('prod-img-preview').src = (p.image && !p.image.includes('unsplash.com')) ? p.image : 'images/product-placeholder.svg';
+    document.getElementById('prod-img-preview').src = p.image || 'images/product-placeholder.svg';
 
     this.updatePricePreview();
     document.getElementById('admin-modal-product').classList.add('active');

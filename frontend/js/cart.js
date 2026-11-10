@@ -430,7 +430,7 @@ const PasarinCart = {
       const safeStoreName = store.shopName.replace(/'/g, "\\'");
 
       const itemsHtml = store.items.map(it => {
-        const itemImg = (it.image && !it.image.includes('unsplash.com')) ? it.image : 'images/product-placeholder.svg';
+        const itemImg = it.image || 'images/product-placeholder.svg';
         return `
           <div class="cart-item-row" data-product-id="${it.productId}">
             <div class="cart-item-prod">
@@ -678,7 +678,7 @@ const PasarinCart = {
     if (footer) footer.style.display = 'block';
 
     body.innerHTML = this.items.map(it => {
-      const imgUrl = (it.image && !it.image.includes('unsplash.com')) ? it.image : 'images/product-placeholder.svg';
+      const imgUrl = it.image || 'images/product-placeholder.svg';
       const imgHtml = `<img src="${imgUrl}" alt="${it.name}" class="prod-real-img" style="border-radius:6px;" onerror="this.src='images/product-placeholder.svg';">`;
       return `
         <div class="cart-item-card" data-id="${it.productId}">
@@ -768,7 +768,7 @@ const PasarinCart = {
     const prodListEl = document.getElementById('checkout-products-list');
     if (prodListEl) {
       prodListEl.innerHTML = activeItems.map(it => {
-        const img = (it.image && !it.image.includes('unsplash.com')) ? it.image : 'images/product-placeholder.svg';
+        const img = it.image || 'images/product-placeholder.svg';
         const hasDiscount = it.originalPrice && Number(it.originalPrice) > Number(it.price);
         return `
           <div class="chk-prod-row">
