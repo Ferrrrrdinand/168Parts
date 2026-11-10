@@ -34,6 +34,9 @@ const PasarinApp = {
   priceRange: { min: null, max: null },
   selectedRating: null,
   selectedLocation: null,
+  notifications: [],
+  unreadNotificationsCount: 0,
+  activeNotificationFilter: 'all',
 
   // Palet tema warna kategori 168 Parts
   categoryThemes: {
@@ -62,6 +65,8 @@ const PasarinApp = {
       await this.loadInitialData();
       this.initPromoSystem();
       await this.loadBanners();
+      this.fetchNotifications();
+      setInterval(() => this.fetchNotifications(), 25000);
       this.route();
       window.addEventListener('hashchange', () => this.route());
     } catch (e) {
@@ -3848,6 +3853,201 @@ const PasarinApp = {
     }
     if (modal) {
       modal.classList.remove('active');
+    }
+  },
+
+  /* =========================================================
+     PUSAT NOTIFIKASI & BROADCAST TOKO (168 PARTS)
+     ========================================================= */
+  async fetchNotifications() {
+    try {
+      const user = window.PasarinAuth?.currentUser || (localStorage.getItem('pasarin_user') ? JSON.parse(localStorage.getItem('pasarin_user')) : null);
+      const userId = user ? (user.id || user.username || user.email) : null;
+      const res = await PasarinAPI.getNotifications(userId);
+      if (res && res.success && Array.isArray(res.data)) {
+        this.notifications = res.data;
+        this.unreadNotificationsCount = typeof res.unread_count === 'number' ? res.unread_count : 0;
+        this.updateNotificationBadges();
+        
+        // Jika modal sedang terbuka, perbarui isinya secara live
+        const modal = document.getElementById('notification-modal-overlay');
+        if (modal && modal.classList.contains('active')) {
+          this.renderNotificationList();
+        }
+      }
+    } catch (e) {
+      console.warn('Gagal fetch notifikasi:', e);
+    }
+  },
+
+  updateNotificationBadges() {
+    const badge = document.getElementById('nav-notif-badge');
+    const profBadge = document.getElementById('prof-notif-badge');
+    const count = this.unreadNotificationsCount;
+
+    if (badge) {
+      if (count > 0) {
+        badge.textContent = count > 99 ? '99+' : count;
+        badge.style.display = 'inline-block';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    if (profBadge) {
+      if (count > 0) {
+        profBadge.textContent = count > 99 ? '99+' : count;
+        profBadge.style.display = 'inline-block';
+      } else {
+        profBadge.style.display = 'none';
+      }
+    }
+  },
+
+  openNotificationModal() {
+    const modal = document.getElementById('notification-modal-overlay');
+    if (modal) {
+      modal.classList.add('active');
+      this.fetchNotifications().then(() => {
+        this.renderNotificationList();
+      });
+    }
+  },
+
+  closeNotificationModal() {
+    const modal = document.getElementById('notification-modal-overlay');
+    if (modal) {
+      modal.classList.remove('active');
+    }
+  },
+
+  filterNotificationCategory(category, btnElement) {
+    this.activeNotificationFilter = category || 'all';
+    const tabBtns = document.querySelectorAll('.notif-tab-item');
+    tabBtns.forEach(btn => btn.classList.remove('active'));
+    if (btnElement) {
+      btnElement.classList.add('active');
+    }
+    this.renderNotificationList();
+  },
+
+  renderNotificationList() {
+    const container = document.getElementById('notification-items-list');
+    if (!container) return;
+
+    let items = this.notifications || [];
+    if (this.activeNotificationFilter && this.activeNotificationFilter !== 'all') {
+      items = items.filter(n => (n.category || 'system') === this.activeNotificationFilter);
+    }
+
+    if (items.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center; padding:44px 20px; color:#94a3b8;">
+          <span style="font-size:36px; display:block; margin-bottom:10px;">🔕</span>
+          <h4 style="font-size:14px; font-weight:800; color:#475569; margin:0 0 4px 0;">Tidak Ada Notifikasi</h4>
+          <p style="font-size:12px; margin:0; color:#94a3b8;">Semua pengumuman dan promo terbaru akan langsung muncul di sini.</p>
+        </div>
+      `;
+      return;
+    }
+
+    const catMeta = {
+      promo: { label: 'PROMO & DISKON', icon: '🎟️', badgeClass: 'notif-tag-promo' },
+      info: { label: 'RESTOK & INFO', icon: '📦', badgeClass: 'notif-tag-info' },
+      system: { label: 'INFO TOKO', icon: '⚙️', badgeClass: 'notif-tag-system' }
+    };
+
+    container.innerHTML = items.map(n => {
+      const meta = catMeta[n.category] || catMeta.system;
+      const isUnread = !n.is_read;
+      const dateStr = n.created_at ? new Date(n.created_at).toLocaleString('id-ID', {
+        day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+      }) : 'Hari ini';
+
+      const actionBtn = n.action_url ? `
+        <a href="${n.action_url}" onclick="PasarinApp.handleNotificationClick('${n.id}', '${n.action_url}')" class="btn-notif-action">
+          <span>${n.action_label || 'Lihat Selengkapnya'}</span>
+          <span>&rarr;</span>
+        </a>
+      ` : `
+        <button type="button" class="btn-notif-action" style="background:#f1f5f9; color:#475569;" onclick="PasarinApp.markNotificationAsRead('${n.id}')">
+          ✓ Ditandai Dibaca
+        </button>
+      `;
+
+      return `
+        <div class="notif-card-item ${isUnread ? 'unread' : ''}" id="notif-card-${n.id}" onclick="if(!event.target.closest('a, button')) PasarinApp.markNotificationAsRead('${n.id}')" style="cursor:pointer;">
+          <div class="notif-card-icon">
+            ${meta.icon}
+          </div>
+          <div class="notif-card-content">
+            <div class="notif-card-header">
+              <span class="notif-tag-badge ${meta.badgeClass}">
+                ${meta.label}
+              </span>
+              <div class="notif-card-time">
+                <span>🕒 ${dateStr}</span>
+                ${isUnread ? '<span class="notif-unread-dot" title="Belum dibaca"></span>' : ''}
+              </div>
+            </div>
+            <h4 class="notif-card-title">${n.title || 'Pengumuman'}</h4>
+            <p class="notif-card-desc">${n.message || ''}</p>
+            <div class="notif-card-actions">
+              ${actionBtn}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  },
+
+  async handleNotificationClick(id, url) {
+    await this.markNotificationAsRead(id);
+    this.closeNotificationModal();
+    if (url && url.startsWith('#')) {
+      window.location.hash = url;
+    }
+  },
+
+  async markNotificationAsRead(id) {
+    if (!id) return;
+    const item = this.notifications.find(n => n.id === id);
+    if (item && !item.is_read) {
+      item.is_read = true;
+      if (this.unreadNotificationsCount > 0) {
+        this.unreadNotificationsCount--;
+        this.updateNotificationBadges();
+      }
+      const card = document.getElementById(`notif-card-${id}`);
+      if (card) {
+        card.classList.remove('unread');
+        const dot = card.querySelector('.notif-unread-dot');
+        if (dot) dot.remove();
+      }
+      try {
+        const user = window.PasarinAuth?.currentUser || (localStorage.getItem('pasarin_user') ? JSON.parse(localStorage.getItem('pasarin_user')) : null);
+        const userId = user ? (user.id || user.username || user.email) : null;
+        await PasarinAPI.markNotificationRead(id, userId);
+      } catch (e) {
+        console.warn('Gagal sync read notif:', e);
+      }
+    }
+  },
+
+  async markAllNotificationsRead() {
+    try {
+      const user = window.PasarinAuth?.currentUser || (localStorage.getItem('pasarin_user') ? JSON.parse(localStorage.getItem('pasarin_user')) : null);
+      const userId = user ? (user.id || user.username || user.email) : null;
+      await PasarinAPI.markAllNotificationsRead(userId);
+      this.notifications.forEach(n => { n.is_read = true; });
+      this.unreadNotificationsCount = 0;
+      this.updateNotificationBadges();
+      this.renderNotificationList();
+      if (window.showToast) {
+        window.showToast('Semua notifikasi toko telah ditandai sudah dibaca ✅', 'success');
+      }
+    } catch (e) {
+      console.warn('Gagal mark all read:', e);
     }
   },
 

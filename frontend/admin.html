@@ -109,6 +109,12 @@
         <span class="nav-badge" id="badge-promo-count">0</span>
       </button>
 
+      <button class="sidebar-nav-item" data-tab="broadcasts">
+        <span class="nav-icon">📢</span>
+        <span>Broadcast Notifikasi</span>
+        <span class="nav-badge" id="badge-broadcast-count" style="background:#0284c7; color:#fff; display:none; padding:2px 7px; border-radius:10px; font-weight:800; font-size:11px;">0</span>
+      </button>
+
       <button class="sidebar-nav-item" data-tab="banners">
         <span class="nav-icon">🎨</span>
         <span>Kelola Banner</span>
@@ -701,6 +707,157 @@
           <button class="btn-primary" style="font-size:12.5px; padding:8px 16px;" onclick="AdminApp.switchTab('products')">
             Atur Item Flash Sale →
           </button>
+        </div>
+
+      </section>
+
+      <!-- =========================================================
+           TAB 4.5: BROADCAST NOTIFIKASI MASSAL KE SELURUH MEMBER
+           ========================================================= -->
+      <section class="admin-tab-pane" id="pane-broadcasts">
+        
+        <!-- Header Info -->
+        <div style="background:#ffffff; border:1px solid var(--admin-border); border-radius:var(--radius-md); padding:20px 24px; box-shadow:var(--shadow-sm); margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;">
+          <div>
+            <h2 style="font-size:16px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:8px;">
+              <span>📢</span> <span>Pusat Broadcast Pesan & Notifikasi Member</span>
+            </h2>
+            <p style="font-size:12.5px; color:#64748b; margin-top:2px;">Kirimkan pengumuman promo, restok sparepart, atau informasi penting toko secara serentak ke lonceng notifikasi seluruh member pembeli.</p>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <button class="btn-secondary" onclick="AdminApp.fetchBroadcasts()" title="Muat ulang riwayat broadcast">
+              🔄 Segarkan
+            </button>
+          </div>
+        </div>
+
+        <!-- 2-Column Composer & Live Preview Grid -->
+        <div style="display:grid; grid-template-columns: 1.2fr 0.8fr; gap:24px; margin-bottom:28px;">
+          
+          <!-- Form Composer -->
+          <div style="background:#ffffff; border:1px solid var(--admin-border); border-radius:var(--radius-md); padding:24px; box-shadow:var(--shadow-sm);">
+            <h3 style="font-size:14.5px; font-weight:800; color:#0f172a; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
+              <span>✍️</span> <span>Buat Pesan Broadcast Baru</span>
+            </h3>
+
+            <form id="admin-broadcast-form" onsubmit="AdminApp.handleSendBroadcast(event)">
+              <div class="form-group" style="margin-bottom:14px;">
+                <label class="form-label" style="font-size:12px; font-weight:700; color:#475569; margin-bottom:6px; display:block;">Judul Notifikasi Broadcast *</label>
+                <input type="text" id="bc-title" class="admin-input" placeholder="Cth: ⚡ Pesta Promo 168: Cashback 50% & Gratis Ongkir!" required style="width:100%; font-size:13px;" oninput="AdminApp.updateBroadcastPreview()">
+              </div>
+
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:14px;">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label" style="font-size:12px; font-weight:700; color:#475569; margin-bottom:6px; display:block;">Kategori Pesan *</label>
+                  <select id="bc-category" class="admin-select" style="width:100%; font-size:12.5px;" onchange="AdminApp.updateBroadcastPreview()">
+                    <option value="promo">🎟️ Promo & Diskon Belanja</option>
+                    <option value="info">📦 Restok & Info Sparepart</option>
+                    <option value="system">⚙️ Pengumuman Toko & Sistem</option>
+                  </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label" style="font-size:12px; font-weight:700; color:#475569; margin-bottom:6px; display:block;">Target Penerima</label>
+                  <div style="background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; padding:9px 12px; border-radius:6px; font-size:12px; font-weight:800; display:flex; align-items:center; gap:6px;">
+                    <span>👥</span> <span>Seluruh Member & Pembeli</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:14px;">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label" style="font-size:12px; font-weight:700; color:#475569; margin-bottom:6px; display:block;">Tautan Aksi (Opsional)</label>
+                  <input type="text" id="bc-action-url" class="admin-input" placeholder="Cth: #/promos atau #/search?category=LCD" style="width:100%; font-size:12.5px;" oninput="AdminApp.updateBroadcastPreview()">
+                </div>
+
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label" style="font-size:12px; font-weight:700; color:#475569; margin-bottom:6px; display:block;">Label Tombol Aksi</label>
+                  <input type="text" id="bc-action-label" class="admin-input" placeholder="Cth: Klaim Voucher / Buka Toko" value="Lihat Detail" style="width:100%; font-size:12.5px;" oninput="AdminApp.updateBroadcastPreview()">
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom:18px;">
+                <label class="form-label" style="font-size:12px; font-weight:700; color:#475569; margin-bottom:6px; display:block;">Isi Pesan Broadcast *</label>
+                <textarea id="bc-message" rows="4" class="admin-input" placeholder="Tuliskan isi detail pengumuman broadcast kepada seluruh member pengguna..." required style="width:100%; font-size:13px; line-height:1.5; resize:vertical;" oninput="AdminApp.updateBroadcastPreview()"></textarea>
+              </div>
+
+              <button type="submit" id="btn-send-broadcast" class="btn-primary" style="background:#be123c; width:100%; padding:12px; font-size:13.5px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; border-radius:8px; box-shadow:0 3px 10px rgba(190,18,60,0.3); border:none; cursor:pointer;">
+                <span>🚀</span> <span>Kirim Broadcast ke Seluruh Member Sekarang</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Live Preview Card (Bagaimana Pelanggan Melihat Notifikasi Ini) -->
+          <div style="background:#ffffff; border:1px solid var(--admin-border); border-radius:var(--radius-md); padding:24px; box-shadow:var(--shadow-sm); display:flex; flex-direction:column;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+              <h3 style="font-size:14.5px; font-weight:800; color:#0f172a; margin:0; display:flex; align-items:center; gap:8px;">
+                <span>👁️</span> <span>Simulasi Tampilan Notifikasi Member</span>
+              </h3>
+              <span style="font-size:11px; background:#f1f5f9; color:#475569; font-weight:700; padding:2px 8px; border-radius:10px;">Preview Nyata</span>
+            </div>
+
+            <!-- Preview Popover Mockup -->
+            <div style="border:1px solid #e2e8f0; border-radius:10px; overflow:hidden; background:#ffffff; box-shadow:0 4px 12px rgba(0,0,0,0.06); flex:1; display:flex; flex-direction:column;">
+              <div style="background:#be123c; color:#fff; padding:10px 14px; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:space-between;">
+                <span>🔔 Notifikasi Toko (168 Parts)</span>
+                <span style="background:rgba(255,255,255,0.2); font-size:10px; padding:1px 6px; border-radius:8px;">Baru</span>
+              </div>
+
+              <div style="padding:16px; background:#fdf2f4; border-bottom:1px solid #fecdd3; display:flex; gap:12px; align-items:flex-start;">
+                <div id="prev-icon" style="font-size:24px; width:40px; height:40px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.08); flex-shrink:0;">
+                  🎟️
+                </div>
+                <div style="flex:1; min-width:0;">
+                  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+                    <span id="prev-category" style="font-size:10px; font-weight:800; color:#be123c; text-transform:uppercase; letter-spacing:0.5px;">PROMO TOKO</span>
+                    <span style="font-size:10.5px; color:#94a3b8;">Baru saja</span>
+                  </div>
+                  <h4 id="prev-title" style="font-size:13px; font-weight:800; color:#0f172a; margin:0 0 4px 0; line-height:1.35;">
+                    Judul Pengumuman Broadcast
+                  </h4>
+                  <p id="prev-message" style="font-size:12px; color:#475569; margin:0 0 10px 0; line-height:1.45;">
+                    Isi pengumuman broadcast akan muncul di sini persis seperti yang akan dibaca oleh pelanggan Anda...
+                  </p>
+                  <button type="button" id="prev-action-btn" style="background:#be123c; color:#fff; border:none; padding:5px 12px; font-size:11.5px; font-weight:700; border-radius:6px; cursor:pointer;">
+                    Lihat Detail
+                  </button>
+                </div>
+              </div>
+
+              <div style="padding:12px 16px; background:#f8fafc; font-size:11px; color:#64748b; text-align:center;">
+                💡 Member yang membuka website atau aplikasi akan menerima notifikasi ini seketika di menu <b>🔔 Notifikasi</b> atas & profil mereka.
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Tabel Riwayat Broadcast Terkirim -->
+        <div style="background:#ffffff; border:1px solid var(--admin-border); border-radius:var(--radius-md); box-shadow:var(--shadow-sm); overflow:hidden;">
+          <div style="padding:16px 20px; border-bottom:1px solid var(--admin-border); display:flex; align-items:center; justify-content:space-between;">
+            <h3 style="font-size:14.5px; font-weight:800; color:#0f172a; margin:0; display:flex; align-items:center; gap:8px;">
+              <span>📜</span> <span>Riwayat Pesan Broadcast Terkirim</span>
+            </h3>
+            <span id="bc-history-count" style="font-size:12px; color:#64748b; font-weight:700;">Memuat riwayat...</span>
+          </div>
+
+          <div class="admin-table-container">
+            <table class="admin-table" style="min-width: 900px;">
+              <thead>
+                <tr>
+                  <th style="min-width:140px;">Waktu Kirim</th>
+                  <th style="min-width:110px;">Kategori</th>
+                  <th style="min-width:240px;">Judul & Pesan</th>
+                  <th style="min-width:140px;">Target Penerima</th>
+                  <th style="min-width:140px; text-align:center;">Status</th>
+                  <th style="min-width:100px; text-align:right;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="admin-broadcasts-tbody">
+                <tr><td colspan="6" style="text-align:center; padding:30px; color:#94a3b8;">Memuat riwayat broadcast...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
       </section>

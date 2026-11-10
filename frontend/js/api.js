@@ -303,6 +303,39 @@ const PasarinAPI = {
       method: 'PATCH',
       body: JSON.stringify({ status })
     });
+  },
+
+  // Broadcasts & User Notifications
+  async getNotifications(userId = null) {
+    const qs = userId ? `?userId=${encodeURIComponent(userId)}` : '';
+    return this.request(`/notifications${qs}`);
+  },
+
+  async sendBroadcast(payload) {
+    return this.request('/notifications/broadcast', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  },
+
+  async markNotificationRead(id, userId = null) {
+    return this.request(`/notifications/${encodeURIComponent(id)}/read`, {
+      method: 'POST',
+      body: JSON.stringify({ userId })
+    });
+  },
+
+  async markAllNotificationsRead(userId = null) {
+    return this.request('/notifications/read-all', {
+      method: 'POST',
+      body: JSON.stringify({ userId })
+    });
+  },
+
+  async deleteBroadcast(id) {
+    return this.request(`/notifications/${encodeURIComponent(id)}`, {
+      method: 'DELETE'
+    });
   }
 };
 

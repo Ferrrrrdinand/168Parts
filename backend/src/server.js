@@ -12,6 +12,7 @@ const orderRoutes = require('./routes/orderRoutes');
 const promoRoutes = require('./routes/promoRoutes');
 const bannerRoutes = require('./routes/bannerRoutes');
 const chatRoutes = require('./routes/chatRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.use(['/api/orders', '/orders'], orderRoutes);
 app.use(['/api/promos', '/promos'], promoRoutes);
 app.use(['/api/banners', '/banners'], bannerRoutes);
 app.use(['/api/chats', '/chats'], chatRoutes);
+app.use(['/api/notifications', '/notifications'], notificationRoutes);
 
 // Health check endpoint dengan pengujian koneksi database Supabase nyata
 app.get(['/api/health', '/health', '/api/health/db', '/health/db'], async (req, res) => {
@@ -100,7 +102,7 @@ app.use(express.static(legacyFrontendPath));
 // Fallback router untuk SPA & Static HTML
 app.use((req, res, next) => {
   const url = req.originalUrl || req.url || '';
-  if (url.startsWith('/api') || url.startsWith('/auth') || url.startsWith('/products') || url.startsWith('/cart') || url.startsWith('/orders') || url.startsWith('/promos') || url.startsWith('/banners') || url.startsWith('/chats')) {
+  if (url.startsWith('/api') || url.startsWith('/auth') || url.startsWith('/products') || url.startsWith('/cart') || url.startsWith('/orders') || url.startsWith('/promos') || url.startsWith('/banners') || url.startsWith('/chats') || url.startsWith('/notifications')) {
     return res.status(404).json({
       success: false,
       message: `Endpoint API ${req.method} ${url} tidak ditemukan.`

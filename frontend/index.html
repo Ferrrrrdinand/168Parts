@@ -143,9 +143,10 @@
           </span>
         </div>
         <div style="display: flex; align-items: center;">
-          <a href="#">
+          <a href="javascript:void(0)" id="btn-topbar-notif" onclick="PasarinApp.openNotificationModal()" style="position:relative; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" title="Lihat Notifikasi & Broadcast">
             <svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-            Notifikasi
+            <span>Notifikasi</span>
+            <span class="nav-notif-badge" id="nav-notif-badge" style="display:none;">0</span>
           </a>
           <a href="#">
             <svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
@@ -749,9 +750,10 @@
             </a>
 
             <!-- Notifikasi -->
-            <a href="javascript:void(0)" onclick="if(window.showToast) window.showToast('Tidak ada notifikasi baru.', 'info')" class="profile-nav-item">
+            <a href="javascript:void(0)" onclick="if(window.PasarinApp) window.PasarinApp.openNotificationModal()" class="profile-nav-item" style="position:relative;">
               <span class="nav-tree-icon">🔔</span>
-              <span>Notifikasi</span>
+              <span>Notifikasi Toko</span>
+              <span id="prof-notif-badge" style="display:none; margin-left:auto; background:#be123c; color:#ffffff; font-size:10px; font-weight:800; padding:1px 6px; border-radius:10px;">0</span>
             </a>
 
             <!-- Voucher Saya -->
@@ -1086,6 +1088,67 @@
             ✨ Klaim Semua Promo
           </button>
         </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== POP UP PUSAT NOTIFIKASI & BROADCAST TOKO ==================== -->
+  <div class="notification-modal-overlay" id="notification-modal-overlay" onclick="if(event.target === this) PasarinApp.closeNotificationModal()">
+    <div class="notification-modal-card">
+      
+      <!-- Modal Header -->
+      <div class="notification-modal-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:18px;">
+            🔔
+          </div>
+          <div>
+            <h3 style="margin:0; font-size:15px; font-weight:800; color:#ffffff;">Pusat Notifikasi & Broadcast</h3>
+            <p style="margin:2px 0 0 0; font-size:11.5px; color:rgba(255,255,255,0.85);">Pengumuman promo, restok sparepart, dan info toko resmi 168 Parts</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" class="btn-notif-mark-read" onclick="PasarinApp.markAllNotificationsRead()" title="Tandai semua pesan sebagai dibaca">
+            ✓ Baca Semua
+          </button>
+          <button type="button" class="notification-modal-close" onclick="PasarinApp.closeNotificationModal()" aria-label="Tutup Notifikasi">&times;</button>
+        </div>
+      </div>
+
+      <!-- Filter Kategori Tabs -->
+      <div class="notif-tabs-bar">
+        <button type="button" class="notif-tab-item active" onclick="PasarinApp.filterNotificationCategory('all', this)">
+          Semua Pesan
+        </button>
+        <button type="button" class="notif-tab-item" onclick="PasarinApp.filterNotificationCategory('promo', this)">
+          🎟️ Promo
+        </button>
+        <button type="button" class="notif-tab-item" onclick="PasarinApp.filterNotificationCategory('info', this)">
+          📦 Info & Restok
+        </button>
+        <button type="button" class="notif-tab-item" onclick="PasarinApp.filterNotificationCategory('system', this)">
+          ⚙️ Pengumuman Toko
+        </button>
+      </div>
+
+      <!-- Notification List -->
+      <div class="notification-modal-body" id="notification-items-list">
+        <!-- Rendered dynamically oleh app.js -->
+        <div style="text-align:center; padding:36px 20px; color:#94a3b8;">
+          <span style="font-size:32px; display:block; margin-bottom:8px;">🔔</span>
+          <p style="font-size:13px; font-weight:600; margin:0;">Memuat notifikasi terbaru...</p>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="notification-modal-footer">
+        <span style="font-size:11.5px; color:#64748b;">
+          💡 Butuh bantuan seputar pesanan atau sparepart?
+        </span>
+        <button type="button" class="btn-notif-chat" onclick="PasarinApp.closeNotificationModal(); if(window.PasarinChatBot) window.PasarinChatBot.toggleChat();">
+          💬 Chat Customer Care
+        </button>
       </div>
 
     </div>

@@ -9,6 +9,7 @@ const AdminApp = {
   promos: [],
   banners: null,
   customers: [],
+  broadcasts: [],
   currentTab: 'overview',
   activeEditingId: null,
   activeEditingPromoCode: null,
@@ -244,11 +245,13 @@ const AdminApp = {
     await this.fetchChatRooms();
     await this.fetchPromos();
     await this.fetchBanners();
+    await this.fetchBroadcasts();
     this.updateStats();
     this.renderProductsTable();
     this.renderOrdersTable();
     this.renderCustomersTable();
     this.renderPromosTable();
+    this.renderBroadcastsTable();
     this.populateBannerForm();
     this.renderOverviewRecent();
     this.initChatPolling();
@@ -339,9 +342,14 @@ const AdminApp = {
         customers: '👥 Data Akun Pelanggan & Member 168',
         chat: '💬 Live Chat Customer Care & Manajemen Obrolan',
         banners: '🎨 Pengaturan & Desain Banner Toko',
-        promos: '🎟️ Kelola Voucher & Kode Promo'
+        promos: '🎟️ Kelola Voucher & Kode Promo',
+        broadcasts: '📢 Broadcast Notifikasi Massal ke Seluruh Member'
       };
       titleEl.textContent = titles[tabName] || 'Dashboard Admin';
+    }
+
+    if (tabName === 'broadcasts') {
+      this.fetchBroadcasts();
     }
 
     if (tabName === 'chat') {
@@ -2864,6 +2872,201 @@ const AdminApp = {
       }
     } catch (e) {
       // ignore
+    }
+  },
+
+  /* =========================================================
+     MANAJEMEN BROADCAST NOTIFIKASI MASSAL MEMBER
+     ========================================================= */
+  async fetchBroadcasts() {
+    try {
+      const res = await this.authFetch('/notifications');
+      const data = await res.json();
+      if (data && data.success && Array.isArray(data.data)) {
+        this.broadcasts = data.data;
+        const badgeEl = document.getElementById('sidebar-broadcasts-count');
+        if (badgeEl) {
+          badgeEl.textContent = this.broadcasts.length;
+        }
+        const histCount = document.getElementById('bc-history-count');
+        if (histCount) {
+          histCount.textContent = `Total ${this.broadcasts.length} broadcast terkirim`;
+        }
+        this.renderBroadcastsTable();
+      }
+    } catch (e) {
+      console.warn('Gagal fetch /api/notifications:', e);
+    }
+  },
+
+  renderBroadcastsTable() {
+    const tbody = document.getElementById('admin-broadcasts-tbody');
+    if (!tbody) return;
+
+    if (!this.broadcasts || this.broadcasts.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:32px; color:#94a3b8;">Belum ada riwayat pengumuman broadcast yang dikirim.</td></tr>`;
+      return;
+    }
+
+    const catBadge = {
+      promo: '<span style="background:#fef2f2; color:#be123c; border:1px solid #fecdd3; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:800;">🎟️ Promo</span>',
+      info: '<span style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:800;">📦 Info Produk</span>',
+      system: '<span style="background:#f8fafc; color:#475569; border:1px solid #e2e8f0; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:800;">⚙️ Sistem Toko</span>'
+    };
+
+    tbody.innerHTML = this.broadcasts.map(bc => {
+      const dateStr = bc.created_at ? new Date(bc.created_at).toLocaleString('id-ID', {
+        day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+      }) : '-';
+      
+      const badge = catBadge[bc.category] || catBadge['system'];
+      const actionHtml = bc.action_url ? `<div style="margin-top:4px;"><a href="${bc.action_url}" target="_blank" style="font-size:11px; color:#be123c; text-decoration:none; font-weight:700;">🔗 ${bc.action_label || 'Tautan'}</a></div>` : '';
+
+      return `
+        <tr>
+          <td style="font-size:12px; color:#64748b; font-weight:600;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span>🕒</span> <span>${dateStr}</span>
+            </div>
+          </td>
+          <td>${badge}</td>
+          <td>
+            <div style="font-weight:800; color:#0f172a; font-size:13px; margin-bottom:2px;">${bc.title || '-'}</div>
+            <div style="font-size:12px; color:#475569; line-height:1.4; max-width:360px;">${bc.message || ''}</div>
+            ${actionHtml}
+          </td>
+          <td>
+            <span style="display:inline-flex; align-items:center; gap:5px; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700;">
+              👥 Seluruh Member (${bc.target || 'Semua'})
+            </span>
+          </td>
+          <td style="text-align:center;">
+            <span style="display:inline-flex; align-items:center; gap:4px; color:#059669; font-size:11.5px; font-weight:700;">
+              <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#10b981;"></span>
+              Terkirim ke Lonceng
+            </span>
+          </td>
+          <td style="text-align:right;">
+            <button class="btn-danger" style="padding:4px 10px; font-size:11.5px; border-radius:6px; cursor:pointer;" onclick="AdminApp.deleteBroadcast('${bc.id}')" title="Hapus broadcast ini">
+              🗑️ Hapus
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  },
+
+  updateBroadcastPreview() {
+    const titleVal = document.getElementById('bc-title')?.value.trim() || 'Judul Pengumuman Broadcast';
+    const catVal = document.getElementById('bc-category')?.value || 'promo';
+    const msgVal = document.getElementById('bc-message')?.value.trim() || 'Isi pengumuman broadcast akan muncul di sini persis seperti yang akan dibaca oleh pelanggan Anda...';
+    const labelVal = document.getElementById('bc-action-label')?.value.trim() || 'Lihat Detail';
+
+    const prevTitle = document.getElementById('prev-title');
+    const prevCat = document.getElementById('prev-category');
+    const prevMsg = document.getElementById('prev-message');
+    const prevIcon = document.getElementById('prev-icon');
+    const prevBtn = document.getElementById('prev-action-btn');
+
+    if (prevTitle) prevTitle.textContent = titleVal;
+    if (prevMsg) prevMsg.textContent = msgVal;
+    if (prevBtn) prevBtn.textContent = labelVal;
+
+    const catMeta = {
+      promo: { label: 'PROMO TOKO', icon: '🎟️', color: '#be123c' },
+      info: { label: 'RESTOK & INFO', icon: '📦', color: '#1d4ed8' },
+      system: { label: 'PENGUMUMAN TOKO', icon: '⚙️', color: '#475569' }
+    };
+
+    const cur = catMeta[catVal] || catMeta.promo;
+    if (prevCat) {
+      prevCat.textContent = cur.label;
+      prevCat.style.color = cur.color;
+    }
+    if (prevIcon) prevIcon.textContent = cur.icon;
+  },
+
+  async handleSendBroadcast(event) {
+    if (event) event.preventDefault();
+
+    const title = document.getElementById('bc-title')?.value.trim();
+    const category = document.getElementById('bc-category')?.value || 'promo';
+    const actionUrl = document.getElementById('bc-action-url')?.value.trim() || '';
+    const actionLabel = document.getElementById('bc-action-label')?.value.trim() || 'Lihat Detail';
+    const message = document.getElementById('bc-message')?.value.trim();
+
+    if (!title || !message) {
+      alert('Mohon lengkapi judul dan isi pesan broadcast.');
+      return;
+    }
+
+    const btn = document.getElementById('btn-send-broadcast');
+    const originalText = btn ? btn.innerHTML : '';
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳</span> <span>Mengirimkan Broadcast Massal...</span>';
+    }
+
+    try {
+      const res = await this.authFetch('/notifications/broadcast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          message,
+          category,
+          action_url: actionUrl,
+          action_label: actionLabel,
+          target: 'all'
+        })
+      });
+
+      const data = await res.json();
+      if (data && data.success) {
+        this.showToast('✅ Berhasil mengirimkan broadcast ke lonceng notifikasi seluruh member!');
+        document.getElementById('admin-broadcast-form')?.reset();
+        this.updateBroadcastPreview();
+        await this.fetchBroadcasts();
+      } else {
+        alert(data.message || 'Gagal mengirimkan pesan broadcast.');
+      }
+    } catch (e) {
+      console.error('Error send broadcast:', e);
+      alert('Terjadi kesalahan jaringan saat mengirim broadcast.');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
+  },
+
+  async deleteBroadcast(id) {
+    const confirmed = await this.confirmModal({
+      title: 'Hapus Pesan Broadcast?',
+      message: 'Apakah Anda yakin ingin menghapus pengumuman broadcast ini?',
+      subtext: 'Pemberitahuan ini tidak akan tampil lagi di lonceng notifikasi para member pembeli.',
+      icon: '📢',
+      confirmText: 'Ya, Hapus Broadcast',
+      cancelText: 'Batal',
+      isDanger: true
+    });
+    if (!confirmed) return;
+
+    try {
+      const res = await this.authFetch(`/notifications/${encodeURIComponent(id)}`, {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      if (data && data.success) {
+        this.showToast('Broadcast berhasil dihapus dari notifikasi.');
+        await this.fetchBroadcasts();
+      } else {
+        alert(data.message || 'Gagal menghapus broadcast.');
+      }
+    } catch (e) {
+      console.error('Error delete broadcast:', e);
+      alert('Gagal menghapus broadcast.');
     }
   }
 };
