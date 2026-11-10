@@ -3897,26 +3897,28 @@ const PasarinApp = {
       const catBadge = catBadges[p.category] || '<span style="background:#fee2e2; color:#be123c; font-size:10px; font-weight:800; padding:2px 7px; border-radius:4px; text-transform:uppercase;">🎁 PROMO</span>';
 
       return `
-        <div class="promo-ticket">
+        <div class="promo-ticket" data-code="${p.code}">
           <div class="ticket-left">
             <span class="ticket-icon">${p.icon}</span>
             <span class="ticket-val">${p.valText}</span>
             <span class="ticket-type-lbl">${p.typeText}</span>
           </div>
           <div class="ticket-center">
-            <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px; flex-wrap:wrap;">
-              ${catBadge}
-              <h4 class="ticket-title" title="${p.title}" style="margin:0;">${p.title}</h4>
-              ${claimCount > 0 ? `<span style="background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; font-size:10.5px; font-weight:800; padding:2px 7px; border-radius:10px;">Dimiliki: ${claimCount}x</span>` : ''}
+            <div class="ticket-head-row">
+              <div class="ticket-head-left">
+                ${catBadge}
+                <h4 class="ticket-title" title="${p.title}">${p.title}</h4>
+              </div>
+              ${claimCount > 0 ? `<span class="ticket-owned-badge">✓ Dimiliki ${claimCount}x</span>` : ''}
             </div>
-            <p class="ticket-desc">${p.desc}</p>
+            ${p.desc ? `<p class="ticket-desc">${p.desc}</p>` : ''}
             <div class="ticket-meta">
               <span class="ticket-meta-tag">${p.minSpend}</span>
               <span class="ticket-code-pill" onclick="PasarinApp.copyPromoCode('${p.code}', this)" title="Klik untuk salin kode voucher">
                 🎫 <b>${p.code}</b>
               </span>
-              <span class="ticket-meta-tag" style="background:#fff1f2; color:#be123c; font-weight:800;">Sisa: ${remainingQuota} kuota</span>
-              <span class="ticket-meta-tag" style="background:#f8fafc; color:#64748b;">Maks. 3x/akun</span>
+              <span class="ticket-meta-tag tag-quota">Sisa: ${remainingQuota} kuota</span>
+              <span class="ticket-meta-tag tag-limit">Maks. 3x/akun</span>
             </div>
           </div>
           <div class="ticket-right">
