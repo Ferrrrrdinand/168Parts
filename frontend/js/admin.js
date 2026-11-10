@@ -8,6 +8,7 @@ const AdminApp = {
   orders: [],
   promos: [],
   banners: null,
+  customers: [],
   currentTab: 'overview',
   activeEditingId: null,
   activeEditingPromoCode: null,
@@ -239,11 +240,13 @@ const AdminApp = {
   async loadAllDashboardData() {
     await this.fetchProducts();
     await this.fetchOrders();
+    await this.fetchCustomers();
     await this.fetchPromos();
     await this.fetchBanners();
     this.updateStats();
     this.renderProductsTable();
     this.renderOrdersTable();
+    this.renderCustomersTable();
     this.renderPromosTable();
     this.populateBannerForm();
     this.renderOverviewRecent();
@@ -293,6 +296,20 @@ const AdminApp = {
     if (promoCat) {
       promoCat.addEventListener('change', () => this.renderPromosTable());
     }
+
+    // Customer Search, Filter & Sort
+    const custSearch = document.getElementById('admin-cust-search');
+    const custFilter = document.getElementById('admin-cust-filter');
+    const custSort = document.getElementById('admin-cust-sort');
+    if (custSearch) {
+      custSearch.addEventListener('input', () => this.renderCustomersTable());
+    }
+    if (custFilter) {
+      custFilter.addEventListener('change', () => this.renderCustomersTable());
+    }
+    if (custSort) {
+      custSort.addEventListener('change', () => this.renderCustomersTable());
+    }
   },
 
   switchTab(tabName) {
@@ -317,6 +334,7 @@ const AdminApp = {
         overview: '📊 Ringkasan & Analisis Penjualan',
         products: '📦 Manajemen & Katalog Produk',
         orders: '📑 Daftar Pesanan & Pengiriman',
+        customers: '👥 Data Akun Pelanggan & Member 168',
         banners: '🎨 Pengaturan & Desain Banner Toko',
         promos: '🎟️ Kelola Voucher & Kode Promo'
       };
@@ -379,6 +397,18 @@ const AdminApp = {
     }
   },
 
+  async fetchCustomers() {
+    try {
+      const res = await this.authFetch('/auth/customers');
+      const data = await res.json();
+      if (data && data.success && Array.isArray(data.customers)) {
+        this.customers = data.customers;
+      }
+    } catch (e) {
+      console.warn('Gagal fetch /api/auth/customers', e);
+    }
+  },
+
   updateStats() {
     const totalProdEl = document.getElementById('stat-total-products');
     const totalOrdersEl = document.getElementById('stat-total-orders');
@@ -408,13 +438,30 @@ const AdminApp = {
     if (inactiveVouchersEl) inactiveVouchersEl.textContent = inactiveCount;
     if (usedVouchersEl) usedVouchersEl.textContent = totalUsed;
 
+    // Customer Stats
+    const totalCustEl = document.getElementById('stat-cust-total');
+    const buyersCustEl = document.getElementById('stat-cust-buyers');
+    const pointsCustEl = document.getElementById('stat-cust-points');
+    const spentCustEl = document.getElementById('stat-cust-spent');
+
+    const buyersCount = this.customers.filter(c => Number(c.totalOrders || 0) > 0).length;
+    const totalPoints = this.customers.reduce((acc, c) => acc + (Number(c.points) || 0), 0);
+    const totalSpent = this.customers.reduce((acc, c) => acc + (Number(c.totalSpent) || 0), 0);
+
+    if (totalCustEl) totalCustEl.textContent = this.customers.length;
+    if (buyersCustEl) buyersCustEl.textContent = buyersCount;
+    if (pointsCustEl) pointsCustEl.textContent = totalPoints.toLocaleString('id-ID');
+    if (spentCustEl) spentCustEl.textContent = 'Rp' + totalSpent.toLocaleString('id-ID');
+
     // Badge di sidebar
     const prodBadge = document.getElementById('badge-prod-count');
     const orderBadge = document.getElementById('badge-order-count');
     const promoBadge = document.getElementById('badge-promo-count');
+    const custBadge = document.getElementById('badge-customer-count');
     if (prodBadge) prodBadge.textContent = this.products.length;
     if (orderBadge) orderBadge.textContent = this.orders.length;
     if (promoBadge) promoBadge.textContent = this.promos.length;
+    if (custBadge) custBadge.textContent = this.customers.length;
   },
 
   renderOverviewRecent() {
@@ -1230,6 +1277,420 @@ const AdminApp = {
       console.error(err);
       alert('Gagal memperbarui status review ke server.');
     }
+  },
+
+  /* =========================================================
+     MANAJEMEN DATA AKUN PELANGGAN (168 PARTS USERS)
+     ========================================================= */
+  renderCustomersTable() {
+    const tbody = document.getElementById('admin-customers-tbody');
+    if (!tbody) return;
+
+    const searchInput = document.getElementById('admin-cust-search');
+    const filterSelect = document.getElementById('admin-cust-filter');
+    const sortSelect = document.getElementById('admin-cust-sort');
+
+    const query = (searchInput?.value || '').trim().toLowerCase();
+    const filter = filterSelect?.value || 'all';
+    const sort = sortSelect?.value || 'newest';
+
+    let list = [...this.customers];
+
+    // Filter Search
+    if (query) {
+      list = list.filter(c => {
+        const name = (c.name || '').toLowerCase();
+        const email = (c.email || '').toLowerCase();
+        const phone = (c.phone || '').toLowerCase();
+        const address = (c.address || '').toLowerCase();
+        const id = (c.id || '').toLowerCase();
+        return name.includes(query) || email.includes(query) || phone.includes(query) || address.includes(query) || id.includes(query);
+      });
+    }
+
+    // Filter Option
+    if (filter === 'has_orders') {
+      list = list.filter(c => Number(c.totalOrders || 0) > 0);
+    } else if (filter === 'no_orders') {
+      list = list.filter(c => Number(c.totalOrders || 0) === 0);
+    } else if (filter === 'buyer') {
+      list = list.filter(c => c.role !== 'admin');
+    } else if (filter === 'admin') {
+      list = list.filter(c => c.role === 'admin');
+    }
+
+    // Sorting
+    if (sort === 'newest') {
+      list.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    } else if (sort === 'spent_desc') {
+      list.sort((a, b) => Number(b.totalSpent || 0) - Number(a.totalSpent || 0));
+    } else if (sort === 'orders_desc') {
+      list.sort((a, b) => Number(b.totalOrders || 0) - Number(a.totalOrders || 0));
+    } else if (sort === 'points_desc') {
+      list.sort((a, b) => Number(b.points || 0) - Number(a.points || 0));
+    } else if (sort === 'name_asc') {
+      list.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    }
+
+    if (list.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="8" style="text-align:center; padding:40px 20px; color:#94a3b8;">
+            <div style="font-size:32px; margin-bottom:8px;">👥</div>
+            <div style="font-weight:700; color:#475569; font-size:14px;">Tidak ada akun pelanggan yang cocok dengan pencarian</div>
+            <div style="font-size:12px; color:#94a3b8; margin-top:4px;">Coba gunakan kata kunci pencarian atau filter yang berbeda.</div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    // Palette warna avatar inisial
+    const avatarColors = ['#be123c', '#0284c7', '#059669', '#d97706', '#7c3aed', '#db2777', '#475569'];
+
+    tbody.innerHTML = list.map((c, index) => {
+      const color = avatarColors[index % avatarColors.length];
+      const initials = (c.name || 'User')
+        .split(' ')
+        .map(n => n[0])
+        .slice(0, 2)
+        .join('')
+        .toUpperCase();
+
+      const isBuyer = c.role !== 'admin';
+      const roleBadge = isBuyer
+        ? `<span style="background:rgba(217,119,6,0.12); color:#b45309; border:1px solid rgba(217,119,6,0.3); font-size:10px; font-weight:800; padding:2px 7px; border-radius:12px; display:inline-flex; align-items:center; gap:3px;">⭐ MEMBER 168</span>`
+        : `<span style="background:rgba(190,18,60,0.12); color:#be123c; border:1px solid rgba(190,18,60,0.3); font-size:10px; font-weight:800; padding:2px 7px; border-radius:12px; display:inline-flex; align-items:center; gap:3px;">🛡️ ADMIN</span>`;
+
+      const pointsFormatted = Number(c.points || 0).toLocaleString('id-ID');
+      const ordersCount = Number(c.totalOrders || 0);
+      const spentFormatted = 'Rp' + Number(c.totalSpent || 0).toLocaleString('id-ID');
+
+      const createdDate = c.createdAt
+        ? new Date(c.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
+        : '-';
+
+      const phoneDisplay = c.phone
+        ? `<a href="https://wa.me/${c.phone.replace(/[^0-9]/g, '')}" target="_blank" rel="noopener noreferrer" style="color:#059669; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:4px;" title="Chat via WhatsApp">
+            <span>💬</span> <span>${c.phone}</span>
+          </a>`
+        : `<span style="color:#94a3b8; font-style:italic;">Belum diatur</span>`;
+
+      const addressDisplay = c.address
+        ? `<div style="max-width:220px; font-size:12px; color:#475569; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${c.address}">📍 ${c.address}</div>`
+        : `<span style="color:#94a3b8; font-size:12px; font-style:italic;">-</span>`;
+
+      const orderBadge = ordersCount > 0
+        ? `<span style="background:#ecfdf5; color:#047857; font-weight:800; padding:3px 9px; border-radius:12px; font-size:11.5px; border:1px solid #a7f3d0;">🛍️ ${ordersCount} Pesanan</span>`
+        : `<span style="background:#f1f5f9; color:#64748b; font-weight:600; padding:3px 9px; border-radius:12px; font-size:11.5px;">Belum Belanja</span>`;
+
+      return `
+        <tr style="border-bottom:1px solid var(--admin-border); transition:background 0.15s ease;">
+          <td style="padding:14px 16px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:38px; height:38px; border-radius:50%; background:${color}; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; flex-shrink:0; box-shadow:0 2px 6px rgba(0,0,0,0.15);">
+                ${initials}
+              </div>
+              <div style="display:flex; flex-direction:column; gap:3px;">
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <span style="font-weight:800; color:#0f172a; font-size:13px;">${c.name}</span>
+                  ${roleBadge}
+                </div>
+                <span style="font-size:11px; color:#64748b; font-family:monospace;">ID: ${c.id}</span>
+              </div>
+            </div>
+          </td>
+          <td style="padding:14px 16px;">
+            <div style="display:flex; flex-direction:column; gap:3px; font-size:12px;">
+              <span style="color:#1e293b; font-weight:600;">✉️ ${c.email}</span>
+              ${phoneDisplay}
+            </div>
+          </td>
+          <td style="padding:14px 16px;">
+            ${addressDisplay}
+          </td>
+          <td style="padding:14px 16px;">
+            <div style="display:inline-flex; align-items:center; gap:5px; background:#fffbeb; border:1px solid #fef3c7; color:#b45309; padding:4px 10px; border-radius:20px; font-weight:800; font-size:12px;">
+              <span>🪙</span>
+              <span>${pointsFormatted} Poin</span>
+            </div>
+          </td>
+          <td style="padding:14px 16px;">
+            ${orderBadge}
+          </td>
+          <td style="padding:14px 16px;">
+            <span style="font-weight:800; color:#be123c; font-size:13px;">${spentFormatted}</span>
+          </td>
+          <td style="padding:14px 16px; font-size:12px; color:#64748b;">
+            ${createdDate}
+          </td>
+          <td style="padding:14px 16px; text-align:right;">
+            <button type="button" class="btn-secondary" style="padding:6px 12px; font-size:12px; font-weight:700; display:inline-flex; align-items:center; gap:5px;" onclick="AdminApp.openCustomerDetailModal('${c.id}')">
+              <span>🔍</span>
+              <span>Detail Akun</span>
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  },
+
+  async openCustomerDetailModal(userId) {
+    const modal = document.getElementById('admin-modal-customer-detail');
+    const body = document.getElementById('admin-customer-detail-body');
+    if (!modal || !body) return;
+
+    modal.classList.add('active');
+    body.innerHTML = `
+      <div style="text-align:center; padding:40px 20px;">
+        <div style="font-size:28px; margin-bottom:8px; animation:spin 1s linear infinite;">⏳</div>
+        <div style="font-weight:700; color:#475569;">Memuat data lengkap profil & riwayat transaksi pelanggan...</div>
+      </div>
+    `;
+
+    try {
+      const res = await this.authFetch(`/auth/customers/${userId}`);
+      const data = await res.json();
+      if (!data || !data.success || !data.customer) {
+        body.innerHTML = `<div style="text-align:center; padding:30px; color:#ef4444;">Gagal menemukan data pelanggan.</div>`;
+        return;
+      }
+
+      const c = data.customer;
+      const orders = c.orders || [];
+      const initials = (c.name || 'U').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+      const createdDate = c.createdAt
+        ? new Date(c.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+        : '-';
+
+      const avgSpent = c.totalOrders > 0
+        ? 'Rp' + Math.round(Number(c.totalSpent || 0) / Number(c.totalOrders)).toLocaleString('id-ID')
+        : 'Rp0';
+
+      const hasCoords = c.coordinates && c.coordinates.lat && c.coordinates.lng;
+      const mapsLink = hasCoords
+        ? `<a href="https://www.google.com/maps?q=${c.coordinates.lat},${c.coordinates.lng}" target="_blank" rel="noopener noreferrer" style="color:#0284c7; font-weight:700; font-size:12px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; margin-top:4px;">
+            <span>🗺️</span> <span>Buka Koordinat GPS di Google Maps (${c.coordinates.lat.toFixed(5)}, ${c.coordinates.lng.toFixed(5)})</span>
+          </a>`
+        : '';
+
+      const ordersListHtml = orders.length === 0
+        ? `
+          <div style="background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px; padding:24px; text-align:center; color:#94a3b8; font-size:13px;">
+            🛒 Pelanggan belum pernah melakukan transaksi checkout.
+          </div>
+        `
+        : `
+          <div style="border:1px solid #e2e8f0; border-radius:8px; overflow:hidden;">
+            <table class="admin-table" style="font-size:12px; margin:0;">
+              <thead>
+                <tr style="background:#f8fafc;">
+                  <th style="padding:10px 12px;">ID Pesanan</th>
+                  <th style="padding:10px 12px;">Tanggal Transaksi</th>
+                  <th style="padding:10px 12px;">Rincian Barang</th>
+                  <th style="padding:10px 12px; text-align:right;">Total Belanja</th>
+                  <th style="padding:10px 12px; text-align:center;">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${orders.map(ord => {
+                  const ordDate = new Date(ord.createdAt || Date.now()).toLocaleDateString('id-ID', {
+                    day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                  });
+                  const itemsSummary = (ord.items || []).map(it => `<div>• ${it.name} <b>(x${it.quantity || 1})</b></div>`).join('');
+                  
+                  let statusBadge = `<span style="background:#f1f5f9; color:#475569; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">${ord.status}</span>`;
+                  if (ord.status === 'Sedang Diproses') {
+                    statusBadge = `<span style="background:#fef3c7; color:#b45309; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">⏳ Diproses</span>`;
+                  } else if (ord.status.includes('Dikirim')) {
+                    statusBadge = `<span style="background:#e0f2fe; color:#0284c7; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">🚚 Dikirim</span>`;
+                  } else if (ord.status === 'Sampai di Tujuan' || ord.status === 'Selesai') {
+                    statusBadge = `<span style="background:#ecfdf5; color:#047857; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">✅ Selesai</span>`;
+                  } else if (ord.returnStatus && ord.returnStatus !== 'none') {
+                    statusBadge = `<span style="background:#fff1f2; color:#be123c; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">🔄 Retur: ${ord.returnStatus}</span>`;
+                  }
+
+                  return `
+                    <tr style="border-bottom:1px solid #f1f5f9;">
+                      <td style="padding:10px 12px; font-weight:700; color:#0f172a;">
+                        ${ord.id}
+                        <div style="font-size:11px; color:#64748b; font-weight:normal;">${ord.paymentMethod || 'Transfer'}</div>
+                      </td>
+                      <td style="padding:10px 12px; color:#475569;">${ordDate}</td>
+                      <td style="padding:10px 12px; max-width:240px;">${itemsSummary || '-'}</td>
+                      <td style="padding:10px 12px; text-align:right; font-weight:800; color:#be123c;">
+                        Rp${Number(ord.totalAmount || 0).toLocaleString('id-ID')}
+                      </td>
+                      <td style="padding:10px 12px; text-align:center;">
+                        ${statusBadge}
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+      body.innerHTML = `
+        <!-- Profile Banner Card -->
+        <div style="background:linear-gradient(135deg, #be123c 0%, #881337 100%); border-radius:12px; padding:20px; color:#fff; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:20px; box-shadow:0 4px 14px rgba(190,18,60,0.25);">
+          <div style="display:flex; align-items:center; gap:16px;">
+            <div style="width:58px; height:58px; border-radius:50%; background:#fff; color:#be123c; font-size:22px; font-weight:900; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);">
+              ${initials}
+            </div>
+            <div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <h3 style="margin:0; font-size:18px; font-weight:800; color:#fff;">${c.name}</h3>
+                <span style="background:rgba(255,255,255,0.2); font-size:11px; font-weight:800; padding:2px 8px; border-radius:12px; color:#fff;">
+                  ${c.role === 'admin' ? '🛡️ Administrator' : '⭐ Member Pelanggan'}
+                </span>
+              </div>
+              <div style="font-size:12.5px; color:#fecdd3; margin-top:3px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                <span>✉️ ${c.email}</span>
+                <span>📞 ${c.phone || '-'}</span>
+                <span>📅 Terdaftar sejak: ${createdDate}</span>
+              </div>
+            </div>
+          </div>
+          <div style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); border-radius:10px; padding:10px 16px; text-align:center; min-width:130px;">
+            <div style="font-size:11px; color:#ffe4e6; font-weight:700; text-transform:uppercase;">Saldo 168 Points</div>
+            <div style="font-size:22px; font-weight:900; color:#fff; display:flex; align-items:center; justify-content:center; gap:6px; margin-top:2px;">
+              <span>🪙</span>
+              <span>${Number(c.points || 0).toLocaleString('id-ID')}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 Quick Metrics Cards -->
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:14px; margin-bottom:20px;">
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px 16px;">
+            <div style="font-size:12px; font-weight:700; color:#64748b;">Total Pesanan</div>
+            <div style="font-size:20px; font-weight:900; color:#0f172a; margin-top:4px;">🛍️ ${c.totalOrders} Transaksi</div>
+          </div>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px 16px;">
+            <div style="font-size:12px; font-weight:700; color:#64748b;">Akumulasi Belanja</div>
+            <div style="font-size:20px; font-weight:900; color:#be123c; margin-top:4px;">Rp${Number(c.totalSpent || 0).toLocaleString('id-ID')}</div>
+          </div>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px 16px;">
+            <div style="font-size:12px; font-weight:700; color:#64748b;">Rata-rata per Pesanan</div>
+            <div style="font-size:20px; font-weight:900; color:#0284c7; margin-top:4px;">${avgSpent}</div>
+          </div>
+        </div>
+
+        <!-- Alamat & Pengiriman -->
+        <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:16px; margin-bottom:20px;">
+          <div style="font-size:13px; font-weight:800; color:#0f172a; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+            <span>📍</span> <span>Alamat Pengiriman Terdaftar</span>
+          </div>
+          <p style="font-size:13px; color:#475569; line-height:1.5; margin:0;">
+            ${c.address || '<span style="color:#94a3b8; font-style:italic;">Pelanggan belum mengisi alamat pengiriman tetap.</span>'}
+          </p>
+          ${mapsLink}
+        </div>
+
+        <!-- Riwayat Transaksi Pesanan -->
+        <div>
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+            <div style="font-size:13.5px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:6px;">
+              <span>📑</span> <span>Riwayat Pesanan Pelanggan (${orders.length})</span>
+            </div>
+          </div>
+          ${ordersListHtml}
+        </div>
+      `;
+    } catch (err) {
+      console.error(err);
+      body.innerHTML = `<div style="text-align:center; padding:30px; color:#ef4444;">Terjadi kesalahan saat memuat data pelanggan.</div>`;
+    }
+  },
+
+  closeCustomerDetailModal() {
+    const modal = document.getElementById('admin-modal-customer-detail');
+    if (modal) modal.classList.remove('active');
+  },
+
+  exportCustomersCSV() {
+    if (!this.customers || this.customers.length === 0) {
+      alert('Tidak ada data akun pelanggan untuk diekspor.');
+      return;
+    }
+
+    const headers = [
+      'ID Akun',
+      'Nama Lengkap',
+      'Role / Tipe',
+      'Email',
+      'Nomor WhatsApp / HP',
+      'Alamat Pengiriman',
+      'Saldo 168 Points',
+      'Total Pesanan',
+      'Total Belanja (Rp)',
+      'Tanggal Registrasi',
+      'Pesanan Terakhir'
+    ];
+
+    const escapeCsv = (str) => {
+      if (str === null || str === undefined) return '""';
+      const s = String(str).replace(/"/g, '""');
+      return `"${s}"`;
+    };
+
+    const rows = this.customers.map(c => {
+      const regDate = c.createdAt
+        ? new Date(c.createdAt).toLocaleDateString('id-ID', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+        : '-';
+      const lastOrder = c.lastOrderDate
+        ? new Date(c.lastOrderDate).toLocaleDateString('id-ID', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+        : '-';
+
+      return [
+        escapeCsv(c.id),
+        escapeCsv(c.name),
+        escapeCsv(c.role === 'admin' ? 'Admin' : 'Member Buyer'),
+        escapeCsv(c.email),
+        escapeCsv(c.phone || '-'),
+        escapeCsv(c.address || '-'),
+        escapeCsv(Number(c.points || 0)),
+        escapeCsv(Number(c.totalOrders || 0)),
+        escapeCsv(Number(c.totalSpent || 0)),
+        escapeCsv(regDate),
+        escapeCsv(lastOrder)
+      ].join(',');
+    });
+
+    // Ringkasan Total
+    const totalPoints = this.customers.reduce((acc, c) => acc + (Number(c.points) || 0), 0);
+    const totalSpent = this.customers.reduce((acc, c) => acc + (Number(c.totalSpent) || 0), 0);
+    const summaryRow = [
+      escapeCsv('TOTAL KESELURUHAN'),
+      escapeCsv(`${this.customers.length} Akun`),
+      escapeCsv(''),
+      escapeCsv(''),
+      escapeCsv(''),
+      escapeCsv(''),
+      escapeCsv(totalPoints),
+      escapeCsv(''),
+      escapeCsv(totalSpent),
+      escapeCsv(''),
+      escapeCsv('')
+    ].join(',');
+
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows, summaryRow].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `Data_Pelanggan_168Parts_${dateStr}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    this.showToast(`👥 Berhasil mengekspor ${this.customers.length} data akun pelanggan ke file Excel (CSV)!`);
   },
 
   renderPromosTable() {

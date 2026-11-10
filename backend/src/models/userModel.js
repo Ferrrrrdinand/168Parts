@@ -193,6 +193,104 @@ class UserModel {
     return newPoints;
   }
 
+  // Ambil semua data akun pengguna / pelanggan beserta statistik pesanan & total belanja
+  async findAllWithStats() {
+    const sql = `
+      SELECT 
+        u.id, u.name, u.email, u.phone, u.address, u.coordinates, u.role, u.points, u.created_at, u.updated_at,
+        COUNT(o.id) AS total_orders,
+        COALESCE(SUM(o.total_amount), 0) AS total_spent,
+        MAX(o.created_at) AS last_order_date
+      FROM users u
+      LEFT JOIN orders o ON u.id = o.user_id
+      GROUP BY u.id, u.name, u.email, u.phone, u.address, u.coordinates, u.role, u.points, u.created_at, u.updated_at
+      ORDER BY u.created_at DESC
+    `;
+    const rows = await dbManager.query(sql);
+    if (!rows || rows.length === 0) return [];
+
+    return rows.map(r => {
+      let coords = null;
+      if (r.coordinates) {
+        try {
+          coords = typeof r.coordinates === 'string' ? JSON.parse(r.coordinates) : r.coordinates;
+        } catch (e) {
+          coords = null;
+        }
+      }
+      return {
+        id: r.id,
+        name: r.name,
+        email: r.email,
+        phone: r.phone || '',
+        address: r.address || '',
+        coordinates: coords,
+        role: r.role || 'buyer',
+        points: Number(r.points || 0),
+        totalOrders: Number(r.total_orders || 0),
+        totalSpent: Number(r.total_spent || 0),
+        lastOrderDate: r.last_order_date || null,
+        createdAt: r.created_at,
+        updatedAt: r.updated_at
+      };
+    });
+  }
+
+  // Ambil detail pelanggan lengkap beserta seluruh riwayat pesanannya
+  async getCustomerDetail(id) {
+    const user = await this.findById(id);
+    if (!user) return null;
+
+    // Bersihkan data kredensial sensitif
+    delete user.salt;
+    delete user.hash;
+
+    const orderRows = await dbManager.query(
+      'SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC',
+      [id]
+    );
+
+    const orders = (orderRows || []).map(row => {
+      let items = [];
+      if (row.items) {
+        try {
+          items = typeof row.items === 'string' ? JSON.parse(row.items) : row.items;
+        } catch (e) {
+          items = [];
+        }
+      }
+      return {
+        id: row.id,
+        userId: row.user_id,
+        items,
+        shippingAddress: row.shipping_address,
+        paymentMethod: row.payment_method,
+        notes: row.notes || '',
+        totalAmount: Number(row.total_amount || 0),
+        earnedPoints: Number(row.earned_points || 0),
+        redeemedPoints: Number(row.redeemed_points || 0),
+        status: row.status || 'Sedang Diproses',
+        subtotal: Number(row.subtotal || row.total_amount || 0),
+        promoCode: row.promo_code || null,
+        discountAmount: Number(row.discount_amount || 0),
+        arrivedAt: row.arrived_at || null,
+        returnStatus: row.return_status || 'none',
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
+      };
+    });
+
+    const totalOrders = orders.length;
+    const totalSpent = orders.reduce((sum, ord) => sum + ord.totalAmount, 0);
+
+    return {
+      ...user,
+      totalOrders,
+      totalSpent,
+      orders
+    };
+  }
+
   async ensureDefaultUsers() {
     try {
       // 1. Admin 168 Parts

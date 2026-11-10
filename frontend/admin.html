@@ -89,6 +89,12 @@
         <span class="nav-badge" id="badge-order-count">0</span>
       </button>
 
+      <button class="sidebar-nav-item" data-tab="customers">
+        <span class="nav-icon">👥</span>
+        <span>Data Pelanggan</span>
+        <span class="nav-badge" id="badge-customer-count">0</span>
+      </button>
+
       <div class="menu-category-title">Pemasaran & Sistem</div>
 
       <button class="sidebar-nav-item" data-tab="promos">
@@ -356,6 +362,112 @@
               </thead>
               <tbody id="admin-orders-tbody">
                 <tr><td colspan="7" style="text-align:center; padding:30px; color:#94a3b8;">Memuat data pesanan...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           TAB: CUSTOMERS (DATA AKUN PELANGGAN & MEMBER 168)
+           ========================================================= -->
+      <section class="admin-tab-pane" id="pane-customers">
+        
+        <!-- Customer KPI Metric Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-info">
+              <span class="kpi-label">Total Akun Terdaftar</span>
+              <span class="kpi-value" id="stat-cust-total">0</span>
+              <span class="kpi-sub">Pelanggan & Teknisi Member</span>
+            </div>
+            <div style="font-size:32px; background:rgba(190,18,60,0.08); width:54px; height:54px; border-radius:12px; display:flex; align-items:center; justify-content:center;">👥</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-info">
+              <span class="kpi-label">Pelanggan Belanja</span>
+              <span class="kpi-value" id="stat-cust-buyers">0</span>
+              <span class="kpi-sub">Memiliki riwayat pesanan</span>
+            </div>
+            <div style="font-size:32px; background:rgba(5,150,105,0.08); width:54px; height:54px; border-radius:12px; display:flex; align-items:center; justify-content:center;">🛍️</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-info">
+              <span class="kpi-label">Total 168 Points Beredar</span>
+              <span class="kpi-value" id="stat-cust-points">0</span>
+              <span class="kpi-sub">Poin loyalitas aktif</span>
+            </div>
+            <div style="font-size:32px; background:rgba(217,119,6,0.08); width:54px; height:54px; border-radius:12px; display:flex; align-items:center; justify-content:center;">🪙</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-info">
+              <span class="kpi-label">Akumulasi Belanja Pelanggan</span>
+              <span class="kpi-value" id="stat-cust-spent">Rp0</span>
+              <span class="kpi-sub">Total transaksi member</span>
+            </div>
+            <div style="font-size:32px; background:rgba(2,132,199,0.08); width:54px; height:54px; border-radius:12px; display:flex; align-items:center; justify-content:center;">💳</div>
+          </div>
+        </div>
+
+        <!-- Customer Table Panel -->
+        <div style="background:#ffffff; border:1px solid var(--admin-border); border-radius:var(--radius-md); box-shadow:var(--shadow-sm); overflow:hidden;">
+          
+          <!-- Toolbar Filter & Search -->
+          <div style="padding:18px 24px; border-bottom:1px solid var(--admin-border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; flex:1; min-width:280px;">
+              <div style="position:relative; flex:1; max-width:320px;">
+                <input type="text" id="admin-cust-search" class="admin-input" placeholder="Cari nama, email, nomor HP, atau kota..." style="width:100%; padding-left:36px;" oninput="AdminApp.renderCustomersTable()">
+                <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:14px; color:#94a3b8; pointer-events:none;">🔍</span>
+              </div>
+
+              <select id="admin-cust-filter" class="admin-select" style="min-width:160px;" onchange="AdminApp.renderCustomersTable()">
+                <option value="all">Semua Akun</option>
+                <option value="has_orders">Pernah Belanja (≥ 1 Order)</option>
+                <option value="no_orders">Belum Belanja (0 Order)</option>
+                <option value="buyer">Hanya Pelanggan (Buyer)</option>
+                <option value="admin">Administrator</option>
+              </select>
+
+              <select id="admin-cust-sort" class="admin-select" style="min-width:170px;" onchange="AdminApp.renderCustomersTable()">
+                <option value="newest">Paling Baru Mendaftar</option>
+                <option value="spent_desc">Total Belanja Tertinggi</option>
+                <option value="orders_desc">Pesanan Terbanyak</option>
+                <option value="points_desc">Poin 168 Terbanyak</option>
+                <option value="name_asc">Nama A-Z</option>
+              </select>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:8px;">
+              <button class="btn-export-sales" onclick="AdminApp.exportCustomersCSV()" style="background:#059669; color:#ffffff; padding:7px 14px; border-radius:6px; font-weight:700; font-size:12px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(5,150,105,0.25); transition:all 0.2s ease;">
+                <span>📥</span>
+                <span>Ekspor Pelanggan (CSV)</span>
+              </button>
+              <button class="btn-secondary" onclick="AdminApp.fetchCustomers()" style="padding:7px 12px; font-size:12px;" title="Refresh Data Pelanggan">
+                <span>🔄</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Customer Data Table -->
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Pelanggan</th>
+                  <th>Kontak / WhatsApp</th>
+                  <th>Alamat Pengiriman</th>
+                  <th>Saldo Poin 168</th>
+                  <th>Total Pesanan</th>
+                  <th>Total Belanja</th>
+                  <th>Terdaftar</th>
+                  <th style="text-align:right;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="admin-customers-tbody">
+                <tr><td colspan="8" style="text-align:center; padding:30px; color:#94a3b8;">Memuat data akun pelanggan...</td></tr>
               </tbody>
             </table>
           </div>
@@ -987,6 +1099,27 @@
       </div>
       <div class="admin-modal-body" id="admin-return-review-body" style="padding: 24px;">
         <div style="text-align:center; padding:30px; color:#64748b;">Memuat data bukti retur...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       7. MODAL DIALOG: DETAIL AKUN PELANGGAN & RIWAYAT PESANAN
+       ========================================================= -->
+  <div class="admin-modal-overlay" id="admin-modal-customer-detail" style="z-index: 5000;">
+    <div class="admin-modal-card" style="width: 820px; max-width: 95vw; max-height: 90vh; display:flex; flex-direction:column;">
+      <div class="admin-modal-header" style="flex-shrink:0;">
+        <h3 class="admin-modal-title" style="display:flex; align-items:center; gap:8px;">
+          <span>👤</span>
+          <span>Detail Akun Pelanggan & Riwayat Pesanan</span>
+        </h3>
+        <button class="admin-modal-close" onclick="AdminApp.closeCustomerDetailModal()" aria-label="Tutup">&times;</button>
+      </div>
+      <div class="admin-modal-body" id="admin-customer-detail-body" style="padding: 24px; overflow-y:auto; flex:1;">
+        <div style="text-align:center; padding:30px; color:#64748b;">Memuat profil pelanggan...</div>
+      </div>
+      <div class="admin-modal-footer" style="flex-shrink:0; display:flex; justify-content:flex-end;">
+        <button type="button" class="btn-secondary" onclick="AdminApp.closeCustomerDetailModal()">Tutup</button>
       </div>
     </div>
   </div>

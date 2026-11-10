@@ -263,3 +263,53 @@ exports.logout = (req, res) => {
     message: 'Berhasil keluar (logout).'
   });
 };
+
+// Ambil seluruh daftar akun pelanggan & pengguna terdaftar untuk Admin
+exports.getAllCustomers = async (req, res) => {
+  try {
+    const customers = await userModel.findAllWithStats();
+    return res.json({
+      success: true,
+      total: customers.length,
+      customers
+    });
+  } catch (error) {
+    console.error('Error getAllCustomers:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memuat data akun pelanggan dari database.'
+    });
+  }
+};
+
+// Ambil detail profil pelanggan dan seluruh riwayat pesanannya untuk Admin
+exports.getCustomerDetail = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID pelanggan wajib disertakan.'
+      });
+    }
+
+    const customer = await userModel.getCustomerDetail(id);
+    if (!customer) {
+      return res.status(404).json({
+        success: false,
+        message: 'Data pelanggan tidak ditemukan.'
+      });
+    }
+
+    return res.json({
+      success: true,
+      customer
+    });
+  } catch (error) {
+    console.error('Error getCustomerDetail:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memuat detail data pelanggan.'
+    });
+  }
+};
