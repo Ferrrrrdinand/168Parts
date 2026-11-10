@@ -35,28 +35,18 @@ const PasarinApp = {
   selectedRating: null,
   selectedLocation: null,
 
-  // Palet tema warna kategori
+  // Palet tema warna kategori 168 Parts
   categoryThemes: {
-    "Elektronik": { bg: "#e0f2fe", color: "#0284c7" },
-    "Komputer & Aksesoris": { bg: "#e0e7ff", color: "#4f46e5" },
-    "HP & Aksesoris": { bg: "#dcfce7", color: "#16a34a" },
-    "Pakaian Pria": { bg: "#fef3c7", color: "#d97706" },
-    "Sepatu Pria": { bg: "#ffedd5", color: "#ea580c" },
-    "Tas Pria": { bg: "#ffe4e6", color: "#e11d48" },
-    "Jam Tangan": { bg: "#cffafe", color: "#0891b2" },
-    "Kesehatan": { bg: "#fee2e2", color: "#dc2626" },
-    "Hobi & Koleksi": { bg: "#f3e8ff", color: "#9333ea" },
-    "Makanan & Minuman": { bg: "#fef9c3", color: "#ca8a04" },
-    "Perawatan & Kecantikan": { bg: "#fce7f3", color: "#db2777" },
-    "Perlengkapan Rumah": { bg: "#ccfbf1", color: "#0d9488" },
-    "Pakaian Wanita": { bg: "#fdf2f8", color: "#c026d3" },
-    "Fashion Muslim": { bg: "#ecfdf5", color: "#059669" },
-    "Ibu & Bayi": { bg: "#fef2f2", color: "#f43f5e" },
-    "Sepatu Wanita": { bg: "#fff1f2", color: "#e11d48" },
-    "Tas Wanita": { bg: "#fae8ff", color: "#a855f7" },
-    "Aksesoris Fashion": { bg: "#fff7ed", color: "#ea580c" },
-    "Fotografi": { bg: "#ede9fe", color: "#7c3aed" },
-    "Otomotif": { bg: "#f1f5f9", color: "#475569" }
+    "LCD & Layar": { bg: "#e0f2fe", color: "#0284c7" },
+    "Baterai HP": { bg: "#dcfce7", color: "#16a34a" },
+    "IC & Chipset": { bg: "#fef3c7", color: "#d97706" },
+    "Alat Servis & Blower": { bg: "#fee2e2", color: "#dc2626" },
+    "Solder & Timah": { bg: "#ffedd5", color: "#ea580c" },
+    "Lem & Perekat": { bg: "#f3e8ff", color: "#9333ea" },
+    "Backdoor & Kaca": { bg: "#e0e7ff", color: "#4f46e5" },
+    "Alat Ukur & Tester": { bg: "#cffafe", color: "#0891b2" },
+    "Pinset & Pembuka": { bg: "#ccfbf1", color: "#0d9488" },
+    "Sparepart Fleksibel": { bg: "#fce7f3", color: "#db2777" }
   },
 
   async init() {
@@ -2483,10 +2473,9 @@ const PasarinApp = {
     }
 
     const categoriesList = [
-      "Elektronik", "Komputer & Aksesoris", "HP & Aksesoris", "Fotografi",
-      "Pakaian Pria", "Sepatu Pria", "Tas Pria", "Jam Tangan", "Kesehatan",
-      "Hobi & Koleksi", "Makanan & Minuman", "Perawatan & Kecantikan",
-      "Perlengkapan Rumah", "Pakaian Wanita", "Fashion Muslim", "Otomotif"
+      "LCD & Layar", "Baterai HP", "IC & Chipset", "Alat Servis & Blower",
+      "Solder & Timah", "Lem & Perekat", "Backdoor & Kaca", "Alat Ukur & Tester",
+      "Pinset & Pembuka", "Sparepart Fleksibel"
     ];
 
     modal.innerHTML = `

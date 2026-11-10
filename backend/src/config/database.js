@@ -1,7 +1,7 @@
 require('dotenv').config();
 const { Pool } = require('pg');
 
-const SUPABASE_DB_URL = process.env.DATABASE_URL || 'postgresql://postgres.vgraouxizjvfnpzfebyb:168parts2026@aws-0-ap-northeast-2.pooler.supabase.com:5432/postgres';
+const SUPABASE_DB_URL = process.env.DATABASE_URL || 'postgresql://postgres.vgraouxizjvfnpzfebyb:168parts2026@aws-0-ap-northeast-2.pooler.supabase.com:6543/postgres';
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://vgraouxizjvfnpzfebyb.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
@@ -42,7 +42,7 @@ class DatabaseManager {
       this.pgPool = new Pool({
         connectionString: SUPABASE_DB_URL,
         ssl: { rejectUnauthorized: false },
-        max: 20,
+        max: 10,
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 10000
       });

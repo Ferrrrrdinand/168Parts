@@ -332,10 +332,10 @@ const AdminApp = {
       console.warn('Gagal fetch /api/products, gunakan fallback', e);
       if (!this.products.length) {
         this.products = [
-          { id: 'prod-1', name: 'DJI Osmo Action 4 Standard Combo', category: 'Fotografi', price: 3940000, stock: 45, soldCount: 1420, isFlashSale: true, image: 'images/product-placeholder.svg' },
-          { id: 'prod-2', name: 'iPhone 12 256GB Garansi Resmi iBox', category: 'Handphone', price: 3599000, stock: 20, soldCount: 980, isFlashSale: true, image: 'images/product-placeholder.svg' },
-          { id: 'prod-3', name: 'Insta360 X4 Kamera 360 8K Ultra', category: 'Fotografi', price: 6990000, stock: 15, soldCount: 650, isFlashSale: false, image: 'images/product-placeholder.svg' },
-          { id: 'prod-4', name: 'Goojodoq Multipurpose Laptop Bag', category: 'Komputer', price: 156000, stock: 120, soldCount: 4200, isFlashSale: true, image: 'images/product-placeholder.svg' }
+          { id: '168-lcd-ip11', name: 'LCD Touchscreen iPhone 11 Incell True Tone Grade A+', category: 'LCD & Layar', price: 245000, stock: 45, soldCount: 1420, isFlashSale: true, image: 'images/product-placeholder.svg' },
+          { id: '168-bat-ip11', name: 'Baterai iPhone 11 Original High Capacity 3110mAh', category: 'Baterai HP', price: 145000, stock: 35, soldCount: 980, isFlashSale: true, image: 'images/product-placeholder.svg' },
+          { id: '168-ic-pm8953', name: 'IC Power PM8953 Original New Xiaomi / Oppo / Vivo', category: 'IC & Chipset', price: 28000, stock: 150, soldCount: 3200, isFlashSale: false, image: 'images/product-placeholder.svg' },
+          { id: '168-blower-857dw', name: 'Quick 857DW+ Blower Uap Panas SMD Rework Station Original', category: 'Alat Servis & Blower', price: 795000, stock: 12, soldCount: 420, isFlashSale: true, image: 'images/product-placeholder.svg' }
         ];
       }
     }
@@ -570,7 +570,7 @@ const AdminApp = {
     this.activeEditingId = prodId;
     document.getElementById('modal-product-title').textContent = 'Edit Informasi Produk';
     document.getElementById('f-prod-name').value = p.name || '';
-    document.getElementById('f-prod-category').value = p.category || 'Elektronik';
+    document.getElementById('f-prod-category').value = p.category || 'LCD & Layar';
     document.getElementById('f-prod-price').value = p.price || '';
     document.getElementById('f-prod-orig-price').value = p.originalPrice || '';
     document.getElementById('f-prod-stock').value = p.stock || 20;
