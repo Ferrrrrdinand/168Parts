@@ -3842,8 +3842,24 @@ const PasarinApp = {
   filterPromoTab(category, btnElement) {
     this.activePromoTab = category;
     const tabBtns = document.querySelectorAll('.promo-tab-item');
-    tabBtns.forEach(btn => btn.classList.remove('active'));
-    if (btnElement) btnElement.classList.add('active');
+    tabBtns.forEach(btn => {
+      btn.classList.remove('active');
+      btn.style.background = '#ffffff';
+      btn.style.color = '#64748b';
+      btn.style.borderColor = '#cbd5e1';
+      btn.style.boxShadow = 'none';
+      const lbl = btn.querySelector('.tab-label');
+      if (lbl) lbl.style.color = '#64748b';
+    });
+    if (btnElement) {
+      btnElement.classList.add('active');
+      btnElement.style.background = '#be123c';
+      btnElement.style.color = '#ffffff';
+      btnElement.style.borderColor = '#be123c';
+      btnElement.style.boxShadow = '0 3px 10px rgba(190, 18, 60, 0.3)';
+      const lbl = btnElement.querySelector('.tab-label');
+      if (lbl) lbl.style.color = '#ffffff';
+    }
     this.renderPromoTickets();
   },
 
@@ -3852,9 +3868,9 @@ const PasarinApp = {
     if (!listEl) return;
 
     // Perbarui label tab dengan jumlah voucher terkini
-    const tabAll = document.querySelector('.promo-tabs-bar .promo-tab-item');
-    if (tabAll && this.promos) {
-      tabAll.textContent = `Semua Promo (${this.promos.length})`;
+    const tabAllLabel = document.querySelector('#promo-tab-all .tab-label') || document.querySelector('.promo-tabs-bar .promo-tab-item');
+    if (tabAllLabel && this.promos) {
+      tabAllLabel.textContent = `Semua Promo (${this.promos.length})`;
     }
 
     let filtered = this.promos || [];
@@ -4101,7 +4117,7 @@ const PasarinApp = {
       badge.style.background = remaining > 0 ? '#ffffff' : '#10b981';
       badge.style.color = remaining > 0 ? '#be123c' : '#ffffff';
     }
-    const tabAll = document.getElementById('promo-tab-all') || document.querySelector('.promo-tabs-bar .promo-tab-item');
+    const tabAll = document.querySelector('#promo-tab-all .tab-label') || document.getElementById('promo-tab-all') || document.querySelector('.promo-tabs-bar .promo-tab-item');
     if (tabAll && this.promos) {
       tabAll.textContent = `Semua Promo (${this.promos.length})`;
     }

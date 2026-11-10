@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light only">
   <title>168 Parts | Pusat Sparepart & Alat Servis HP Terlengkap Surabaya</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/gmaps-picker.css">
-  <link rel="stylesheet" href="css/responsive-sensor.css">
-  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/style.css?v=2.6">
+  <link rel="stylesheet" href="css/gmaps-picker.css?v=2.6">
+  <link rel="stylesheet" href="css/responsive-sensor.css?v=2.6">
+  <link rel="stylesheet" href="css/animations.css?v=2.6">
   <!-- Leaflet Map CSS & JS untuk Pemilihan Lokasi GMaps -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -1048,12 +1048,26 @@
       </div>
 
       <!-- Filter Kategori Promo -->
-      <div class="promo-tabs-bar" id="promo-tabs-bar">
-        <button class="promo-tab-item active" id="promo-tab-all" onclick="PasarinApp.filterPromoTab('all', this)">Semua Promo (6)</button>
-        <button class="promo-tab-item" onclick="PasarinApp.filterPromoTab('ongkir', this)">🚚 Gratis Ongkir</button>
-        <button class="promo-tab-item" onclick="PasarinApp.filterPromoTab('diskon', this)">🏷️ Diskon Belanja</button>
-        <button class="promo-tab-item" onclick="PasarinApp.filterPromoTab('cashback', this)">💰 Cashback</button>
-        <button class="promo-tab-item" onclick="PasarinApp.filterPromoTab('lokal', this)">🏬 Brand Lokal</button>
+      <div class="promo-tabs-bar" id="promo-tabs-bar" style="display:flex; align-items:center; background:#f8fafc; padding:12px 24px; border-bottom:1px solid #e2e8f0; gap:8px; overflow-x:auto; scrollbar-width:none; box-sizing:border-box;">
+        <button type="button" class="promo-tab-item active" id="promo-tab-all" onclick="PasarinApp.filterPromoTab('all', this)" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; height:36px; min-height:36px; padding:0 16px; line-height:1; border-radius:9999px; font-size:12.5px; font-weight:700; background:#be123c; color:#ffffff; border:1.5px solid #be123c; cursor:pointer; white-space:nowrap; flex-shrink:0; box-sizing:border-box;">
+          <span class="tab-label" style="line-height:1; font-weight:700; color:#ffffff;">Semua Promo (6)</span>
+        </button>
+        <button type="button" class="promo-tab-item" onclick="PasarinApp.filterPromoTab('ongkir', this)" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; height:36px; min-height:36px; padding:0 16px; line-height:1; border-radius:9999px; font-size:12.5px; font-weight:700; background:#ffffff; color:#64748b; border:1.5px solid #cbd5e1; cursor:pointer; white-space:nowrap; flex-shrink:0; box-sizing:border-box;">
+          <span class="tab-icon" style="font-size:14px; line-height:1;">🚚</span>
+          <span class="tab-label" style="line-height:1; font-weight:700;">Gratis Ongkir</span>
+        </button>
+        <button type="button" class="promo-tab-item" onclick="PasarinApp.filterPromoTab('diskon', this)" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; height:36px; min-height:36px; padding:0 16px; line-height:1; border-radius:9999px; font-size:12.5px; font-weight:700; background:#ffffff; color:#64748b; border:1.5px solid #cbd5e1; cursor:pointer; white-space:nowrap; flex-shrink:0; box-sizing:border-box;">
+          <span class="tab-icon" style="font-size:14px; line-height:1;">🏷️</span>
+          <span class="tab-label" style="line-height:1; font-weight:700;">Diskon Belanja</span>
+        </button>
+        <button type="button" class="promo-tab-item" onclick="PasarinApp.filterPromoTab('cashback', this)" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; height:36px; min-height:36px; padding:0 16px; line-height:1; border-radius:9999px; font-size:12.5px; font-weight:700; background:#ffffff; color:#64748b; border:1.5px solid #cbd5e1; cursor:pointer; white-space:nowrap; flex-shrink:0; box-sizing:border-box;">
+          <span class="tab-icon" style="font-size:14px; line-height:1;">💰</span>
+          <span class="tab-label" style="line-height:1; font-weight:700;">Cashback</span>
+        </button>
+        <button type="button" class="promo-tab-item" onclick="PasarinApp.filterPromoTab('lokal', this)" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; height:36px; min-height:36px; padding:0 16px; line-height:1; border-radius:9999px; font-size:12.5px; font-weight:700; background:#ffffff; color:#64748b; border:1.5px solid #cbd5e1; cursor:pointer; white-space:nowrap; flex-shrink:0; box-sizing:border-box;">
+          <span class="tab-icon" style="font-size:14px; line-height:1;">🏬</span>
+          <span class="tab-label" style="line-height:1; font-weight:700;">Brand Lokal</span>
+        </button>
       </div>
 
       <!-- Daftar Voucher Tiket -->
