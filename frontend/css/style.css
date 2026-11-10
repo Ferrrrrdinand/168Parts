@@ -2742,12 +2742,12 @@ main.w {
   background: #ffffff;
   border-radius: 20px;
   width: 95%;
-  max-width: 680px;
+  max-width: 740px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.35);
   position: relative;
   transform: scale(0.9) translateY(20px);
   animation: promoCardPop 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -2759,23 +2759,24 @@ main.w {
   }
 }
 
-/* Modal Header with Festive Theme */
+/* Modal Header with Festive 168 Parts Red/Crimson Theme */
 .promo-modal-header {
-  background: linear-gradient(135deg, #9f1239 0%, #be123c 50%, #2e6919 100%);
+  background: linear-gradient(135deg, #700b25 0%, #9f1239 45%, #be123c 75%, #db2777 100%);
   color: #ffffff;
-  padding: 22px 24px 18px 24px;
+  padding: 24px 28px 20px 28px;
   position: relative;
   overflow: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .promo-modal-header::before {
   content: '';
   position: absolute;
   top: -40px;
-  right: -40px;
-  width: 140px;
-  height: 140px;
-  background: rgba(255, 255, 255, 0.12);
+  right: -30px;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 70%);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -2783,11 +2784,11 @@ main.w {
 .promo-modal-header::after {
   content: '';
   position: absolute;
-  bottom: -30px;
-  left: 10%;
-  width: 100px;
-  height: 100px;
-  background: rgba(255, 255, 255, 0.08);
+  bottom: -20px;
+  left: 15%;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(255, 228, 230, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -2796,25 +2797,28 @@ main.w {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .promo-tag-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(8px);
-  padding: 4px 12px;
+  padding: 5px 14px;
   border-radius: var(--radius-full);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.5px;
   text-transform: uppercase;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .promo-modal-close {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.22);
   color: #ffffff;
   width: 32px;
   height: 32px;
@@ -2822,38 +2826,42 @@ main.w {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 19px;
+  font-weight: 700;
   cursor: pointer;
-  border: none;
-  transition: var(--transition);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.2s ease;
 }
 
 .promo-modal-close:hover {
-  background: rgba(255, 255, 255, 0.35);
-  transform: rotate(90deg);
+  background: rgba(255, 255, 255, 0.4);
+  transform: rotate(90deg) scale(1.08);
 }
 
 .promo-modal-header h2 {
-  font-size: 20px;
+  font-size: 21px;
   font-weight: 800;
   line-height: 1.3;
-  margin: 0 0 4px 0;
+  margin: 0 0 6px 0;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .promo-modal-header p {
-  font-size: 12.5px;
-  opacity: 0.94;
+  font-size: 13px;
+  opacity: 0.95;
   margin: 0;
-  line-height: 1.45;
+  line-height: 1.5;
+  color: #ffe4e6;
 }
 
 /* Custom Promo Input Bar */
 .custom-promo-bar {
-  padding: 12px 20px;
+  padding: 14px 24px;
   background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #f1f5f9;
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: center;
 }
 
@@ -2867,55 +2875,55 @@ main.w {
 .custom-promo-input-box input {
   width: 100%;
   background: #f8fafc;
-  border: 1.5px solid #cbd5e1;
+  border: 1.5px solid #e2e8f0;
   border-radius: 8px;
-  padding: 9px 14px 9px 36px;
-  font-size: 13px;
+  padding: 10px 14px 10px 38px;
+  font-size: 12.5px;
   font-weight: 700;
   text-transform: uppercase;
-  color: #1e293b;
+  color: #0f172a;
   outline: none;
-  transition: var(--transition);
+  transition: all 0.2s ease;
 }
 
 .custom-promo-input-box input:focus {
   background: #ffffff;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(238, 77, 45, 0.12);
+  border-color: #be123c;
+  box-shadow: 0 0 0 3px rgba(190, 18, 60, 0.12);
 }
 
 .custom-promo-input-box .input-icon {
   position: absolute;
-  left: 11px;
+  left: 12px;
   font-size: 15px;
   pointer-events: none;
 }
 
 .btn-custom-claim {
-  background: linear-gradient(135deg, var(--primary) 0%, #ff5722 100%);
+  background: linear-gradient(135deg, #be123c 0%, #e11d48 100%);
   color: #ffffff;
   border: none;
-  padding: 10px 18px;
+  padding: 10px 20px;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 800;
   white-space: nowrap;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(238, 77, 45, 0.25);
-  transition: var(--transition);
+  box-shadow: 0 2px 8px rgba(190, 18, 60, 0.25);
+  transition: all 0.2s ease;
 }
 
 .btn-custom-claim:hover {
-  background: var(--primary-hover);
+  background: linear-gradient(135deg, #9f1239 0%, #be123c 100%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(238, 77, 45, 0.4);
+  box-shadow: 0 4px 14px rgba(190, 18, 60, 0.35);
 }
 
 /* Promo Tabs Filter */
 .promo-tabs-bar {
   display: flex;
   background: #f8fafc;
-  padding: 10px 18px;
+  padding: 10px 24px;
   border-bottom: 1px solid #e2e8f0;
   gap: 8px;
   overflow-x: auto;
@@ -2942,100 +2950,90 @@ main.w {
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
-  transition: var(--transition);
+  transition: all 0.2s ease;
 }
 
 .promo-tab-item:hover {
-  color: var(--primary);
-  border-color: #ffd8cc;
+  color: #be123c;
+  border-color: #fca5a5;
+  background: #fff1f2;
 }
 
 .promo-tab-item.active {
-  background: var(--primary);
+  background: #be123c;
   color: #ffffff;
-  border-color: var(--primary);
-  box-shadow: 0 2px 8px rgba(238, 77, 45, 0.3);
+  border-color: #be123c;
+  box-shadow: 0 2px 8px rgba(190, 18, 60, 0.25);
 }
 
 /* Voucher Ticket List */
 .promo-body {
-  padding: 14px 18px;
+  padding: 16px 24px;
   overflow-y: auto;
-  max-height: 390px;
+  max-height: 430px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   background: #f8fafc;
+  scrollbar-width: thin;
+  scrollbar-color: #fca5a5 #f1f5f9;
 }
 
-/* Single Ticket Card (E-commerce Style with Cutouts) */
+.promo-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.promo-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 6px;
+}
+
+/* Single Ticket Card (E-commerce Style with Clean Perforated Dividing Line) */
 .promo-ticket {
   display: flex;
   align-items: stretch;
   background: #ffffff;
   border-radius: 12px;
-  border: 1.5px dashed #cbd5e1;
+  border: 1.5px solid #fed7cc;
   position: relative;
   overflow: hidden;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   transition: all 0.25s ease;
-  min-height: 84px;
+  min-height: 92px;
 }
 
 .promo-ticket:hover {
-  border-color: var(--primary);
-  box-shadow: 0 6px 16px rgba(238, 77, 45, 0.12);
+  border-color: #be123c;
+  box-shadow: 0 8px 22px rgba(190, 18, 60, 0.12);
   transform: translateY(-2px);
-}
-
-/* Left Cutout Notches */
-.promo-ticket::before, .promo-ticket::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  width: 14px;
-  height: 14px;
-  background: #f8fafc;
-  border-radius: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
-}
-
-.promo-ticket::before {
-  left: -7px;
-  border-right: 1.5px dashed #cbd5e1;
-}
-
-.promo-ticket::after {
-  right: -7px;
-  border-left: 1.5px dashed #cbd5e1;
 }
 
 /* Left Column: Value / Discount */
 .ticket-left {
-  width: 110px;
-  min-width: 110px;
-  max-width: 110px;
+  width: 124px;
+  min-width: 124px;
+  max-width: 124px;
   flex-shrink: 0;
   background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 10px 8px;
-  border-right: 1.5px dashed #fed7cc;
+  padding: 12px 10px;
+  border-right: 1.5px dashed #f43f5e;
   text-align: center;
-  gap: 2px;
+  gap: 3px;
+  position: relative;
 }
 
 .ticket-icon {
-  font-size: 20px;
+  font-size: 22px;
   line-height: 1;
 }
 
 .ticket-val {
-  color: var(--primary);
-  font-size: 15px;
+  color: #be123c;
+  font-size: 16px;
   font-weight: 900;
   line-height: 1.1;
   white-space: nowrap;
@@ -3043,8 +3041,8 @@ main.w {
 
 .ticket-type-lbl {
   font-size: 10px;
-  font-weight: 700;
-  color: #713f12;
+  font-weight: 800;
+  color: #9f1239;
   text-transform: uppercase;
   white-space: nowrap;
   line-height: 1.2;
@@ -3054,7 +3052,7 @@ main.w {
 .ticket-center {
   flex: 1;
   min-width: 0;
-  padding: 10px 14px;
+  padding: 12px 18px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -3062,7 +3060,7 @@ main.w {
 }
 
 .ticket-title {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
   color: #0f172a;
   line-height: 1.3;
@@ -3073,9 +3071,9 @@ main.w {
 }
 
 .ticket-desc {
-  font-size: 11.5px;
-  color: #64748b;
-  line-height: 1.35;
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.4;
   margin: 0;
   white-space: normal;
   display: -webkit-box;
@@ -3088,72 +3086,110 @@ main.w {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 10.5px;
-  color: #94a3b8;
-  margin: 0;
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 4px;
   flex-wrap: wrap;
+}
+
+.ticket-meta-tag {
+  background: #f1f5f9;
+  color: #475569;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 4px;
 }
 
 .ticket-code-pill {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: #f1f5f9;
-  color: #334155;
-  padding: 2px 7px;
+  background: #fff1f2;
+  color: #be123c;
+  padding: 2px 8px;
   border-radius: 4px;
   font-family: monospace;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 11px;
   cursor: pointer;
-  border: 1px solid #e2e8f0;
-  transition: var(--transition);
+  border: 1px dashed #f43f5e;
+  transition: all 0.2s ease;
   white-space: nowrap;
 }
 
 .ticket-code-pill:hover {
-  background: #e2e8f0;
-  color: var(--primary);
+  background: #fee2e2;
+  transform: scale(1.03);
 }
 
 /* Right Column: Claim Button */
 .ticket-right {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   justify-content: center;
-  padding: 0 16px;
+  padding: 12px 18px;
+  width: 140px;
   flex-shrink: 0;
+  gap: 6px;
+  background: #ffffff;
+}
+
+.btn-copy-code-direct {
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.btn-copy-code-direct:hover {
+  background: #f8fafc;
+  border-color: #be123c;
+  color: #be123c;
 }
 
 .btn-claim-voucher {
-  background: var(--primary);
+  background: linear-gradient(135deg, #be123c 0%, #e11d48 100%);
   color: #ffffff;
   border: none;
-  padding: 8px 16px;
+  padding: 8px 14px;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 800;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(190, 18, 60, 0.25);
+  text-align: center;
 }
 
 .btn-claim-voucher:hover {
-  background: var(--primary-hover);
-  transform: scale(1.04);
+  background: linear-gradient(135deg, #9f1239 0%, #be123c 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(190, 18, 60, 0.35);
 }
 
 .btn-claim-voucher.claimed {
-  background: #10b981;
-  color: #ffffff;
+  background: #f1f5f9;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+  box-shadow: none;
   cursor: default;
 }
 
 /* Promo Modal Footer */
 .promo-modal-footer {
-  padding: 14px 20px;
+  padding: 16px 24px;
   background: #ffffff;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid #f1f5f9;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -3163,9 +3199,15 @@ main.w {
 .promo-dont-show {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
+  gap: 8px;
+  font-size: 12.5px;
   color: #64748b;
+  cursor: pointer;
+  user-select: none;
+}
+
+.promo-dont-show input {
+  accent-color: #be123c;
   cursor: pointer;
 }
 
@@ -3176,22 +3218,22 @@ main.w {
 }
 
 .btn-claim-all-promo {
-  background: linear-gradient(135deg, var(--primary) 0%, #ff5722 100%);
+  background: linear-gradient(135deg, #be123c 0%, #e11d48 100%);
   color: #ffffff;
   border: none;
-  padding: 10px 18px;
-  border-radius: var(--radius-sm);
+  padding: 10px 22px;
+  border-radius: 8px;
   font-size: 13px;
   font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 3px 10px rgba(238, 77, 45, 0.3);
-  transition: var(--transition);
+  box-shadow: 0 3px 12px rgba(190, 18, 60, 0.3);
+  transition: all 0.2s ease;
 }
 
 .btn-claim-all-promo:hover {
-  background: var(--primary-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 14px rgba(238, 77, 45, 0.4);
+  background: linear-gradient(135deg, #9f1239 0%, #be123c 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 16px rgba(190, 18, 60, 0.4);
 }
 
 /* Mobile Responsive: Welcome Promo Modal */

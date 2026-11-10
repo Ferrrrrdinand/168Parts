@@ -3833,9 +3833,26 @@ const PasarinApp = {
     const listEl = document.getElementById('promo-ticket-list');
     if (!listEl) return;
 
-    let filtered = this.promos;
+    // Perbarui label tab dengan jumlah voucher terkini
+    const tabAll = document.querySelector('.promo-tabs-bar .promo-tab-item');
+    if (tabAll && this.promos) {
+      tabAll.textContent = `Semua Promo (${this.promos.length})`;
+    }
+
+    let filtered = this.promos || [];
     if (this.activePromoTab !== 'all') {
       filtered = this.promos.filter(p => p.category === this.activePromoTab);
+    }
+
+    if (filtered.length === 0) {
+      listEl.innerHTML = `
+        <div style="text-align:center; padding:40px 20px; background:#ffffff; border-radius:12px; border:1px dashed #cbd5e1; color:#64748b;">
+          <div style="font-size:36px; margin-bottom:8px;">🎟️</div>
+          <div style="font-weight:800; font-size:14px; color:#1e293b;">Belum ada voucher aktif di kategori ini</div>
+          <div style="font-size:12px; margin-top:4px; color:#94a3b8;">Silakan klik tab "Semua Promo" untuk melihat semua voucher yang tersedia.</div>
+        </div>
+      `;
+      return;
     }
 
     listEl.innerHTML = filtered.map(p => {
@@ -3847,29 +3864,37 @@ const PasarinApp = {
       let claimBtnHtml = '';
       if (isSoldOut) {
         claimBtnHtml = `
-          <button class="btn-claim-voucher" disabled style="background:#cbd5e1; color:#64748b; cursor:not-allowed; border:none; padding:7px 12px; border-radius:6px; font-weight:700; font-size:12px;">
+          <button class="btn-claim-voucher" disabled style="background:#cbd5e1; color:#64748b; cursor:not-allowed; border:none; padding:8px 12px; border-radius:6px; font-weight:700; font-size:12px;">
             Habis
           </button>
         `;
       } else if (isMaxClaimed) {
         claimBtnHtml = `
-          <button class="btn-claim-voucher claimed" disabled style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; cursor:not-allowed; padding:7px 12px; border-radius:6px; font-weight:700; font-size:12px;" title="Batas maksimal 3 voucher telah tercapai">
+          <button class="btn-claim-voucher claimed" disabled style="background:#f1f5f9; color:#059669; border:1px solid #a7f3d0; cursor:not-allowed; padding:8px 12px; border-radius:6px; font-weight:800; font-size:11.5px;" title="Batas maksimal 3 voucher telah tercapai">
             ✓ Maks. 3/3
           </button>
         `;
       } else if (claimCount > 0) {
         claimBtnHtml = `
-          <button class="btn-claim-voucher" onclick="PasarinApp.claimPromo('${p.code}', this)" style="background:#be123c; color:#fff; border:none; padding:7px 12px; border-radius:6px; font-weight:700; font-size:12px; cursor:pointer;" title="Klaim lagi (+1 voucher)">
+          <button class="btn-claim-voucher" onclick="PasarinApp.claimPromo('${p.code}', this)" style="background:linear-gradient(135deg, #be123c 0%, #e11d48 100%); color:#fff; border:none; padding:8px 12px; border-radius:6px; font-weight:800; font-size:11.5px; cursor:pointer;" title="Klaim lagi (+1 voucher)">
             +1 Klaim (${claimCount}/3)
           </button>
         `;
       } else {
         claimBtnHtml = `
-          <button class="btn-claim-voucher" onclick="PasarinApp.claimPromo('${p.code}', this)" style="background:#be123c; color:#fff; border:none; padding:7px 14px; border-radius:6px; font-weight:700; font-size:12px; cursor:pointer;" title="Klaim voucher (maks. 3 per akun)">
-            Klaim (0/3)
+          <button class="btn-claim-voucher" onclick="PasarinApp.claimPromo('${p.code}', this)" style="background:linear-gradient(135deg, #be123c 0%, #e11d48 100%); color:#fff; border:none; padding:8px 14px; border-radius:6px; font-weight:800; font-size:12px; cursor:pointer;" title="Klaim voucher (maks. 3 per akun)">
+            🎟️ Klaim (0/3)
           </button>
         `;
       }
+
+      const catBadges = {
+        ongkir: '<span style="background:#e0f2fe; color:#0369a1; font-size:10px; font-weight:800; padding:2px 7px; border-radius:4px; text-transform:uppercase;">🚚 GRATIS ONGKIR</span>',
+        cashback: '<span style="background:#fef3c7; color:#b45309; font-size:10px; font-weight:800; padding:2px 7px; border-radius:4px; text-transform:uppercase;">💰 CASHBACK</span>',
+        lokal: '<span style="background:#f3e8ff; color:#7e22ce; font-size:10px; font-weight:800; padding:2px 7px; border-radius:4px; text-transform:uppercase;">🏬 BRAND LOKAL</span>',
+        diskon: '<span style="background:#fee2e2; color:#be123c; font-size:10px; font-weight:800; padding:2px 7px; border-radius:4px; text-transform:uppercase;">🏷️ DISKON</span>'
+      };
+      const catBadge = catBadges[p.category] || '<span style="background:#fee2e2; color:#be123c; font-size:10px; font-weight:800; padding:2px 7px; border-radius:4px; text-transform:uppercase;">🎁 PROMO</span>';
 
       return `
         <div class="promo-ticket">
@@ -3880,24 +3905,22 @@ const PasarinApp = {
           </div>
           <div class="ticket-center">
             <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px; flex-wrap:wrap;">
+              ${catBadge}
               <h4 class="ticket-title" title="${p.title}" style="margin:0;">${p.title}</h4>
-              ${claimCount > 0 ? `<span style="background:#fee2e2; color:#be123c; font-size:10.5px; font-weight:800; padding:2px 7px; border-radius:10px;">Dimiliki: ${claimCount}x</span>` : ''}
+              ${claimCount > 0 ? `<span style="background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; font-size:10.5px; font-weight:800; padding:2px 7px; border-radius:10px;">Dimiliki: ${claimCount}x</span>` : ''}
             </div>
             <p class="ticket-desc">${p.desc}</p>
             <div class="ticket-meta">
-              <span>${p.minSpend}</span>
-              <span>•</span>
+              <span class="ticket-meta-tag">${p.minSpend}</span>
               <span class="ticket-code-pill" onclick="PasarinApp.copyPromoCode('${p.code}', this)" title="Klik untuk salin kode voucher">
                 🎫 <b>${p.code}</b>
               </span>
-              <span>•</span>
-              <span style="color:#e11d48; font-weight:700;">Sisa: ${remainingQuota} kuota</span>
-              <span>•</span>
-              <span style="color:#475569; font-weight:600;">Maks. 3 voucher/akun</span>
+              <span class="ticket-meta-tag" style="background:#fff1f2; color:#be123c; font-weight:800;">Sisa: ${remainingQuota} kuota</span>
+              <span class="ticket-meta-tag" style="background:#f8fafc; color:#64748b;">Maks. 3x/akun</span>
             </div>
           </div>
           <div class="ticket-right">
-            <button class="btn-copy-code-direct" onclick="PasarinApp.copyPromoCode('${p.code}', this)" style="background:#f1f5f9; color:#1e293b; border:1px solid #cbd5e1; border-radius:6px; padding:6px 10px; font-size:11.5px; font-weight:700; cursor:pointer; width:100%; transition:all 0.2s;">
+            <button class="btn-copy-code-direct" onclick="PasarinApp.copyPromoCode('${p.code}', this)" title="Salin kode voucher ke clipboard">
               📋 Salin Kode
             </button>
             ${claimBtnHtml}
@@ -4052,11 +4075,16 @@ const PasarinApp = {
 
   updatePromoBadgeCount() {
     const badge = document.getElementById('fab-voucher-count');
-    if (!badge) return;
-    const remaining = this.promos.length - this.claimedPromos.length;
-    badge.textContent = remaining > 0 ? remaining : '✓';
-    badge.style.background = remaining > 0 ? '#ffffff' : '#10b981';
-    badge.style.color = remaining > 0 ? '#ee4d2d' : '#ffffff';
+    if (badge) {
+      const remaining = this.promos.length - this.claimedPromos.length;
+      badge.textContent = remaining > 0 ? remaining : '✓';
+      badge.style.background = remaining > 0 ? '#ffffff' : '#10b981';
+      badge.style.color = remaining > 0 ? '#be123c' : '#ffffff';
+    }
+    const tabAll = document.getElementById('promo-tab-all') || document.querySelector('.promo-tabs-bar .promo-tab-item');
+    if (tabAll && this.promos) {
+      tabAll.textContent = `Semua Promo (${this.promos.length})`;
+    }
   },
 
   bindGlobalEvents() {
