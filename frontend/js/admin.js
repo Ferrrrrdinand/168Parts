@@ -2878,19 +2878,76 @@ const AdminApp = {
   /* =========================================================
      MANAJEMEN BROADCAST NOTIFIKASI MASSAL MEMBER
      ========================================================= */
+  fillBroadcastPreset(type) {
+    const presets = {
+      promo: {
+        title: '🔥 Pesta Gajian 168 Parts - Diskon Spesial s.d 50%!',
+        category: 'promo',
+        actionUrl: '#/promos',
+        actionLabel: 'Klaim Voucher Diskon',
+        message: 'Gunakan kode promo gajian hari ini untuk potongan belanja langsung sparepart LCD, baterai, dan alat servis pilihan Anda! Klaim vouchernya sekarang.'
+      },
+      restock: {
+        title: '📦 Stok Baru Tiba: LCD iPhone 11-15 & Samsung Seri A/S',
+        category: 'info',
+        actionUrl: '#/search?category=LCD',
+        actionLabel: 'Lihat Stok Sparepart',
+        message: 'Stok sparepart layar LCD Grade A+ serta baterai kapasitas original 168 Parts telah siap dikirim hari ini dengan garansi tukar langsung.'
+      },
+      flash: {
+        title: '⚡ Flash Sale Kilat Khusus Teknisi & Mitra 168 Parts',
+        category: 'promo',
+        actionUrl: '#/promos',
+        actionLabel: 'Buka Flash Sale',
+        message: 'Dapatkan harga spesial grosir untuk pembelian lem LCD, solder station, multitester digital, dan pinset presisi hari ini saja!'
+      },
+      system: {
+        title: '🕒 Info Jadwal Operasional & Pengiriman Toko 168 Parts',
+        category: 'system',
+        actionUrl: '#/',
+        actionLabel: 'Kunjungi Toko',
+        message: 'Toko & layanan kurir instan 168 Parts buka setiap hari 08.00 - 21.00 WIB. Seluruh pesanan sebelum pukul 17.00 WIB dikirim di hari yang sama.'
+      }
+    };
+
+    const preset = presets[type];
+    if (!preset) return;
+
+    const titleEl = document.getElementById('bc-title');
+    const catEl = document.getElementById('bc-category');
+    const urlEl = document.getElementById('bc-action-url');
+    const labelEl = document.getElementById('bc-action-label');
+    const msgEl = document.getElementById('bc-message');
+
+    if (titleEl) titleEl.value = preset.title;
+    if (catEl) catEl.value = preset.category;
+    if (urlEl) urlEl.value = preset.actionUrl;
+    if (labelEl) labelEl.value = preset.actionLabel;
+    if (msgEl) msgEl.value = preset.message;
+
+    this.updateBroadcastPreview();
+    if (titleEl) titleEl.focus();
+    this.showToast(`Template ${type.toUpperCase()} berhasil dimuat!`);
+  },
+
   async fetchBroadcasts() {
     try {
       const res = await this.authFetch('/notifications');
       const data = await res.json();
       if (data && data.success && Array.isArray(data.data)) {
         this.broadcasts = data.data;
-        const badgeEl = document.getElementById('sidebar-broadcasts-count');
+        const badgeEl = document.getElementById('badge-broadcast-count');
         if (badgeEl) {
           badgeEl.textContent = this.broadcasts.length;
+          badgeEl.style.display = this.broadcasts.length > 0 ? 'inline-block' : 'none';
         }
         const histCount = document.getElementById('bc-history-count');
         if (histCount) {
           histCount.textContent = `Total ${this.broadcasts.length} broadcast terkirim`;
+        }
+        const statTotal = document.getElementById('bc-stat-total');
+        if (statTotal) {
+          statTotal.textContent = this.broadcasts.length;
         }
         this.renderBroadcastsTable();
       }
@@ -2904,14 +2961,14 @@ const AdminApp = {
     if (!tbody) return;
 
     if (!this.broadcasts || this.broadcasts.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:32px; color:#94a3b8;">Belum ada riwayat pengumuman broadcast yang dikirim.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:36px; color:#94a3b8; font-size:13px;">Belum ada riwayat pengumuman broadcast yang dikirim.</td></tr>`;
       return;
     }
 
     const catBadge = {
-      promo: '<span style="background:#fef2f2; color:#be123c; border:1px solid #fecdd3; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:800;">🎟️ Promo</span>',
-      info: '<span style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:800;">📦 Info Produk</span>',
-      system: '<span style="background:#f8fafc; color:#475569; border:1px solid #e2e8f0; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:800;">⚙️ Sistem Toko</span>'
+      promo: '<span style="background:#fff1f2; color:#be123c; border:1px solid #fecdd3; padding:4px 10px; border-radius:9999px; font-size:11px; font-weight:800; display:inline-flex; align-items:center; gap:4px;">🎟️ Promo & Diskon</span>',
+      info: '<span style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; padding:4px 10px; border-radius:9999px; font-size:11px; font-weight:800; display:inline-flex; align-items:center; gap:4px;">📦 Info Produk</span>',
+      system: '<span style="background:#f8fafc; color:#475569; border:1px solid #e2e8f0; padding:4px 10px; border-radius:9999px; font-size:11px; font-weight:800; display:inline-flex; align-items:center; gap:4px;">⚙️ Sistem Toko</span>'
     };
 
     tbody.innerHTML = this.broadcasts.map(bc => {
@@ -2920,35 +2977,37 @@ const AdminApp = {
       }) : '-';
       
       const badge = catBadge[bc.category] || catBadge['system'];
-      const actionHtml = bc.action_url ? `<div style="margin-top:4px;"><a href="${bc.action_url}" target="_blank" style="font-size:11px; color:#be123c; text-decoration:none; font-weight:700;">🔗 ${bc.action_label || 'Tautan'}</a></div>` : '';
+      const actionHtml = bc.action_url ? `<div style="margin-top:5px;"><a href="${bc.action_url}" target="_blank" style="font-size:11.5px; color:#be123c; text-decoration:none; font-weight:700; display:inline-flex; align-items:center; gap:4px;">🔗 ${bc.action_label || 'Tautan'}</a></div>` : '';
 
       return `
-        <tr>
+        <tr style="border-bottom:1px solid #f1f5f9;">
           <td style="font-size:12px; color:#64748b; font-weight:600;">
             <div style="display:flex; align-items:center; gap:6px;">
-              <span>🕒</span> <span>${dateStr}</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span>${dateStr}</span>
             </div>
           </td>
           <td>${badge}</td>
           <td>
-            <div style="font-weight:800; color:#0f172a; font-size:13px; margin-bottom:2px;">${bc.title || '-'}</div>
-            <div style="font-size:12px; color:#475569; line-height:1.4; max-width:360px;">${bc.message || ''}</div>
+            <div style="font-weight:800; color:#0f172a; font-size:13px; margin-bottom:3px;">${bc.title || '-'}</div>
+            <div style="font-size:12px; color:#475569; line-height:1.45; max-width:380px;">${bc.message || ''}</div>
             ${actionHtml}
           </td>
           <td>
-            <span style="display:inline-flex; align-items:center; gap:5px; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700;">
-              👥 Seluruh Member (${bc.target || 'Semua'})
+            <span style="display:inline-flex; align-items:center; gap:5px; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; padding:4px 9px; border-radius:8px; font-size:11.5px; font-weight:700;">
+              👥 Seluruh Member
             </span>
           </td>
           <td style="text-align:center;">
-            <span style="display:inline-flex; align-items:center; gap:4px; color:#059669; font-size:11.5px; font-weight:700;">
-              <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#10b981;"></span>
-              Terkirim ke Lonceng
+            <span style="display:inline-flex; align-items:center; gap:5px; color:#059669; font-size:11.5px; font-weight:700; background:#f0fdf4; border:1px solid #bbf7d0; padding:3px 8px; border-radius:9999px;">
+              <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:#10b981; box-shadow:0 0 0 2px rgba(16,185,129,0.2);"></span>
+              Terkirim
             </span>
           </td>
           <td style="text-align:right;">
-            <button class="btn-danger" style="padding:4px 10px; font-size:11.5px; border-radius:6px; cursor:pointer;" onclick="AdminApp.deleteBroadcast('${bc.id}')" title="Hapus broadcast ini">
-              🗑️ Hapus
+            <button class="btn-danger" style="padding:5px 10px; font-size:11.5px; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-weight:700;" onclick="AdminApp.deleteBroadcast('${bc.id}')" title="Hapus broadcast ini dari notifikasi">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+              <span>Hapus</span>
             </button>
           </td>
         </tr>
@@ -2973,15 +3032,16 @@ const AdminApp = {
     if (prevBtn) prevBtn.textContent = labelVal;
 
     const catMeta = {
-      promo: { label: 'PROMO TOKO', icon: '🎟️', color: '#be123c' },
-      info: { label: 'RESTOK & INFO', icon: '📦', color: '#1d4ed8' },
-      system: { label: 'PENGUMUMAN TOKO', icon: '⚙️', color: '#475569' }
+      promo: { label: 'PROMO TOKO', icon: '🎟️', color: '#be123c', bg: '#ffe4e6' },
+      info: { label: 'RESTOK & INFO', icon: '📦', color: '#1d4ed8', bg: '#dbeafe' },
+      system: { label: 'PENGUMUMAN TOKO', icon: '⚙️', color: '#475569', bg: '#f1f5f9' }
     };
 
     const cur = catMeta[catVal] || catMeta.promo;
     if (prevCat) {
       prevCat.textContent = cur.label;
       prevCat.style.color = cur.color;
+      prevCat.style.background = cur.bg;
     }
     if (prevIcon) prevIcon.textContent = cur.icon;
   },

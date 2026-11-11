@@ -3,17 +3,27 @@
    ========================================================= */
 
 :root {
-  --primary: #ee4d2d;
-  --primary-hover: #d73211;
-  --primary-light: #fff5f2;
-  --bg-auth: #f5f5f5;
+  --primary: #be123c;
+  --primary-hover: #9f1239;
+  --primary-light: #fff1f2;
+  --bg-auth: #f8fafc;
   --card-bg: #ffffff;
-  --text-main: #222222;
-  --text-muted: #757575;
-  --border-color: #e0e0e0;
-  --border-focus: #ee4d2d;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --border-focus: #be123c;
   --radius: 8px;
   --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Fix browser autofill pale blue color */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #0f172a !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 body.auth-page {
@@ -697,8 +707,8 @@ body.auth-page {
 
 .btn-open-gmaps {
   background: #fff;
-  border: 1.5px solid #fed7cc;
-  color: #c2410c;
+  border: 1.5px solid #fecdd3;
+  color: #be123c;
   padding: 4px 10px;
   border-radius: 6px;
   font-size: 11px;
@@ -712,7 +722,7 @@ body.auth-page {
 }
 
 .btn-open-gmaps:hover {
-  background: #fff5f2;
+  background: #fff1f2;
   border-color: var(--primary);
   color: var(--primary);
   transform: translateY(-1px);

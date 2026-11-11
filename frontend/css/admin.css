@@ -6,11 +6,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --admin-primary: #1d3f0d;
-  --admin-primary-dark: #152e09;
-  --admin-primary-light: #285715;
-  --admin-primary-subtle: #f2f8f0;
-  --admin-accent: #ea580c;
+  --admin-primary: #be123c;
+  --admin-primary-dark: #9f1239;
+  --admin-primary-light: #e11d48;
+  --admin-primary-subtle: #fff1f2;
+  --admin-accent: #f43f5e;
   
   --admin-bg: #f8fafc;
   --admin-card-bg: #ffffff;
@@ -162,10 +162,11 @@ body {
 }
 
 .sidebar-nav-item.active {
-  background: var(--admin-primary);
+  background: linear-gradient(135deg, #be123c 0%, #e11d48 100%);
   color: #ffffff;
   font-weight: 700;
-  box-shadow: 0 2px 8px rgba(29, 63, 13, 0.35);
+  box-shadow: 0 3px 12px rgba(190, 18, 60, 0.4);
+  position: relative;
 }
 
 .sidebar-nav-item .nav-icon {
@@ -174,6 +175,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .sidebar-nav-item .nav-badge {
@@ -183,6 +185,36 @@ body {
   background: rgba(255, 255, 255, 0.2);
   padding: 2px 7px;
   border-radius: 10px;
+}
+
+/* Preset Template Chips for Broadcast */
+.bc-preset-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  color: #334155;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  user-select: none;
+}
+
+.bc-preset-chip:hover {
+  background: #fff1f2;
+  border-color: #fecdd3;
+  color: #be123c;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(190, 18, 60, 0.15);
+}
+
+.bc-preset-chip:active {
+  transform: translateY(0);
 }
 
 .admin-sidebar-footer {

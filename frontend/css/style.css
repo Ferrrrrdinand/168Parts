@@ -47,6 +47,16 @@
   padding: 0;
 }
 
+/* Fix browser autofill pale blue color */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #0f172a !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 body {
   background-color: var(--bg-page);
   color: var(--text-main);
@@ -6193,7 +6203,7 @@ button:disabled {
 }
 
 .profile-link-btn:hover {
-  color: #ee4d2d;
+  color: #be123c;
 }
 
 .profile-text-input {
@@ -6201,7 +6211,7 @@ button:disabled {
   max-width: 440px;
   height: 40px;
   border: 1px solid rgba(0, 0, 0, 0.14);
-  border-radius: 2px;
+  border-radius: 6px;
   padding: 0 12px;
   font-size: 14px;
   outline: none;
@@ -6210,8 +6220,8 @@ button:disabled {
 }
 
 .profile-text-input:focus {
-  border-color: rgba(0, 0, 0, 0.54);
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+  border-color: #be123c;
+  box-shadow: 0 0 0 3px rgba(190, 18, 60, 0.12);
 }
 
 .profile-radio-group {
@@ -6230,7 +6240,7 @@ button:disabled {
 }
 
 .profile-radio-label input[type="radio"] {
-  accent-color: #ee4d2d;
+  accent-color: #be123c;
   width: 16px;
   height: 16px;
   cursor: pointer;
@@ -6250,25 +6260,27 @@ button:disabled {
 }
 
 .profile-row-submit {
-  margin-top: 10px;
+  margin-top: 14px;
 }
 
 .btn-shopee-save-profile {
-  background: #ee4d2d;
+  background: linear-gradient(135deg, #be123c 0%, #e11d48 100%);
   color: #ffffff;
   border: none;
-  height: 40px;
-  padding: 0 28px;
-  border-radius: 2px;
+  height: 42px;
+  padding: 0 32px;
+  border-radius: 6px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.09);
-  transition: background 0.15s ease;
+  box-shadow: 0 2px 8px rgba(190, 18, 60, 0.25);
+  transition: all 0.2s ease;
 }
 
 .btn-shopee-save-profile:hover {
-  background: #d73211;
+  background: linear-gradient(135deg, #9f1239 0%, #be123c 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(190, 18, 60, 0.35);
 }
 
 /* Kolom Avatar Kanan */
