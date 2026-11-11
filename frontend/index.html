@@ -132,12 +132,12 @@
     <div class="w">
       <div class="top">
         <div>
-          <a href="admin.html" title="Kanal Penjual & Dashboard Admin 168 Parts (Wajib Login)" style="font-weight:700; color:#ffffff; background:rgba(255,255,255,0.18); padding:3px 10px; border-radius:4px; margin-right:8px; display:inline-flex; align-items:center; gap:5px; text-decoration:none;">
+          <a href="admin.html" data-i18n="nav.seller_channel" data-i18n-title="nav.seller_channel_title" title="Kanal Penjual & Dashboard Admin 168 Parts (Wajib Login)" style="font-weight:700; color:#ffffff; background:rgba(255,255,255,0.18); padding:3px 10px; border-radius:4px; margin-right:8px; display:inline-flex; align-items:center; gap:5px; text-decoration:none;">
             ⚙️ Kanal Penjual
           </a>
-          <a href="javascript:void(0)" onclick="if(window.PasarinApp) window.PasarinApp.openPromoModal();" title="Buka Pop up Kode Promo & Voucher" style="color:#fef08a; font-weight:800; background:rgba(234,179,8,0.22); border:1px solid rgba(254,240,138,0.4); padding:3px 10px; border-radius:4px; margin-right:8px; display:inline-flex; align-items:center; gap:5px; text-decoration:none;">🎁 Kode Promo & Voucher</a>
-          <a href="#/">Unduh Aplikasi</a>
-          <span>Ikuti kami di 
+          <a href="javascript:void(0)" onclick="if(window.PasarinApp) window.PasarinApp.openPromoModal();" data-i18n="nav.promo_vouchers" data-i18n-title="nav.promo_vouchers_title" title="Buka Pop up Kode Promo & Voucher" style="color:#fef08a; font-weight:800; background:rgba(234,179,8,0.22); border:1px solid rgba(254,240,138,0.4); padding:3px 10px; border-radius:4px; margin-right:8px; display:inline-flex; align-items:center; gap:5px; text-decoration:none;">🎁 Kode Promo & Voucher</a>
+          <a href="#/" data-i18n="nav.download_app">Unduh Aplikasi</a>
+          <span><span data-i18n="nav.follow_us">Ikuti kami di</span> 
             <svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"></rect><circle cx="12" cy="12" r="4.5"></circle><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"></circle></svg>
             <svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
           </span>
@@ -145,23 +145,40 @@
         <div style="display: flex; align-items: center;">
           <a href="javascript:void(0)" id="btn-topbar-notif" onclick="PasarinApp.openNotificationModal()" style="position:relative; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" title="Lihat Notifikasi & Broadcast">
             <svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-            <span>Notifikasi</span>
+            <span data-i18n="nav.notifications">Notifikasi</span>
             <span class="nav-notif-badge" id="nav-notif-badge" style="display:none;">0</span>
           </a>
-          <a href="#">
+          <a href="#" data-i18n="nav.help">
             <svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
             Bantuan
           </a>
-          <span>
-            <svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-            Bahasa Indonesia
-          </span>
+
+          <!-- Interactive Language Switcher Dropdown (ID & EN) -->
+          <div class="lang-dropdown-container" id="lang-dropdown-wrapper" style="position:relative; display:inline-flex; align-items:center;">
+            <button type="button" class="lang-dropdown-btn" id="lang-current-btn" onclick="PasarinI18n.toggleDropdown()" style="background:none; border:none; color:inherit; font:inherit; display:flex; align-items:center; gap:5px; cursor:pointer; padding:3px 8px; border-radius:4px; transition:background 0.15s ease;">
+              <span id="lang-flag" style="font-size:14px;">🇮🇩</span>
+              <span id="lang-label" style="font-weight:600;">Bahasa Indonesia</span>
+              <span style="font-size:8px; opacity:0.8; margin-left:1px;">▼</span>
+            </button>
+            <div class="lang-dropdown-menu" id="lang-dropdown-menu" style="display:none; position:absolute; top:calc(100% + 6px); right:0; background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; box-shadow:0 10px 28px rgba(0,0,0,0.16); padding:6px; min-width:175px; z-index:999999;">
+              <button type="button" class="lang-option-item active" onclick="PasarinI18n.setLanguage('id')" id="lang-opt-id" style="width:100%; text-align:left; background:none; border:none; padding:8px 12px; font-size:12.5px; font-weight:700; color:#0f172a; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:8px;">
+                <span style="font-size:16px;">🇮🇩</span>
+                <span>Bahasa Indonesia</span>
+                <span class="lang-check" id="check-id" style="margin-left:auto; color:#be123c; font-weight:900;">✓</span>
+              </button>
+              <button type="button" class="lang-option-item" onclick="PasarinI18n.setLanguage('en')" id="lang-opt-en" style="width:100%; text-align:left; background:none; border:none; padding:8px 12px; font-size:12.5px; font-weight:700; color:#0f172a; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:8px;">
+                <span style="font-size:16px;">🇬🇧</span>
+                <span>English (US)</span>
+                <span class="lang-check" id="check-en" style="margin-left:auto; color:#be123c; font-weight:900; display:none;">✓</span>
+              </button>
+            </div>
+          </div>
           
           <!-- User Auth Status Container -->
           <div class="auth-user-container">
-            <a class="auth-link" href="login.html#register"><b>Daftar</b></a>
+            <a class="auth-link" href="login.html#register"><b data-i18n="nav.register">Daftar</b></a>
             <span class="auth-divider">|</span>
-            <a class="auth-link" href="login.html#login"><b>Log In</b></a>
+            <a class="auth-link" href="login.html#login"><b data-i18n="nav.login">Log In</b></a>
           </div>
         </div>
       </div>
@@ -177,13 +194,13 @@
 
         <div class="cart-header-title-wrap" id="cart-header-title" style="display: none;">
           <span class="cart-header-sep">|</span>
-          <span class="cart-header-text">Keranjang Saya</span>
+          <span class="cart-header-text" data-i18n="nav.cart_title">Keranjang Saya</span>
         </div>
 
         <div class="sb">
           <form id="form-home">
-            <input placeholder="Cari produk, merek dan toko" aria-label="Cari">
-            <button aria-label="Cari" type="submit" class="btn-search-shopee">
+            <input placeholder="Cari produk, merek dan toko" aria-label="Cari" data-i18n-placeholder="nav.search_placeholder" data-i18n-aria="nav.search_aria">
+            <button aria-label="Cari" type="submit" class="btn-search-shopee" data-i18n-aria="nav.search_aria">
               <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             </button>
           </form>
@@ -193,7 +210,7 @@
         </div>
 
         <!-- Trigger Keranjang -->
-        <a class="cart cart-trigger-btn" href="#/cart" aria-label="Keranjang Belanja">
+        <a class="cart cart-trigger-btn" href="#/cart" aria-label="Keranjang Belanja" data-i18n-title="nav.cart_title">
           <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
           <span class="cart-badge" style="display: none;">0</span>
         </a>
@@ -211,21 +228,21 @@
         <div class="hero-shopee-left" id="hero-banner-left" role="button" tabindex="0" title="Klik Banner Promosi (Buka Link / Video)" aria-label="Banner Promosi Utama (Klik untuk membuka)" onclick="if(window.PasarinApp) window.PasarinApp.onHeroBannerLeftClick(event);">
           <div class="banner-action-pill" id="banner-left-action" style="position: absolute; top: 12px; right: 14px; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; border: 1px solid rgba(255,255,255,0.25); z-index: 5; pointer-events: none;">
             <span id="banner-action-icon">🎁</span>
-            <span id="banner-action-text">Daftar & Klaim 50RB ↗</span>
+            <span id="banner-action-text" data-i18n="banner.left_action">Daftar & Klaim 50RB ↗</span>
           </div>
 
           <div class="shopee-hero-content">
             <div class="shopee-hero-info">
-              <div class="hero-tag-badge" id="banner-left-badge">✨ 168 PARTS SURABAYA</div>
-              <h2 class="hero-banner-title" id="banner-left-title">Pusat Sparepart & Alat Servis HP Terlengkap</h2>
+              <div class="hero-tag-badge" id="banner-left-badge" data-i18n="banner.left_badge">✨ 168 PARTS SURABAYA</div>
+              <h2 class="hero-banner-title" id="banner-left-title" data-i18n="banner.left_title">Pusat Sparepart & Alat Servis HP Terlengkap</h2>
               <div class="shopee-hero-pills" id="banner-left-pills">
-                <span class="shopee-pill"><span class="pill-icon">🏷️</span> LCD & Baterai Bergaransi</span>
-                <span class="shopee-pill"><span class="pill-icon">⚡</span> Promo Pengguna Baru: Diskon 50RB</span>
-                <span class="shopee-pill"><span class="pill-icon">⭐</span> Sparepart Presisi Siap Kirim</span>
+                <span class="shopee-pill"><span class="pill-icon">🏷️</span> <span data-i18n="banner.pill_lcd">LCD & Baterai Bergaransi</span></span>
+                <span class="shopee-pill"><span class="pill-icon">⚡</span> <span data-i18n="banner.pill_promo">Promo Pengguna Baru: Diskon 50RB</span></span>
+                <span class="shopee-pill"><span class="pill-icon">⭐</span> <span data-i18n="banner.pill_precision">Sparepart Presisi Siap Kirim</span></span>
               </div>
             </div>
             <div class="shopee-hero-models">
-              <img id="banner-left-img" src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=320&auto=format&fit=crop&q=80" alt="Sparepart & Alat Servis" class="model-hero-img">
+              <img id="banner-left-img" src="images/white-product.svg" alt="Foto Produk Sparepart & Alat Servis" data-i18n-alt="Sparepart & Alat Servis" class="model-hero-img">
             </div>
           </div>
           <!-- Dots Indicator (Dapat Diklik untuk Berpindah Slide) -->
@@ -241,20 +258,20 @@
         <div class="hero-shopee-right" id="hero-banner-right" role="button" tabindex="0" title="Klik untuk Klaim Promo & Voucher" aria-label="Banner Promo Kanan (Klik untuk membuka)" onclick="if(window.PasarinApp) window.PasarinApp.onHeroBannerRightClick(event);">
           <div class="banner-action-pill" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); color: #fff; padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; border: 1px solid rgba(255,255,255,0.25); z-index: 5; pointer-events: none;">
             <span>🎟️</span>
-            <span>Klaim Voucher ↗</span>
+            <span id="banner-right-action-text" data-i18n="banner.right_action">Klaim Voucher ↗</span>
           </div>
-          <img id="banner-right-img1" src="https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=240&auto=format&fit=crop&q=80" alt="Sparepart Kiri" class="side-model">
+          <img id="banner-right-img1" src="images/white-product.svg" alt="Sparepart Kiri" data-i18n-alt="Sparepart Kiri" class="side-model">
           <div class="side-promo-content">
             <div class="side-promo-pill pill-diskon">
-              <span class="tag-title" id="banner-right-pill1-title">DISKON S.D.</span>
+              <span class="tag-title" id="banner-right-pill1-title" data-i18n="banner.right_discount_label">DISKON S.D.</span>
               <span class="tag-val" id="banner-right-pill1-val">50%</span>
             </div>
             <div class="side-promo-pill pill-voucher">
-              <span class="tag-title" id="banner-right-pill2-title">VOUCHER</span>
+              <span class="tag-title" id="banner-right-pill2-title" data-i18n="banner.right_voucher_label">VOUCHER</span>
               <span class="tag-val" id="banner-right-pill2-val">100RB</span>
             </div>
           </div>
-          <img id="banner-right-img2" src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=240&auto=format&fit=crop&q=80" alt="Teknisi Kanan" class="side-model">
+          <img id="banner-right-img2" src="images/white-product.svg" alt="Teknisi Kanan" data-i18n-alt="Teknisi Kanan" class="side-model">
         </div>
       </section>
 
@@ -267,7 +284,7 @@
           <div class="fs-title-wrap">
             <h2 class="fs-logo">
               <svg class="i" viewBox="0 0 24 24" fill="#ee4d2d" stroke="#ee4d2d" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-              <span>FLASH SALE</span>
+              <span data-i18n="section.flash_sale">FLASH SALE</span>
             </h2>
             <div class="fs-timer" id="tm">
               <span class="tm-digit">01</span>
@@ -277,24 +294,24 @@
               <span class="tm-digit">35</span>
             </div>
           </div>
-          <a href="#/search?q=flash" class="fs-see-all">Lihat Semua &rsaquo;</a>
+          <a href="#/search?q=flash" class="fs-see-all" data-i18n="section.see_all">Lihat Semua &rsaquo;</a>
         </div>
         <div class="row" id="fs"></div>
       </section>
 
       <!-- Top Produk -->
       <div class="tabs" id="produk">
-        <div>Rekomendasi Produk Terbaik</div>
+        <div data-i18n="section.recommended">Rekomendasi Produk Terbaik</div>
       </div>
       <div class="grid" id="grid"></div>
-      <a class="more" href="#/search">Jelajahi Lebih Banyak Produk &rsaquo;</a>
+      <a class="more" href="#/search" data-i18n="section.explore_more">Jelajahi Lebih Banyak Produk &rsaquo;</a>
 
       <!-- SEO Content -->
       <section class="seo">
-        <h3>168 Parts Surabaya - Pusat Sparepart & Peralatan Servis HP Terlengkap</h3>
-        <p>168 Parts adalah toko grosir dan eceran sparepart handphone terlengkap di Surabaya. Menyediakan LCD touchscreen, baterai original, IC power & chipset, fleksibel, lem LCD, solder station, blower, hingga perlengkapan teknisi HP dengan kualitas terjamin dan harga terbaik tanpa potongan komisi marketplace.</p>
-        <h3>Belanja Nyaman & Garansi Tes Teknisi</h3>
-        <p>Dapatkan kemudahan order langsung dengan stok ready Surabaya, garansi tes fungsi sebelum dipasang lem, serta pengiriman cepat ke seluruh Indonesia. Mendukung pembayaran transfer bank, e-wallet, dan COD.</p>
+        <h3 data-i18n="seo.title1">168 Parts Surabaya - Pusat Sparepart & Peralatan Servis HP Terlengkap</h3>
+        <p data-i18n="seo.desc1">168 Parts adalah toko grosir dan eceran sparepart handphone terlengkap di Surabaya. Menyediakan LCD touchscreen, baterai original, IC power & chipset, fleksibel, lem LCD, solder station, blower, hingga perlengkapan teknisi HP dengan kualitas terjamin dan harga terbaik tanpa potongan komisi marketplace.</p>
+        <h3 data-i18n="seo.title2">Belanja Nyaman & Garansi Tes Teknisi</h3>
+        <p data-i18n="seo.desc2">Dapatkan kemudahan order langsung dengan stok ready Surabaya, garansi tes fungsi sebelum dipasang lem, serta pengiriman cepat ke seluruh Indonesia. Mendukung pembayaran transfer bank, e-wallet, dan COD.</p>
       </section>
     </main>
 
@@ -303,41 +320,39 @@
       <div class="w">
         <div class="fg">
           <div>
-            <h5>Layanan Pelanggan</h5>
-            <a href="#">Pusat Bantuan</a>
-            <a href="#">Metode Pembayaran</a>
-            <a href="#">Garansi 168 Parts</a>
-            <a href="#">Pengembalian Barang</a>
-            <a href="#">Hubungi Layanan CS</a>
+            <h5 data-i18n="footer.customer_care">Layanan Pelanggan</h5>
+            <a href="#" data-i18n="footer.help_center">Pusat Bantuan</a>
+            <a href="#" data-i18n="footer.payment_methods">Metode Pembayaran</a>
+            <a href="#" data-i18n="footer.warranty">Garansi 168 Parts</a>
+            <a href="#" data-i18n="footer.return_policy">Pengembalian Barang</a>
           </div>
           <div>
-            <h5>Jelajahi 168 Parts</h5>
-            <a href="#">Tentang Kami</a>
-            <a href="#">Karir & Lowongan</a>
-            <a href="#">Kebijakan Privasi</a>
-            <a href="#">Flash Sale Harian</a>
-            <a href="#">Blog Komunitas</a>
+            <h5 data-i18n="footer.about_us">Tentang 168 Parts</h5>
+            <a href="#" data-i18n="footer.about_us">Tentang Kami</a>
+            <a href="#" data-i18n="footer.careers">Karir</a>
+            <a href="#" data-i18n="footer.privacy">Kebijakan Privasi</a>
+            <a href="#" data-i18n="footer.blog">Blog Teknisi HP</a>
           </div>
           <div>
-            <h5>Pembayaran Aman</h5>
+            <h5 data-i18n="footer.payment_methods">Pembayaran Aman</h5>
             <p>BCA • Mandiri • BRI • BNI</p>
             <p>GoPay • DANA • OVO</p>
             <p>Kartu Kredit & COD</p>
           </div>
           <div>
-            <h5>Jasa Pengiriman</h5>
+            <h5 data-i18n="footer.shipping">Mitra Pengiriman</h5>
             <p>168 Xpress • JNE • J&T</p>
             <p>SiCepat • AnterAja • GoSend</p>
           </div>
           <div>
-            <h5>Ikuti Kami</h5>
+            <h5 data-i18n="nav.follow_us">Ikuti Kami</h5>
             <a href="#">Facebook</a>
             <a href="#">Instagram</a>
-            <a href="#">Twitter (X)</a>
-            <a href="#">LinkedIn</a>
+            <a href="#">YouTube</a>
+            <a href="#">TikTok</a>
           </div>
         </div>
-        <div class="cp">© 2026 168 Parts Surabaya. Seluruh hak cipta dilindungi undang-undang.</div>
+        <div class="cp" data-i18n="footer.copyright">© 2026 168 Parts Surabaya. Seluruh Hak Cipta Dilindungi Undang-Undang.</div>
       </div>
     </footer>
   </div>
@@ -734,44 +749,44 @@
             <div class="profile-nav-group">
               <div class="profile-nav-title active">
                 <span class="nav-tree-icon">👤</span>
-                <span>Akun Saya</span>
+                <span data-i18n="prof.nav_account">Akun Saya</span>
               </div>
               <div class="profile-nav-sublist">
-                <a href="#/user/profile" class="profile-nav-subitem active" id="prof-subnav-profile">Profil</a>
-                <a href="javascript:void(0)" onclick="if(window.PasarinApp) window.PasarinApp.openAddressModal()" class="profile-nav-subitem" id="prof-subnav-address">Alamat</a>
-                <a href="#/user/password" class="profile-nav-subitem" id="prof-subnav-password">Ubah Password</a>
+                <a href="#/user/profile" class="profile-nav-subitem active" id="prof-subnav-profile" data-i18n="prof.nav_profile">Profil</a>
+                <a href="javascript:void(0)" onclick="if(window.PasarinApp) window.PasarinApp.openAddressModal()" class="profile-nav-subitem" id="prof-subnav-address" data-i18n="prof.nav_address">Alamat</a>
+                <a href="#/user/password" class="profile-nav-subitem" id="prof-subnav-password" data-i18n="prof.nav_password">Ubah Password</a>
               </div>
             </div>
 
             <!-- Pesanan Saya -->
             <a href="javascript:void(0)" onclick="if(window.PasarinApp) window.PasarinApp.openOrdersModal()" class="profile-nav-item">
               <span class="nav-tree-icon">📋</span>
-              <span>Pesanan Saya</span>
+              <span data-i18n="prof.nav_orders">Pesanan Saya</span>
             </a>
 
             <!-- Notifikasi -->
             <a href="javascript:void(0)" onclick="if(window.PasarinApp) window.PasarinApp.openNotificationModal()" class="profile-nav-item" style="position:relative;">
               <span class="nav-tree-icon">🔔</span>
-              <span>Notifikasi Toko</span>
+              <span data-i18n="prof.nav_notifications">Notifikasi Toko</span>
               <span id="prof-notif-badge" style="display:none; margin-left:auto; background:#be123c; color:#ffffff; font-size:10px; font-weight:800; padding:1px 6px; border-radius:10px;">0</span>
             </a>
 
             <!-- Voucher Saya -->
             <a href="javascript:void(0)" onclick="if(window.PasarinApp) window.PasarinApp.openPromoModal()" class="profile-nav-item">
               <span class="nav-tree-icon">🎟️</span>
-              <span>Voucher Saya</span>
+              <span data-i18n="prof.nav_vouchers">Voucher Saya</span>
             </a>
 
             <!-- Koin 168 Parts Saya -->
             <a href="javascript:void(0)" onclick="if(window.showToast) window.showToast(`Saldo Koin Anda: ${window.PasarinPoints ? window.PasarinPoints.getPoints().toLocaleString('id-ID') : 0} Koin`, 'info')" class="profile-nav-item">
               <span class="nav-tree-icon">🪙</span>
-              <span>Koin 168 Parts Saya</span>
+              <span data-i18n="prof.nav_coins">Koin 168 Parts Saya</span>
             </a>
 
             <!-- Kanal Penjual & Admin -->
             <a href="admin.html" class="profile-nav-item" style="color: #be123c; font-weight: 700; margin-top: 12px; border-top: 1px dashed #e2e8f0; padding-top: 10px;">
               <span class="nav-tree-icon">⚙️</span>
-              <span>Kanal Penjual (Admin)</span>
+              <span data-i18n="prof.nav_seller">Kanal Penjual (Admin)</span>
             </a>
           </nav>
         </aside>
@@ -780,8 +795,8 @@
         <main class="shopee-profile-main-card" id="profile-subpanel-profile">
           <!-- Card Header -->
           <div class="profile-card-header">
-            <h1 class="profile-card-title">Profil Saya</h1>
-            <p class="profile-card-subtitle">Kelola informasi profil Anda untuk mengontrol, melindungi dan mengamankan akun</p>
+            <h1 class="profile-card-title" data-i18n="prof.title">Profil Saya</h1>
+            <p class="profile-card-subtitle" data-i18n="prof.subtitle">Kelola informasi profil Anda untuk mengontrol, melindungi dan mengamankan akun</p>
           </div>
 
           <div class="profile-card-body">
@@ -790,17 +805,17 @@
               
               <!-- Username -->
               <div class="profile-form-row">
-                <label class="profile-form-label">Username</label>
+                <label class="profile-form-label" data-i18n="prof.username">Username</label>
                 <div class="profile-form-field profile-field-inline">
                   <span class="profile-text-val" id="prof-val-username" style="font-weight:600;">ferdinand2341</span>
-                  <button type="button" class="profile-link-btn" onclick="PasarinApp.promptChangeUsername()">Ubah</button>
+                  <button type="button" class="profile-link-btn" onclick="PasarinApp.promptChangeUsername()" data-i18n="prof.change">Ubah</button>
                   <input type="hidden" id="prof-hidden-username">
                 </div>
               </div>
 
               <!-- Nama -->
               <div class="profile-form-row">
-                <label class="profile-form-label" for="prof-input-name">Nama</label>
+                <label class="profile-form-label" for="prof-input-name" data-i18n="prof.name">Nama</label>
                 <div class="profile-form-field">
                   <input type="text" id="prof-input-name" class="profile-text-input" placeholder="Nama lengkap Anda" required>
                 </div>
@@ -808,20 +823,20 @@
 
               <!-- Email -->
               <div class="profile-form-row">
-                <label class="profile-form-label">Email</label>
+                <label class="profile-form-label" data-i18n="prof.email">Email</label>
                 <div class="profile-form-field profile-field-inline">
                   <span class="profile-text-val" id="prof-val-email">fe************@gmail.com</span>
-                  <button type="button" class="profile-link-btn" onclick="PasarinApp.promptChangeEmail()">Ubah</button>
+                  <button type="button" class="profile-link-btn" onclick="PasarinApp.promptChangeEmail()" data-i18n="prof.change">Ubah</button>
                   <input type="hidden" id="prof-hidden-email">
                 </div>
               </div>
 
               <!-- Nomor Telepon -->
               <div class="profile-form-row">
-                <label class="profile-form-label">Nomor Telepon</label>
+                <label class="profile-form-label" data-i18n="prof.phone">Nomor Telepon</label>
                 <div class="profile-form-field profile-field-inline">
                   <span class="profile-text-val" id="prof-val-phone">**********76</span>
-                  <button type="button" class="profile-link-btn" onclick="PasarinApp.promptChangePhone()">Ubah</button>
+                  <button type="button" class="profile-link-btn" onclick="PasarinApp.promptChangePhone()" data-i18n="prof.change">Ubah</button>
                   <input type="hidden" id="prof-hidden-phone">
                 </div>
               </div>
@@ -829,7 +844,7 @@
               <!-- Nama Toko -->
               <div class="profile-form-row">
                 <label class="profile-form-label" for="prof-input-shop">
-                  Nama Toko
+                  <span data-i18n="prof.shop_name">Nama Toko</span>
                   <span class="profile-help-circle" title="Nama toko Anda di kanal penjual 168 Parts Surabaya">?</span>
                 </label>
                 <div class="profile-form-field">
@@ -839,19 +854,19 @@
 
               <!-- Jenis Kelamin -->
               <div class="profile-form-row">
-                <label class="profile-form-label">Jenis Kelamin</label>
+                <label class="profile-form-label" data-i18n="prof.gender">Jenis Kelamin</label>
                 <div class="profile-form-field profile-radio-group">
                   <label class="profile-radio-label">
                     <input type="radio" name="prof-gender" value="Laki-laki" checked>
-                    <span>Laki-laki</span>
+                    <span data-i18n="prof.gender_male">Laki-laki</span>
                   </label>
                   <label class="profile-radio-label">
                     <input type="radio" name="prof-gender" value="Perempuan">
-                    <span>Perempuan</span>
+                    <span data-i18n="prof.gender_female">Perempuan</span>
                   </label>
                   <label class="profile-radio-label">
                     <input type="radio" name="prof-gender" value="Lainnya">
-                    <span>Lainnya</span>
+                    <span data-i18n="prof.gender_other">Lainnya</span>
                   </label>
                 </div>
               </div>
@@ -859,7 +874,7 @@
               <!-- Tanggal Lahir -->
               <div class="profile-form-row">
                 <label class="profile-form-label" for="prof-input-birthdate">
-                  Tanggal lahir
+                  <span data-i18n="prof.birthdate">Tanggal lahir</span>
                   <span class="profile-help-circle" title="Digunakan untuk kejutan diskon ulang tahun spesial">?</span>
                 </label>
                 <div class="profile-form-field">
@@ -871,7 +886,7 @@
               <div class="profile-form-row profile-row-submit">
                 <div class="profile-form-label"></div>
                 <div class="profile-form-field">
-                  <button type="submit" class="btn-shopee-save-profile" id="btn-save-profile">
+                  <button type="submit" class="btn-shopee-save-profile" id="btn-save-profile" data-i18n="prof.save">
                     Simpan
                   </button>
                 </div>
@@ -882,15 +897,14 @@
             <!-- Kolom Kanan: Foto Profil (Persis Screenshot) -->
             <div class="profile-avatar-column">
               <div class="profile-avatar-preview-wrap">
-                <img id="prof-avatar-big-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=240" alt="Foto Profil" class="profile-avatar-big">
+                <img id="prof-avatar-big-img" src="images/white-product.svg" alt="Foto Profil" data-i18n-alt="prof.title" class="profile-avatar-big">
               </div>
               <input type="file" id="prof-file-input" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="PasarinApp.handleAvatarFileSelect(this)">
-              <button type="button" class="btn-shopee-choose-image" onclick="document.getElementById('prof-file-input').click()">
+              <button type="button" class="btn-shopee-choose-image" onclick="document.getElementById('prof-file-input').click()" data-i18n="prof.choose_image">
                 Pilih Gambar
               </button>
               <div class="profile-avatar-notes">
-                <span>Ukuran gambar: maks. 1 MB</span>
-                <span>Format gambar: .JPEG, .PNG</span>
+                <span data-i18n="prof.image_hint">Ukuran gambar: maks. 1 MB. Format gambar: .JPEG, .PNG</span>
               </div>
             </div>
 
@@ -1031,20 +1045,20 @@
       <!-- Header Pesta Promo -->
       <div class="promo-modal-header">
         <div class="promo-header-top">
-          <span class="promo-tag-pill">🔥 PESTA DISKON SPESIAL</span>
+          <span class="promo-tag-pill" data-i18n="modal_promo.badge">🔥 PESTA DISKON SPESIAL</span>
           <button class="promo-modal-close" onclick="PasarinApp.closePromoModal()" aria-label="Tutup Promo">&times;</button>
         </div>
-        <h2>🎉 Sambut Promo Terbaik 168 Parts!</h2>
-        <p>Klaim voucher belanja pengguna baru, gratis ongkir se-Indonesia, dan cashback kilat sekarang sebelum kuota habis!</p>
+        <h2 data-i18n="modal_promo.title">🎉 Sambut Promo Terbaik 168 Parts!</h2>
+        <p data-i18n="modal_promo.desc">Klaim voucher belanja pengguna baru, gratis ongkir se-Indonesia, dan cashback kilat sekarang sebelum kuota habis!</p>
       </div>
 
       <!-- Input Kode Voucher / Promo Manual Sendiri -->
       <div class="custom-promo-bar">
         <div class="custom-promo-input-box">
           <span class="input-icon">🎟️</span>
-          <input type="text" id="custom-promo-code-input" placeholder="Punya kode voucher / promo? Ketik di sini...">
+          <input type="text" id="custom-promo-code-input" placeholder="Punya kode voucher / promo? Ketik di sini..." data-i18n-placeholder="modal_promo.input_placeholder">
         </div>
-        <button type="button" class="btn-custom-claim" onclick="PasarinApp.claimCustomPromoInput()">
+        <button type="button" class="btn-custom-claim" onclick="PasarinApp.claimCustomPromoInput()" data-i18n="modal_promo.use_btn">
           Gunakan Voucher
         </button>
       </div>
@@ -1052,23 +1066,23 @@
       <!-- Filter Kategori Promo -->
       <div class="promo-tabs-bar" id="promo-tabs-bar" style="display:flex; align-items:center; background:#ffffff; padding:12px 24px; border-bottom:1px solid #f1f5f9; gap:8px; overflow-x:auto; scrollbar-width:none; box-sizing:border-box;">
         <button type="button" class="promo-tab-item active" id="promo-tab-all" onclick="PasarinApp.filterPromoTab('all', this)" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; height:36px; min-height:36px; padding:0 16px; line-height:1; border-radius:9999px; font-size:12.5px; font-weight:700; background:linear-gradient(135deg, #be123c 0%, #e11d48 100%); color:#ffffff; border:1.5px solid #be123c; box-shadow:0 3px 10px rgba(190, 18, 60, 0.28); cursor:pointer; white-space:nowrap; flex-shrink:0; box-sizing:border-box;">
-          <span class="tab-label" style="line-height:1; font-weight:700; color:#ffffff;">Semua Promo (6)</span>
+          <span class="tab-label" id="promo-tab-lbl-all" style="line-height:1; font-weight:700; color:#ffffff;" data-i18n="modal_promo.tab_all">Semua Promo</span>
         </button>
         <button type="button" class="promo-tab-item" onclick="PasarinApp.filterPromoTab('ongkir', this)" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; height:36px; min-height:36px; padding:0 16px; line-height:1; border-radius:9999px; font-size:12.5px; font-weight:700; background:#f8fafc; color:#475569; border:1.5px solid #e2e8f0; cursor:pointer; white-space:nowrap; flex-shrink:0; box-sizing:border-box;">
           <span class="tab-icon" style="font-size:14px; line-height:1;">🚚</span>
-          <span class="tab-label" style="line-height:1; font-weight:700; color:#475569;">Gratis Ongkir</span>
+          <span class="tab-label" style="line-height:1; font-weight:700; color:#475569;" data-i18n="modal_promo.tab_ongkir">Gratis Ongkir</span>
         </button>
         <button type="button" class="promo-tab-item" onclick="PasarinApp.filterPromoTab('diskon', this)" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; height:36px; min-height:36px; padding:0 16px; line-height:1; border-radius:9999px; font-size:12.5px; font-weight:700; background:#f8fafc; color:#475569; border:1.5px solid #e2e8f0; cursor:pointer; white-space:nowrap; flex-shrink:0; box-sizing:border-box;">
           <span class="tab-icon" style="font-size:14px; line-height:1;">🏷️</span>
-          <span class="tab-label" style="line-height:1; font-weight:700; color:#475569;">Diskon Belanja</span>
+          <span class="tab-label" style="line-height:1; font-weight:700; color:#475569;" data-i18n="modal_promo.tab_diskon">Diskon Belanja</span>
         </button>
         <button type="button" class="promo-tab-item" onclick="PasarinApp.filterPromoTab('cashback', this)" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; height:36px; min-height:36px; padding:0 16px; line-height:1; border-radius:9999px; font-size:12.5px; font-weight:700; background:#f8fafc; color:#475569; border:1.5px solid #e2e8f0; cursor:pointer; white-space:nowrap; flex-shrink:0; box-sizing:border-box;">
           <span class="tab-icon" style="font-size:14px; line-height:1;">💰</span>
-          <span class="tab-label" style="line-height:1; font-weight:700; color:#475569;">Cashback</span>
+          <span class="tab-label" style="line-height:1; font-weight:700; color:#475569;" data-i18n="modal_promo.tab_cashback">Cashback</span>
         </button>
         <button type="button" class="promo-tab-item" onclick="PasarinApp.filterPromoTab('lokal', this)" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; height:36px; min-height:36px; padding:0 16px; line-height:1; border-radius:9999px; font-size:12.5px; font-weight:700; background:#f8fafc; color:#475569; border:1.5px solid #e2e8f0; cursor:pointer; white-space:nowrap; flex-shrink:0; box-sizing:border-box;">
           <span class="tab-icon" style="font-size:14px; line-height:1;">🏬</span>
-          <span class="tab-label" style="line-height:1; font-weight:700; color:#475569;">Brand Lokal</span>
+          <span class="tab-label" style="line-height:1; font-weight:700; color:#475569;" data-i18n="modal_promo.tab_lokal">Brand Lokal</span>
         </button>
       </div>
 
@@ -1081,10 +1095,10 @@
       <div class="promo-modal-footer">
         <label class="promo-dont-show">
           <input type="checkbox" id="chk-dont-show-promo">
-          <span>Jangan tampilkan lagi hari ini</span>
+          <span data-i18n="modal_promo.dont_show">Jangan tampilkan lagi hari ini</span>
         </label>
         <div class="promo-footer-actions">
-          <button class="btn-claim-all-promo" id="btn-claim-all" onclick="PasarinApp.claimAllPromos()">
+          <button class="btn-claim-all-promo" id="btn-claim-all" onclick="PasarinApp.claimAllPromos()" data-i18n="modal_promo.claim_all">
             ✨ Klaim Semua Promo
           </button>
         </div>
@@ -1104,12 +1118,12 @@
             🔔
           </div>
           <div>
-            <h3 style="margin:0; font-size:15px; font-weight:800; color:#ffffff;">Pusat Notifikasi & Broadcast</h3>
-            <p style="margin:2px 0 0 0; font-size:11.5px; color:rgba(255,255,255,0.85);">Pengumuman promo, restok sparepart, dan info toko resmi 168 Parts</p>
+            <h3 style="margin:0; font-size:15px; font-weight:800; color:#ffffff;" data-i18n="modal_notif.title">Pusat Notifikasi & Broadcast</h3>
+            <p style="margin:2px 0 0 0; font-size:11.5px; color:rgba(255,255,255,0.85);" data-i18n="modal_notif.subtitle">Pengumuman promo, restok sparepart, dan info toko resmi 168 Parts</p>
           </div>
         </div>
         <div style="display:flex; align-items:center; gap:8px;">
-          <button type="button" class="btn-notif-mark-read" onclick="PasarinApp.markAllNotificationsRead()" title="Tandai semua pesan sebagai dibaca">
+          <button type="button" class="btn-notif-mark-read" onclick="PasarinApp.markAllNotificationsRead()" title="Tandai semua pesan sebagai dibaca" data-i18n="modal_notif.mark_all">
             ✓ Baca Semua
           </button>
           <button type="button" class="notification-modal-close" onclick="PasarinApp.closeNotificationModal()" aria-label="Tutup Notifikasi">&times;</button>
@@ -1118,16 +1132,16 @@
 
       <!-- Filter Kategori Tabs -->
       <div class="notif-tabs-bar">
-        <button type="button" class="notif-tab-item active" onclick="PasarinApp.filterNotificationCategory('all', this)">
+        <button type="button" class="notif-tab-item active" onclick="PasarinApp.filterNotificationCategory('all', this)" data-i18n="modal_notif.tab_all">
           Semua Pesan
         </button>
-        <button type="button" class="notif-tab-item" onclick="PasarinApp.filterNotificationCategory('promo', this)">
+        <button type="button" class="notif-tab-item" onclick="PasarinApp.filterNotificationCategory('promo', this)" data-i18n="modal_notif.tab_promo">
           🎟️ Promo
         </button>
-        <button type="button" class="notif-tab-item" onclick="PasarinApp.filterNotificationCategory('info', this)">
+        <button type="button" class="notif-tab-item" onclick="PasarinApp.filterNotificationCategory('info', this)" data-i18n="modal_notif.tab_info">
           📦 Info & Restok
         </button>
-        <button type="button" class="notif-tab-item" onclick="PasarinApp.filterNotificationCategory('system', this)">
+        <button type="button" class="notif-tab-item" onclick="PasarinApp.filterNotificationCategory('system', this)" data-i18n="modal_notif.tab_system">
           ⚙️ Pengumuman Toko
         </button>
       </div>
@@ -1143,10 +1157,10 @@
 
       <!-- Modal Footer -->
       <div class="notification-modal-footer">
-        <span style="font-size:11.5px; color:#64748b;">
+        <span style="font-size:11.5px; color:#64748b;" data-i18n="modal_notif.footer_hint">
           💡 Butuh bantuan seputar pesanan atau sparepart?
         </span>
-        <button type="button" class="btn-notif-chat" onclick="PasarinApp.closeNotificationModal(); if(window.PasarinChatBot) window.PasarinChatBot.toggleChat();">
+        <button type="button" class="btn-notif-chat" onclick="PasarinApp.closeNotificationModal(); if(window.PasarinChatBot) window.PasarinChatBot.toggleChat();" data-i18n="modal_notif.chat_btn">
           💬 Chat Customer Care
         </button>
       </div>
@@ -1159,7 +1173,7 @@
     <!-- Tombol Promo Spesial -->
     <button class="docked-action-btn dock-btn-promo" id="btn-fab-promo" onclick="PasarinApp.openPromoModal()" title="Buka Promo Spesial" aria-label="Buka Promo Spesial">
       <span class="dock-icon">🎁</span>
-      <span class="dock-label">Promo Spesial</span>
+      <span class="dock-label" data-i18n="dock.promo">Promo Spesial</span>
       <span class="dock-badge" id="fab-voucher-count">6</span>
     </button>
 
@@ -1170,7 +1184,7 @@
           <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
         </svg>
       </span>
-      <span class="dock-label">Chat</span>
+      <span class="dock-label" data-i18n="dock.chat">Chat</span>
       <span class="dock-badge" id="chat-badge-bubble" style="display: none;">0</span>
     </button>
   </div>
@@ -1179,6 +1193,7 @@
   <script src="js/icons.js?v=3.0"></script>
   <script src="js/animations.js?v=3.0"></script>
   <script src="js/api.js?v=3.0"></script>
+  <script src="js/i18n.js?v=3.0"></script>
   <script src="js/gmaps-picker.js?v=3.0"></script>
   <script src="js/addresses.js?v=3.0"></script>
   <script src="js/auth.js?v=3.0"></script>

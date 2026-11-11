@@ -96,11 +96,12 @@ const PasarinApp = {
 
   formatSoldCount(count) {
     const n = Number(count) || 0;
+    const isEn = window.PasarinI18n && window.PasarinI18n.currentLang === 'en';
     if (n >= 1000) {
-      const k = (n / 1000).toFixed(1).replace('.0', '').replace('.', ',');
-      return `${k}rb+ terjual`;
+      const k = (n / 1000).toFixed(1).replace('.0', '').replace('.', isEn ? '.' : ',');
+      return isEn ? `${k}k+ sold` : `${k}rb+ terjual`;
     }
-    return `${n}+ terjual`;
+    return isEn ? `${n}+ sold` : `${n}+ terjual`;
   },
 
   renderIcon(name, cls = 'i') {
@@ -1339,17 +1340,32 @@ const PasarinApp = {
       { icon: "tag", label: "Semua Promo", color: "#be123c", bg: "#ffe4e6" }
     ];
 
+    const lang = window.PasarinI18n ? window.PasarinI18n.currentLang : 'id';
+    const labelMap = {
+      'LCD & Layar': { id: 'LCD & Layar', en: 'LCD & Screens' },
+      'Baterai HP': { id: 'Baterai HP', en: 'Phone Batteries' },
+      'IC & Chipset': { id: 'IC & Chipset', en: 'IC & Chipsets' },
+      'Alat Servis': { id: 'Alat Servis', en: 'Service Tools' },
+      'Solder Station': { id: 'Solder Station', en: 'Solder Station' },
+      'Lem LCD I9': { id: 'Lem LCD I9', en: 'LCD Glue I9' },
+      'Backdoor Kaca': { id: 'Backdoor Kaca', en: 'Backdoor Glass' },
+      'Tester & Multitester': { id: 'Tester & Multitester', en: 'Multitesters' },
+      'Pinset Presisi': { id: 'Pinset Presisi', en: 'Precision Tweezers' },
+      'Semua Promo': { id: 'Semua Promo', en: 'All Promos' }
+    };
+
     qkEl.innerHTML = quickServices.map(item => {
       const isPromo = item.label === 'Semua Promo';
       const hrefAttr = isPromo ? 'javascript:void(0)' : `#/search?q=${encodeURIComponent(item.label)}`;
       const clickAttr = isPromo ? 'onclick="PasarinApp.openPromoModal()"' : '';
+      const displayLabel = (labelMap[item.label] && labelMap[item.label][lang]) || item.label;
 
       return `
         <a href="${hrefAttr}" ${clickAttr} class="qk-item">
           <div class="qk-circle" style="background: ${item.bg}; color: ${item.color};">
             ${this.renderIcon(item.icon, 'i')}
           </div>
-          <span class="qk-label">${item.label}</span>
+          <span class="qk-label">${displayLabel}</span>
         </a>
       `;
     }).join('');

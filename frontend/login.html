@@ -21,9 +21,29 @@
           <div class="auth-logo-badge">168</div>
           <span class="auth-logo-text">168 Parts</span>
         </a>
-        <span class="auth-page-title" id="page-title-label">Masuk</span>
+        <span class="auth-page-title" id="page-title-label" data-i18n="login.title_login">Masuk</span>
       </div>
-      <a href="index.html" class="auth-header-help">← Kembali ke Beranda</a>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <!-- Language Switcher in Login Page -->
+        <div class="lang-dropdown-container" id="lang-dropdown-wrapper" style="position:relative; display:inline-flex; align-items:center;">
+          <button type="button" class="lang-dropdown-btn" id="lang-current-btn" onclick="PasarinI18n.toggleDropdown()" style="background:#ffffff; border:1px solid #e2e8f0; color:#334155; font:inherit; display:flex; align-items:center; gap:6px; cursor:pointer; padding:5px 10px; border-radius:6px; font-size:12px; font-weight:700;">
+            <span id="lang-flag">🇮🇩</span>
+            <span id="lang-label">Bahasa Indonesia</span>
+            <span style="font-size:8px; opacity:0.8;">▼</span>
+          </button>
+          <div class="lang-dropdown-menu" id="lang-dropdown-menu" style="display:none; position:absolute; top:calc(100% + 6px); right:0; background:#ffffff; border:1px solid #e2e8f0; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.12); padding:6px; min-width:160px; z-index:999999;">
+            <button type="button" class="lang-option-item active" onclick="PasarinI18n.setLanguage('id')" id="lang-opt-id" style="width:100%; text-align:left; background:none; border:none; padding:8px 12px; font-size:12px; font-weight:700; color:#0f172a; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:8px;">
+              <span>🇮🇩</span> <span>Bahasa Indonesia</span>
+              <span class="lang-check" id="check-id" style="margin-left:auto; color:#be123c; font-weight:900;">✓</span>
+            </button>
+            <button type="button" class="lang-option-item" onclick="PasarinI18n.setLanguage('en')" id="lang-opt-en" style="width:100%; text-align:left; background:none; border:none; padding:8px 12px; font-size:12px; font-weight:700; color:#0f172a; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:8px;">
+              <span>🇬🇧</span> <span>English (US)</span>
+              <span class="lang-check" id="check-en" style="margin-left:auto; color:#be123c; font-weight:900; display:none;">✓</span>
+            </button>
+          </div>
+        </div>
+        <a href="index.html" class="auth-header-help" data-i18n="login.back_home">← Kembali ke Beranda</a>
+      </div>
     </div>
   </header>
 
@@ -38,21 +58,21 @@
       
       <!-- Promo Banner Kiri -->
       <div class="auth-promo">
-        <h1>Pusat Sparepart & Alat Servis HP Surabaya</h1>
-        <p>Solusi lengkap kebutuhan sparepart HP, LCD touchscreen, baterai original, IC chipset, hingga perlengkapan servis teknisi profesional dengan harga grosir terbaik.</p>
+        <h1 data-i18n="login.promo_heading">Pusat Sparepart & Alat Servis HP Surabaya</h1>
+        <p data-i18n="login.promo_desc">Solusi lengkap kebutuhan sparepart HP, LCD touchscreen, baterai original, IC chipset, hingga perlengkapan servis teknisi profesional dengan harga grosir terbaik.</p>
         
         <div class="auth-promo-features">
           <div class="auth-feature-item">
             <span class="auth-feature-icon">✓</span>
-            <span>Garansi Toko Resmi & Kualitas Presisi Grade A+</span>
+            <span data-i18n="login.feat1">Garansi Toko Resmi & Kualitas Presisi Grade A+</span>
           </div>
           <div class="auth-feature-item">
             <span class="auth-feature-icon">✓</span>
-            <span>Pengiriman Cepat Se-Indonesia & Siap Kirim Hari Ini</span>
+            <span data-i18n="login.feat2">Pengiriman Cepat Se-Indonesia & Siap Kirim Hari Ini</span>
           </div>
           <div class="auth-feature-item">
             <span class="auth-feature-icon">✓</span>
-            <span>Dukungan Konsultasi Sparepart Langsung Teknisi</span>
+            <span data-i18n="login.feat3">Dukungan Konsultasi Sparepart Langsung Teknisi</span>
           </div>
         </div>
       </div>
@@ -62,8 +82,8 @@
         
         <!-- Tab Switcher -->
         <div class="auth-tabs">
-          <button class="auth-tab-btn active" id="tab-btn-login" type="button">Log In</button>
-          <button class="auth-tab-btn" id="tab-btn-register" type="button">Daftar Akun</button>
+          <button class="auth-tab-btn active" id="tab-btn-login" type="button" data-i18n="login.tab_login">Log In</button>
+          <button class="auth-tab-btn" id="tab-btn-register" type="button" data-i18n="login.tab_register">Daftar Akun</button>
         </div>
 
         <!-- Alert Message -->
@@ -72,28 +92,28 @@
         <!-- FORM LOGIN -->
         <form class="auth-form active" id="form-login">
           <div class="form-group">
-            <label class="form-label" for="login-email">Email / Nomor Handphone</label>
-            <input class="auth-input" type="email" id="login-email" placeholder="contoh: nama@email.com" required autocomplete="email">
+            <label class="form-label" for="login-email" data-i18n="login.label_email">Email / Nomor Handphone</label>
+            <input class="auth-input" type="email" id="login-email" placeholder="contoh: nama@email.com" data-i18n-placeholder="login.placeholder_email" required autocomplete="email">
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="login-password">Password</label>
+            <label class="form-label" for="login-password" data-i18n="login.label_password">Password</label>
             <div class="input-wrap">
-              <input class="auth-input" type="password" id="login-password" placeholder="Masukkan kata sandi..." required autocomplete="current-password">
-              <button class="btn-toggle-pwd" type="button" onclick="togglePasswordVisibility('login-password', this)">Lihat</button>
+              <input class="auth-input" type="password" id="login-password" placeholder="Masukkan kata sandi..." data-i18n-placeholder="login.placeholder_password" required autocomplete="current-password">
+              <button class="btn-toggle-pwd" type="button" onclick="togglePasswordVisibility('login-password', this)" data-i18n="login.show_pwd">Lihat</button>
             </div>
           </div>
 
-          <button class="btn-auth-submit" type="submit" id="btn-login-submit">Masuk ke Akun</button>
+          <button class="btn-auth-submit" type="submit" id="btn-login-submit" data-i18n="login.btn_login">Masuk ke Akun</button>
 
           <!-- 1-Click Demo Testing Credentials -->
           <div class="demo-accounts-box">
             <div class="demo-title">
-              <span>⚡</span> <span>Coba Cepat (Akun Siap Pakai di Supabase):</span>
+              <span>⚡</span> <span data-i18n="login.demo_title">Coba Cepat (Akun Siap Pakai di Supabase):</span>
             </div>
             <div class="demo-buttons-row">
-              <button class="btn-demo" type="button" onclick="fillDemo('demo@pasarin.com', 'demo123')">Akun Pembeli (demo)</button>
-              <button class="btn-demo" type="button" onclick="fillDemo('admin@168parts.com', 'admin123')">Akun Admin (admin@168parts)</button>
+              <button class="btn-demo" type="button" onclick="fillDemo('demo@pasarin.com', 'demo123')" data-i18n="login.demo_buyer">Akun Pembeli (demo)</button>
+              <button class="btn-demo" type="button" onclick="fillDemo('admin@168parts.com', 'admin123')" data-i18n="login.demo_admin">Akun Admin (admin@168parts)</button>
             </div>
           </div>
         </form>
@@ -217,6 +237,7 @@
   </footer>
 
   <script src="js/api.js"></script>
+  <script src="js/i18n.js?v=3.0"></script>
   <script src="js/gmaps-picker.js"></script>
   <script src="js/auth.js"></script>
   <script>

@@ -68,3 +68,4 @@ setupNotifications().catch(err => {
   console.error('❌ Gagal menyiapkan tabel notifications:', err);
   process.exit(1);
 });
+

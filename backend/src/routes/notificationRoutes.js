@@ -18,3 +18,4 @@ router.post('/read-all', notificationController.markAllAsRead);
 router.delete('/:id', notificationController.deleteBroadcast);
 
 module.exports = router;
+

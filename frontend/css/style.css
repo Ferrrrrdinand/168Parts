@@ -7312,3 +7312,28 @@ button:disabled {
     padding: 12px 14px;
   }
 }
+
+/* =========================================================
+   LANGUAGE SELECTOR DROPDOWN (ID & EN)
+   ========================================================= */
+.lang-dropdown-btn {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 12px !important;
+}
+
+.lang-dropdown-btn:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+}
+
+.lang-option-item:hover {
+  background: #f1f5f9 !important;
+  color: #be123c !important;
+}
+
+.lang-option-item.active {
+  background: #fff1f2 !important;
+  color: #be123c !important;
+  font-weight: 800 !important;
+}
+
