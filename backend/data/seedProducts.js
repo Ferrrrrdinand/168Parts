@@ -1,5 +1,4 @@
 // Katalog Resmi 400 Produk Terlaris Shopee 168 Parts Surabaya
-// Dihasilkan dari Rekap Gabungan Penjualan 2024-2026
 module.exports = [
   {
     "id": "168-p1",
@@ -20,13 +19,15 @@ module.exports = [
     "bgPattern": "#f8fafc",
     "isFlashSale": true,
     "flashSaleSold": 600,
-    "description": "SELAMAT DATANG DI 168 PARTS SURABAYA\nPusat Grosir & Eceran Sparepart HP, IC Chipset, & Alat Servis Teknisi Terlengkap\n\nNAMA PRODUK:\nLem Lanrui i9 55ml hitam, transparant\n\nKETERANGAN & DETAIL PRODUK:\n- Kategori: Lem LCD I9\n- Kualitas: 100% Brand New Grade Original (QC Passed oleh teknisi)\n- Kondisi: Baru, Tersegel, dan Bebas Cacat Pabrik\n- Varian Tersedia: LANRUI TRANSPARANT, LANRUI HITAM\n- Cocok digunakan oleh teknisi handphone profesional, konter servis, maupun perbaikan mandiri.\n\nKEUNGGULAN PRODUK:\n- Presisi tinggi dengan daya tahan maksimal.\n- Komponen teruji stabil dan minim resiko return.\n- Produk fast moving dan terlaris di etalase 168 Parts dengan reputasi kepuasan tinggi.\n\nKETENTUAN GARANSI & PENGIRIMAN 168 PARTS:\n1. Wajib melakukan tes fungsi barang terlebih dahulu sebelum dipasang permanen (khusus LCD, IC, baterai, dan fleksibel).\n2. Garansi berlaku jika segel utuh, plastik pelindung tidak dilepas, dan fisik barang tidak retak / terkena lem berlebih.\n3. WAJIB melampirkan rekaman VIDEO UNBOXING utuh tanpa jeda / edit untuk keperluan klaim jika terjadi kendala isi paket.\n4. Setiap pesanan dikemas ekstra aman menggunakan Bubble Wrap tebal dan kotak kardus khusus toko.\n5. Pengiriman cepat langsung dari gudang toko fisik kami di Kota Surabaya. Pesanan sebelum jam 17.00 WIB dikirim di hari yang sama!\n\nTerima kasih telah berbelanja di 168 Parts Surabaya. Kepuasan dan kelancaran servis Anda adalah prioritas kami!",
+    "description": "Deskripsi Produk : \n\nLanRui I9 adalah lem perekat aktif / multi-fungsi dari merek LanRui, dirancang khusus untuk keperluan servis elektronik seperti bonding screen, housing frame, back cover, bracket, dan aplikasi lain yang membutuhkan adhesi kuat tapi tetap lembut jika disentuh. Tersedia dalam varian transparan maupun hitam. \nFungsi :\n\n1. Untuk perekat housing / frame perangkat mobile seperti body belakang HP, sisi bingkai, dan komponen penutup lain.\n\n2. Untuk bonding screen / panel kaca ketika mengganti layar, memastikan sambungan kuat dan rata.\n\n3. Untuk pengerjaan back cover / bracket / fitting screen border agar rapih dan tidak mudah lepas. \n\n4. Untuk aplikasi repair elektronik lain yang memerlukan lem dengan adhesi tinggi tapi tetap lembut agar tidak merusak bagian yang sensitif seperti kabel fleksibel.\n\nNb: Lebih baik tanyakan stok barang terlebih dahulu sebelum check out",
     "specs": [
-      "Kategori: Lem LCD I9",
-      "Kondisi: 100% Baru & Tersegel",
-      "Kualitas: Grade Original 168 Parts",
-      "Asal Toko: Kota Surabaya",
-      "Garansi: Garansi Tes 7 Hari (Segel Utuh)"
+      "Merek: LanRui",
+      "Seri: I9 Multi-Function Adhesive",
+      "Volume: 55ml",
+      "Varian Warna: Hitam & Transparan",
+      "Karakteristik: Adhesi Kuat & Lembut Fleksibel",
+      "Aplikasi: LCD Screen, Housing Frame, Back Cover & Bracket",
+      "Asal: 168 Parts Official Surabaya"
     ]
   },
   {
@@ -48,13 +49,15 @@ module.exports = [
     "bgPattern": "#f8fafc",
     "isFlashSale": true,
     "flashSaleSold": 358,
-    "description": "SELAMAT DATANG DI 168 PARTS SURABAYA\nPusat Grosir & Eceran Sparepart HP, IC Chipset, & Alat Servis Teknisi Terlengkap\n\nNAMA PRODUK:\nLEM LCD TOUCHSCREEN DAN LEM BACKDOOR LANRUI I9 55ML\n\nKETERANGAN & DETAIL PRODUK:\n- Kategori: Lem LCD I9\n- Kualitas: 100% Brand New Grade Original (QC Passed oleh teknisi)\n- Kondisi: Baru, Tersegel, dan Bebas Cacat Pabrik\n- Varian Tersedia: LANRUI HITAM, LANRUI TRANSPARANT\n- Cocok digunakan oleh teknisi handphone profesional, konter servis, maupun perbaikan mandiri.\n\nKEUNGGULAN PRODUK:\n- Presisi tinggi dengan daya tahan maksimal.\n- Komponen teruji stabil dan minim resiko return.\n- Produk fast moving dan terlaris di etalase 168 Parts dengan reputasi kepuasan tinggi.\n\nKETENTUAN GARANSI & PENGIRIMAN 168 PARTS:\n1. Wajib melakukan tes fungsi barang terlebih dahulu sebelum dipasang permanen (khusus LCD, IC, baterai, dan fleksibel).\n2. Garansi berlaku jika segel utuh, plastik pelindung tidak dilepas, dan fisik barang tidak retak / terkena lem berlebih.\n3. WAJIB melampirkan rekaman VIDEO UNBOXING utuh tanpa jeda / edit untuk keperluan klaim jika terjadi kendala isi paket.\n4. Setiap pesanan dikemas ekstra aman menggunakan Bubble Wrap tebal dan kotak kardus khusus toko.\n5. Pengiriman cepat langsung dari gudang toko fisik kami di Kota Surabaya. Pesanan sebelum jam 17.00 WIB dikirim di hari yang sama!\n\nTerima kasih telah berbelanja di 168 Parts Surabaya. Kepuasan dan kelancaran servis Anda adalah prioritas kami!",
+    "description": "Deskripsi Produk : \n\nLanRui I9 adalah lem perekat aktif / multi-fungsi dari merek LanRui, dirancang khusus untuk keperluan servis elektronik seperti bonding screen, housing frame, back cover, bracket, dan aplikasi lain yang membutuhkan adhesi kuat tapi tetap lembut jika disentuh. Tersedia dalam varian transparan maupun hitam. \nFungsi :\n\n1. Untuk perekat housing / frame perangkat mobile seperti body belakang HP, sisi bingkai, dan komponen penutup lain.\n\n2. Untuk bonding screen / panel kaca ketika mengganti layar, memastikan sambungan kuat dan rata.\n\n3. Untuk pengerjaan back cover / bracket / fitting screen border agar rapih dan tidak mudah lepas. \n\n4. Untuk aplikasi repair elektronik lain yang memerlukan lem dengan adhesi tinggi tapi tetap lembut agar tidak merusak bagian yang sensitif seperti kabel fleksibel.\n\nNb: Lebih baik tanyakan stok barang terlebih dahulu sebelum check out",
     "specs": [
-      "Kategori: Lem LCD I9",
-      "Kondisi: 100% Baru & Tersegel",
-      "Kualitas: Grade Original 168 Parts",
-      "Asal Toko: Kota Surabaya",
-      "Garansi: Garansi Tes 7 Hari (Segel Utuh)"
+      "Merek: LanRui",
+      "Seri: I9 Multi-Function Adhesive",
+      "Volume: 55ml",
+      "Varian Warna: Hitam & Transparan",
+      "Karakteristik: Adhesi Kuat & Lembut Fleksibel",
+      "Aplikasi: LCD Screen, Housing Frame, Back Cover & Bracket",
+      "Asal: 168 Parts Official Surabaya"
     ]
   },
   {
