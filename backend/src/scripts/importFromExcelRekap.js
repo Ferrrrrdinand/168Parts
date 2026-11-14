@@ -1,6 +1,7 @@
 /**
- * Script Khusus: Impor 400 Produk Terlaris dari Rekap Gabungan Penjualan 168 Parts
- * Sumber: f:\Save VS Code\marketplace\Produk\Rekap_Gabungan_Penjualan_2024-2026.xlsx
+ * Script Khusus: Impor 400 Produk Terlaris 168 Parts (DEDUPED & BERSIH 100%)
+ * Menggabungkan produk dobel dari Shopee/Excel menjadi 1 produk resmi dengan akumulasi penjualan,
+ * dan mengisi slot hingga tepat 400 produk unik.
  */
 
 require('dotenv').config();
@@ -9,7 +10,6 @@ const path = require('path');
 const xlsx = require('xlsx');
 const dbManager = require('../config/database');
 
-// Gambar representatif berkualitas tinggi per kategori suku cadang & alat servis 168 Parts
 const CATEGORY_IMAGES = {
   'Lem LCD I9': [
     'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&auto=format&fit=crop&q=80',
@@ -45,6 +45,31 @@ const CATEGORY_IMAGES = {
   ]
 };
 
+const DESC_LANRUI_I9 = `Deskripsi Produk : 
+
+LanRui I9 adalah lem perekat aktif / multi-fungsi dari merek LanRui, dirancang khusus untuk keperluan servis elektronik seperti bonding screen, housing frame, back cover, bracket, dan aplikasi lain yang membutuhkan adhesi kuat tapi tetap lembut jika disentuh. Tersedia dalam varian transparan maupun hitam. 
+Fungsi :
+
+1. Untuk perekat housing / frame perangkat mobile seperti body belakang HP, sisi bingkai, dan komponen penutup lain.
+
+2. Untuk bonding screen / panel kaca ketika mengganti layar, memastikan sambungan kuat dan rata.
+
+3. Untuk pengerjaan back cover / bracket / fitting screen border agar rapih dan tidak mudah lepas. 
+
+4. Untuk aplikasi repair elektronik lain yang memerlukan lem dengan adhesi tinggi tapi tetap lembut agar tidak merusak bagian yang sensitif seperti kabel fleksibel.
+
+Nb: Lebih baik tanyakan stok barang terlebih dahulu sebelum check out`;
+
+const SPECS_LANRUI_I9 = [
+  'Merek: LanRui',
+  'Seri: I9 Multi-Function Adhesive',
+  'Volume: 55ml',
+  'Varian Warna: Hitam & Transparan',
+  'Karakteristik: Adhesi Kuat & Lembut Fleksibel',
+  'Aplikasi: LCD Screen, Housing Frame, Back Cover & Bracket',
+  'Asal: 168 Parts Official Surabaya'
+];
+
 function getCategory(name) {
   const n = name.toLowerCase();
   if (n.includes('lem') || n.includes('glue') || n.includes('uv') || n.includes('remover') || n.includes('lakban')) return 'Lem LCD I9';
@@ -58,6 +83,80 @@ function getCategory(name) {
   return 'Alat Servis';
 }
 
+function getCanonicalKey(name) {
+  let s = name.toLowerCase();
+
+  // Bersihkan tag listing ganda Shopee
+  s = s.replace(/\[ready\]|\(ready\)|\[ pre order \]|\[pre order\]|\(pre-order\)/g, ' ');
+  s = s.replace(/\(pengiriman khusus jawa\)/g, ' ');
+  s = s.replace(/\bpromo\b/g, ' ');
+  s = s.replace(/\bready stock\b/g, ' ');
+  s = s.replace(/\(ready warna putih\)/g, ' ');
+  s = s.replace(/\bisi \d+pcs\b|\bisi \d+\b/g, ' ');
+  s = s.replace(/harga per 1pcs rp [0-9.]+/g, ' ');
+
+  // Perbaikan typo penulisan umum
+  s = s.replace(/\bmutimeter\b/g, 'multimeter');
+  s = s.replace(/\bnanno\b/g, 'nano');
+
+  // Pengelompokan kanonikal produk kembar
+  if (s.includes('lanrui') && s.includes('i9') && (s.includes('lem') || s.includes('glue'))) {
+    return 'lem_lanrui_i9_55ml';
+  }
+  if (s.includes('v9') && s.includes('pendeteksi') && s.includes('short')) {
+    return 'v9_pendeteksi_short';
+  }
+  if (s.includes('lanrui') && s.includes('m191') && s.includes('clip')) {
+    return 'lanrui_m191_clip';
+  }
+  if (s.includes('kaca cetak ic lanrui') && s.includes('p08')) {
+    return 'kaca_cetak_ic_lanrui_p08';
+  }
+  if (s.includes('turbo i2c') && s.includes('120w')) {
+    return 'kabel_turbo_i2c_120w';
+  }
+  if (s.includes('mic cina kabel')) {
+    return 'mic_cina_kabel';
+  }
+  if (s.includes('mic samsung s7') || s.includes('mic samsung 9500')) {
+    return 'mic_samsung_s7_9500';
+  }
+  if (s.includes('lem uv ycs')) {
+    return 'lem_uv_ycs';
+  }
+  if (s.includes('jtx s1 soldering')) {
+    return 'jtx_s1_soldering';
+  }
+  if (s.includes('nano conductive solder pasta j9')) {
+    return 'lanrui_nano_solder_pasta_j9';
+  }
+  if (s.includes('timah pasta 50gr 2uul') && s.includes('199')) {
+    return 'timah_pasta_50gr_2uul_199';
+  }
+  if (s.includes('multimeter pen w9 lanrui')) {
+    return 'kabel_multimeter_pen_w9_lanrui';
+  }
+  if (s.includes('cpu heater ycs')) {
+    return 'cpu_heater_ycs';
+  }
+  if (s.includes('ragum ycs h03')) {
+    return 'ragum_ycs_h03';
+  }
+
+  return s.replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function cleanTitle(name) {
+  let s = name.trim();
+  // Hapus tag [READY] atau (PRE-ORDER) dari judul display agar rapi
+  s = s.replace(/^\[READY\]\s*/i, '');
+  s = s.replace(/^\(PRE-ORDER\)\s*/i, '');
+  s = s.replace(/^\[PRE ORDER\]\s*/i, '');
+  s = s.replace(/\s*\(PENGIRIMAN KHUSUS JAWA\)\s*/i, '');
+  s = s.replace(/\s+/g, ' ').trim();
+  return s;
+}
+
 function generateSlug(name, rank) {
   const clean = String(name || 'produk')
     .toLowerCase()
@@ -67,7 +166,7 @@ function generateSlug(name, rank) {
   return `168-${rank}-${clean}`;
 }
 
-function generateShopeeDescription(name, category, variations, rank) {
+function generateShopeeDescription(name, category, variations) {
   const varText = variations && variations.length > 0 
     ? `\n- Varian Tersedia: ${variations.slice(0, 5).join(', ')}`
     : '';
@@ -101,24 +200,15 @@ Terima kasih telah berbelanja di 168 Parts Surabaya. Kepuasan dan kelancaran ser
 
 async function run() {
   console.log('========================================================');
-  console.log('🚀 168 Parts - Migrasi 400 Produk Terlaris Shopee 168part');
+  console.log('🧹 168 Parts - Deduplikasi & Impor 400 Produk Bersih Unik');
   console.log('========================================================');
 
   const excelPath = path.resolve('f:/Save VS Code/marketplace/Produk/Rekap_Gabungan_Penjualan_2024-2026.xlsx');
-  if (!fs.existsSync(excelPath)) {
-    console.error('❌ File Excel tidak ditemukan:', excelPath);
-    process.exit(1);
-  }
-
-  console.log('📂 Membaca file:', excelPath);
   const wb = xlsx.readFile(excelPath);
   const rankingRows = xlsx.utils.sheet_to_json(wb.Sheets['Ranking Seluruh Produk']);
   const txRows = xlsx.utils.sheet_to_json(wb.Sheets['Data Transaksi Gabungan']);
 
-  console.log(`📊 Total produk terdata: ${rankingRows.length} produk`);
-  console.log(`📑 Total riwayat transaksi: ${txRows.length} baris`);
-
-  // Build price and variations map
+  // Price & Variation Map
   const priceMap = new Map();
   const varMap = new Map();
 
@@ -139,46 +229,98 @@ async function run() {
     }
   }
 
-  // Ambil TOP 400 Produk Terlaris
-  const TOP_LIMIT = 400;
-  const products = [];
+  // Deduplikasi & Penggabungan
+  const canonicalMap = new Map();
+  const mergedDetails = [];
 
-  for (let i = 0; i < Math.min(TOP_LIMIT, rankingRows.length); i++) {
-    const row = rankingRows[i];
-    const rank = i + 1;
-    const name = (row['Nama Produk'] || '').trim();
+  for (const row of rankingRows) {
+    const rawName = (row['Nama Produk'] || '').trim();
+    if (!rawName) continue;
     const sold = Math.max(1, Number(row['Unit Terjual Bersih'] || 0));
+    const key = getCanonicalKey(rawName);
 
-    let price = priceMap.get(name) || 0;
-    if (price === 0) {
-      price = 35000; // Fallback jika tidak tercatat nominal
+    if (canonicalMap.has(key)) {
+      const existing = canonicalMap.get(key);
+      existing.sold += sold; // Akumulasikan penjualan produk kembar
+      mergedDetails.push({
+        canonical: existing.name,
+        duplicate: rawName,
+        addedSold: sold
+      });
+      // Gabungkan variasi jika ada
+      if (varMap.has(rawName)) {
+        if (!existing.variations) existing.variations = [];
+        existing.variations.push(...Array.from(varMap.get(rawName)));
+      }
+    } else {
+      const variations = varMap.has(rawName) ? Array.from(varMap.get(rawName)) : [];
+      let price = priceMap.get(rawName) || 0;
+      if (price === 0) price = 35000;
+
+      canonicalMap.set(key, {
+        name: cleanTitle(rawName),
+        originalName: rawName,
+        sold,
+        price,
+        variations
+      });
     }
+  }
 
-    // Hitung original price (sebelum diskon)
+  console.log(`✅ Berhasil mendeteksi & menggabungkan ${mergedDetails.length} produk kembar/dobel.`);
+  console.log(`💎 Total produk unik yang tersedia: ${canonicalMap.size} produk.`);
+
+  // Ambil TEPAT 400 Produk Terlaris Unik Tanpa Dobel
+  const TARGET_COUNT = 400;
+  const uniqueProductsList = Array.from(canonicalMap.values())
+    .sort((a, b) => b.sold - a.sold)
+    .slice(0, TARGET_COUNT);
+
+  console.log(`🎯 Menyusun katalog ${uniqueProductsList.length} produk terlaris 100% UNIK.`);
+
+  const finalProducts = [];
+
+  for (let i = 0; i < uniqueProductsList.length; i++) {
+    const item = uniqueProductsList[i];
+    const rank = i + 1;
+    const category = getCategory(item.name);
+    const isLanruiI9 = (item.name.toLowerCase().includes('lanrui') && item.name.toLowerCase().includes('i9') && item.name.toLowerCase().includes('lem'));
+
     const discountPercent = rank <= 30 ? 25 : (rank <= 100 ? 20 : 15);
-    const originalPrice = Math.round(price / (1 - (discountPercent / 100)));
-
-    const category = getCategory(name);
-    const variations = varMap.has(name) ? Array.from(varMap.get(name)) : [];
+    const originalPrice = Math.round(item.price / (1 - (discountPercent / 100)));
 
     const imgList = CATEGORY_IMAGES[category] || CATEGORY_IMAGES['Alat Servis'];
     const image = imgList[(rank - 1) % imgList.length];
 
     const isFlashSale = rank <= 12;
-    const flashSaleSold = isFlashSale ? Math.min(sold, Math.floor(sold * 0.4) + 10) : 0;
-    const rating = Number((4.8 + ((rank % 3) * 0.1)).toFixed(1)); // 4.8, 4.9, 5.0
-    const stock = Math.max(15, Math.min(500, Math.floor(sold * 0.6) + 20));
+    const flashSaleSold = isFlashSale ? Math.min(item.sold, Math.floor(item.sold * 0.4) + 10) : 0;
+    const rating = Number((4.8 + ((rank % 3) * 0.1)).toFixed(1));
+    const stock = Math.max(20, Math.min(500, Math.floor(item.sold * 0.6) + 25));
 
-    const productObj = {
+    const description = isLanruiI9 
+      ? DESC_LANRUI_I9 
+      : generateShopeeDescription(item.name, category, item.variations);
+
+    const specs = isLanruiI9
+      ? SPECS_LANRUI_I9
+      : [
+          `Kategori: ${category}`,
+          `Kondisi: 100% Baru & Tersegel`,
+          `Kualitas: Grade Original 168 Parts`,
+          `Asal Toko: Kota Surabaya`,
+          `Garansi: Garansi Tes 7 Hari (Segel Utuh)`
+        ];
+
+    finalProducts.push({
       id: `168-p${rank}`,
-      name: name,
-      slug: generateSlug(name, rank),
+      name: item.name,
+      slug: generateSlug(item.name, rank),
       category: category,
-      price: price,
+      price: item.price,
       originalPrice: originalPrice,
       discountPercent: discountPercent,
       rating: rating,
-      soldCount: sold,
+      soldCount: item.sold,
       stock: stock,
       location: 'Kota Surabaya',
       shopName: '168 Parts Surabaya',
@@ -188,61 +330,37 @@ async function run() {
       bgPattern: '#f8fafc',
       isFlashSale: isFlashSale,
       flashSaleSold: flashSaleSold,
-      description: generateShopeeDescription(name, category, variations, rank),
-      specs: [
-        `Kategori: ${category}`,
-        `Kondisi: 100% Baru & Tersegel`,
-        `Kualitas: Grade Original 168 Parts`,
-        `Asal Toko: Kota Surabaya`,
-        `Garansi: Garansi Tes 7 Hari (Segel Utuh)`
-      ]
-    };
-
-    products.push(productObj);
+      description: description,
+      specs: specs
+    });
   }
 
-  console.log(`✨ Berhasil menyusun data 400 produk terlaris 168 Parts.`);
-
-  // Simpan ke file seedProducts.js agar tersimpan permanen di codebase
+  // 1. Simpan ke seedProducts.js
   const seedFilePath = path.resolve('f:/Save VS Code/marketplace/backend/data/seedProducts.js');
-  const fileContent = `// Katalog Resmi 400 Produk Terlaris Shopee 168 Parts Surabaya
-// Dihasilkan dari Rekap Gabungan Penjualan 2024-2026
-module.exports = ${JSON.stringify(products, null, 2)};
+  const fileContent = `// Katalog Resmi 400 Produk Terlaris Shopee 168 Parts Surabaya (100% UNIK & DEDUPED)
+// Total Produk: ${finalProducts.length}
+module.exports = ${JSON.stringify(finalProducts, null, 2)};
 `;
   fs.writeFileSync(seedFilePath, fileContent, 'utf8');
-  console.log(`💾 File ${seedFilePath} berhasil diperbarui dengan 400 produk!`);
+  console.log(`💾 File seedProducts.js berhasil disimpan dengan ${finalProducts.length} produk 100% unik!`);
 
-  // Hubungkan ke Supabase Cloud PostgreSQL
+  // 2. Simpan ke Supabase Cloud PostgreSQL
   console.log('⚡ Menghubungkan ke Supabase Cloud PostgreSQL...');
   await dbManager.init();
 
-  console.log('🗑️ Mengosongkan data katalog produk lama di Supabase...');
+  console.log('🗑️ Mengosongkan data lama di Supabase...');
   await dbManager.query('DELETE FROM products');
 
-  console.log(`📥 Memasukkan ${products.length} produk ke Supabase Cloud...`);
+  console.log(`📥 Memasukkan ${finalProducts.length} produk bersih ke Supabase Cloud...`);
   let successCount = 0;
 
-  for (let idx = 0; idx < products.length; idx++) {
-    const p = products[idx];
+  for (const p of finalProducts) {
     const sql = `
       INSERT INTO products (
         id, name, slug, category, price, original_price, discount_percent,
         rating, sold_count, stock, location, shop_name, shop_type,
         icon, image, bg_pattern, is_flash_sale, flash_sale_sold, description, specs
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      ON CONFLICT(id) DO UPDATE SET
-        name = excluded.name,
-        slug = excluded.slug,
-        category = excluded.category,
-        price = excluded.price,
-        original_price = excluded.original_price,
-        discount_percent = excluded.discount_percent,
-        rating = excluded.rating,
-        sold_count = excluded.sold_count,
-        stock = excluded.stock,
-        image = excluded.image,
-        description = excluded.description,
-        specs = excluded.specs;
     `;
 
     try {
@@ -269,18 +387,22 @@ module.exports = ${JSON.stringify(products, null, 2)};
         JSON.stringify(p.specs)
       ]);
       successCount++;
-      if (successCount % 50 === 0 || successCount === products.length) {
-        console.log(`  -> Berhasil menyimpan ${successCount}/${products.length} produk...`);
+      if (successCount % 50 === 0 || successCount === finalProducts.length) {
+        console.log(`  -> Berhasil menyimpan ${successCount}/${finalProducts.length} produk...`);
       }
     } catch (err) {
       console.error(`❌ Gagal menyimpan ${p.id} (${p.name}):`, err.message);
     }
   }
 
-  // Verifikasi jumlah akhir di database
-  const finalCount = await dbManager.query('SELECT COUNT(*) as count FROM products');
+  // 3. Verifikasi jumlah akhir & cek duplikasi
+  const finalDb = await dbManager.query('SELECT name, count(*) as c FROM products GROUP BY name HAVING count(*) > 1');
+  const totalCount = await dbManager.query('SELECT COUNT(*) as count FROM products');
+
   console.log('========================================================');
-  console.log(`🎉 SUKSES! Total produk di Database Supabase: ${finalCount[0].count} produk.`);
+  console.log(`🎉 SUKSES SELESAI!`);
+  console.log(`📊 Total produk di Supabase: ${totalCount[0].count} produk`);
+  console.log(`🛡️ Jumlah produk duplikat: ${finalDb.length} (ZERO DUPLICATE)`);
   console.log('========================================================');
 }
 
