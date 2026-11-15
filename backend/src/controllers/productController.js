@@ -172,32 +172,19 @@ exports.getCategories = (req, res) => {
   }
 };
 
-// 7. READ FLASH SALE (Siklus 24 Jam - Reset Pukul 00:00:00 Tengah Malam WIB)
+// 7. READ FLASH SALE (Siklus 24 Jam - Reset Pukul 00:00:00 Tengah Malam WIB / Manual Admin)
 exports.getFlashSale = async (req, res) => {
   try {
-    const now = new Date();
-    // Hitung waktu tengah malam WIB (UTC+7)
-    const nowUtcMs = now.getTime();
-    const wibOffsetMs = 7 * 60 * 60 * 1000;
-    const nowWib = new Date(nowUtcMs + wibOffsetMs);
-
-    // Tengah malam WIB hari berikutnya (00:00:00)
-    const nextMidnightWib = new Date(Date.UTC(
-      nowWib.getUTCFullYear(),
-      nowWib.getUTCMonth(),
-      nowWib.getUTCDate() + 1,
-      0, 0, 0, 0
-    ));
-    const nextMidnightUtcMs = nextMidnightWib.getTime() - wibOffsetMs;
-    const secondsRemaining = Math.max(0, Math.floor((nextMidnightUtcMs - nowUtcMs) / 1000));
-
+    const timing = productModel.getFlashSaleTiming();
     const flashSales = await productModel.findFlashSale();
+
     return res.json({
       success: true,
       cycleHours: 24,
-      resetTime: nextMidnightUtcMs,
-      secondsRemaining: secondsRemaining,
-      resetSchedule: 'Setiap hari pukul 00:00 WIB (Tengah Malam)',
+      resetTime: timing.nextResetMs,
+      secondsRemaining: timing.secondsRemaining,
+      resetSchedule: timing.resetSchedule,
+      isManualCycle: timing.isManualCycle,
       total: flashSales.length,
       data: flashSales
     });
@@ -206,6 +193,68 @@ exports.getFlashSale = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Gagal memuat produk Flash Sale.',
+      error: error.message
+    });
+  }
+};
+
+// 7.1. ADMIN CONTROL: Reset Siklus Flash Sale 24 Jam Sekarang
+exports.resetFlashSaleCycle = async (req, res) => {
+  try {
+    const result = await productModel.resetFlashSaleCycle();
+    const flashSales = await productModel.findFlashSale();
+
+    return res.json({
+      success: true,
+      message: '⚡ Siklus Flash Sale 24 jam berhasil di-reset oleh Admin! Countdown dan progres dimulai dari 0 kembali.',
+      data: flashSales,
+      timing: result.timing
+    });
+  } catch (error) {
+    console.error('Error resetFlashSaleCycle:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal mereset siklus Flash Sale.',
+      error: error.message
+    });
+  }
+};
+
+// 7.2. ADMIN CONTROL: Pilihkan 12 Produk Terlaris Otomatis Masuk Flash Sale
+exports.autoSelectFlashSale = async (req, res) => {
+  try {
+    const limit = parseInt(req.body.limit, 10) || 12;
+    const flashSales = await productModel.autoSelectFlashSale(limit);
+
+    return res.json({
+      success: true,
+      message: `✨ Berhasil memilih ${flashSales.length} produk terlaris masuk ke daftar Flash Sale!`,
+      data: flashSales
+    });
+  } catch (error) {
+    console.error('Error autoSelectFlashSale:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal mengatur produk Flash Sale otomatis.',
+      error: error.message
+    });
+  }
+};
+
+// 7.3. ADMIN CONTROL: Bersihkan Seluruh Produk dari Flash Sale
+exports.clearAllFlashSale = async (req, res) => {
+  try {
+    await productModel.clearAllFlashSale();
+
+    return res.json({
+      success: true,
+      message: 'Seluruh produk berhasil dikeluarkan dari Flash Sale toko.'
+    });
+  } catch (error) {
+    console.error('Error clearAllFlashSale:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal membersihkan Flash Sale.',
       error: error.message
     });
   }

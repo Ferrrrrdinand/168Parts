@@ -7,6 +7,12 @@ const { requireAdmin } = require('../middleware/authMiddleware');
 router.get('/', productController.getProducts);
 router.get('/categories', productController.getCategories);
 router.get('/flash-sale', productController.getFlashSale);
+
+// Flash Sale Admin Controls (Wajib sebelum /:id)
+router.post('/flash-sale/reset', requireAdmin, productController.resetFlashSaleCycle);
+router.post('/flash-sale/auto-select', requireAdmin, productController.autoSelectFlashSale);
+router.post('/flash-sale/clear', requireAdmin, productController.clearAllFlashSale);
+
 router.get('/:id', productController.getProductById);
 
 // CREATE (CRUD - C) - Khusus Akun Admin Tunggal

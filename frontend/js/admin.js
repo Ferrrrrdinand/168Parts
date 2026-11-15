@@ -343,9 +343,15 @@ const AdminApp = {
         chat: '💬 Live Chat Customer Care & Manajemen Obrolan',
         banners: '🎨 Pengaturan & Desain Banner Toko',
         promos: '🎟️ Kelola Voucher & Kode Promo',
-        broadcasts: '📢 Broadcast Notifikasi Massal ke Seluruh Member'
+        broadcasts: '📢 Broadcast Notifikasi Massal ke Seluruh Member',
+        flashsale: '⚡ Manajemen Flash Sale & Countdown 24 Jam'
       };
       titleEl.textContent = titles[tabName] || 'Dashboard Admin';
+    }
+
+    if (tabName === 'flashsale') {
+      this.renderFlashSaleTable();
+      this.initFlashSaleTimer();
     }
 
     if (tabName === 'broadcasts') {
@@ -473,10 +479,15 @@ const AdminApp = {
     const orderBadge = document.getElementById('badge-order-count');
     const promoBadge = document.getElementById('badge-promo-count');
     const custBadge = document.getElementById('badge-customer-count');
+    const flashBadge = document.getElementById('badge-flash-count');
+    const flashCountEl = document.getElementById('admin-flash-active-count');
+
     if (prodBadge) prodBadge.textContent = this.products.length;
     if (orderBadge) orderBadge.textContent = this.orders.length;
     if (promoBadge) promoBadge.textContent = this.promos.length;
     if (custBadge) custBadge.textContent = this.customers.length;
+    if (flashBadge) flashBadge.textContent = flashCount;
+    if (flashCountEl) flashCountEl.textContent = flashCount;
   },
 
   renderOverviewRecent() {
@@ -876,6 +887,269 @@ const AdminApp = {
       });
       this.showToast(`Status Flash Sale produk "${p.name.slice(0, 20)}..." diperbarui!`);
       this.updateStats();
+      if (this.currentTab === 'flashsale') {
+        this.renderFlashSaleTable();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  },
+
+  /* =========================================================
+     MANAJEMEN FLASH SALE 24 JAM (KONTROL ADMIN)
+     ========================================================= */
+  initFlashSaleTimer() {
+    const timerEl = document.getElementById('admin-flash-timer');
+    if (!timerEl) return;
+
+    const tick = () => {
+      const now = new Date();
+      let diffSec = 0;
+
+      if (this._flashSaleManualResetMs && (now.getTime() - this._flashSaleManualResetMs) < 86400000) {
+        diffSec = Math.max(0, Math.floor(((this._flashSaleManualResetMs + 86400000) - now.getTime()) / 1000));
+      } else {
+        const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
+        diffSec = Math.max(0, Math.floor((nextMidnight.getTime() - now.getTime()) / 1000));
+      }
+
+      const pad = n => String(n).padStart(2, '0');
+      const h = Math.floor(diffSec / 3600);
+      const m = Math.floor((diffSec % 3600) / 60);
+      const s = diffSec % 60;
+      timerEl.textContent = `${pad(h)} : ${pad(m)} : ${pad(s)}`;
+    };
+
+    tick();
+    if (this._adminFlashInterval) clearInterval(this._adminFlashInterval);
+    this._adminFlashInterval = setInterval(tick, 1000);
+  },
+
+  renderFlashSaleTable() {
+    const tbody = document.getElementById('admin-flash-tbody');
+    const countEl = document.getElementById('admin-flash-active-count');
+    const badgeEl = document.getElementById('badge-flash-count');
+    if (!tbody) return;
+
+    const flashList = this.products.filter(p => p.isFlashSale);
+    if (countEl) countEl.textContent = flashList.length;
+    if (badgeEl) badgeEl.textContent = flashList.length;
+
+    if (flashList.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="9" style="text-align:center; padding:35px 20px; color:#64748b;">
+            <div style="font-size:32px; margin-bottom:8px;">⚡</div>
+            <div style="font-size:14px; font-weight:700; color:#1e293b;">Belum Ada Produk Flash Sale yang Aktif</div>
+            <p style="font-size:12px; color:#94a3b8; margin-top:4px;">Klik tombol "Pilihkan 12 Terlaris Otomatis" atau cari produk di atas untuk memasukkannya ke Flash Sale toko.</p>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = flashList.map((p, idx) => {
+      const origPrice = p.originalPrice || Math.round(p.price * 1.25);
+      const discountPct = p.discountPercent || Math.round(((origPrice - p.price) / origPrice) * 100);
+
+      return `
+        <tr>
+          <td style="text-align:center; font-weight:700; color:#64748b;">${idx + 1}</td>
+          <td>
+            <div style="font-weight:700; color:#0f172a; font-size:13px; line-height:1.3; max-width:280px;">${p.name}</div>
+            <div style="font-size:11px; color:#94a3b8; margin-top:2px;">ID: ${p.id}</div>
+          </td>
+          <td>
+            <span style="font-size:11px; font-weight:700; background:#f1f5f9; color:#475569; padding:2px 8px; border-radius:4px;">${p.category || 'Alat Servis'}</span>
+          </td>
+          <td style="font-size:12.5px; color:#64748b; text-decoration:line-through;">
+            ${this.formatRupiah(origPrice)}
+          </td>
+          <td style="width:100px;">
+            <div style="display:flex; align-items:center; gap:4px;">
+              <input type="number" min="5" max="90" value="${discountPct}" 
+                style="width:55px; height:30px; font-size:12px; font-weight:800; color:#ea580c; border:1px solid #cbd5e1; border-radius:4px; text-align:center;"
+                onchange="AdminApp.handleUpdateFlashDiscount('${p.id}', this.value)">
+              <span style="font-size:12px; font-weight:800; color:#ea580c;">%</span>
+            </div>
+          </td>
+          <td style="font-size:13.5px; font-weight:800; color:#dc2626;">
+            ${this.formatRupiah(p.price)}
+          </td>
+          <td style="font-size:12.5px; font-weight:600; color:#334155;">
+            ${p.stock || 50} unit
+          </td>
+          <td style="text-align:center;">
+            <label class="toggle-switch" style="display:inline-block; margin:0 auto;">
+              <input type="checkbox" checked onchange="AdminApp.toggleFlashSale('${p.id}', this.checked)">
+              <span class="toggle-slider"></span>
+            </label>
+          </td>
+          <td style="text-align:center;">
+            <button type="button" class="btn-action-icon btn-del" onclick="AdminApp.toggleFlashSale('${p.id}', false)" title="Keluarkan dari Flash Sale" style="color:#dc2626;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  },
+
+  handleSearchFlashSaleCandidates(query) {
+    const resBox = document.getElementById('admin-flash-search-results');
+    if (!resBox) return;
+
+    const q = (query || '').toLowerCase().trim();
+    if (!q || q.length < 2) {
+      resBox.style.display = 'none';
+      resBox.innerHTML = '';
+      return;
+    }
+
+    const matches = this.products.filter(p => 
+      !p.isFlashSale && (
+        p.name.toLowerCase().includes(q) ||
+        (p.category && p.category.toLowerCase().includes(q)) ||
+        p.id.toLowerCase().includes(q)
+      )
+    ).slice(0, 15);
+
+    if (matches.length === 0) {
+      resBox.style.display = 'block';
+      resBox.innerHTML = `
+        <div style="padding:12px 16px; font-size:12px; color:#64748b; text-align:center;">
+          Tidak ditemukan produk non-flashsale yang cocok dengan "${query}".
+        </div>
+      `;
+      return;
+    }
+
+    resBox.style.display = 'block';
+    resBox.innerHTML = matches.map(p => `
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-bottom:1px solid #e2e8f0; background:#ffffff;">
+        <div style="flex:1; margin-right:12px;">
+          <div style="font-size:12.5px; font-weight:700; color:#0f172a;">${p.name}</div>
+          <div style="font-size:11px; color:#64748b; display:flex; gap:8px; margin-top:2px;">
+            <span style="color:#ea580c; font-weight:700;">${this.formatRupiah(p.price)}</span>
+            <span>•</span>
+            <span>${p.category || 'Alat Servis'}</span>
+            <span>•</span>
+            <span>Stok: ${p.stock || 50}</span>
+          </div>
+        </div>
+        <button type="button" class="btn-primary" onclick="AdminApp.addCandidateToFlashSale('${p.id}')" style="background:#ea580c; border-color:#ea580c; font-size:11.5px; padding:5px 12px; white-space:nowrap;">
+          + Jadikan Flash Sale
+        </button>
+      </div>
+    `).join('');
+  },
+
+  async addCandidateToFlashSale(prodId) {
+    const p = this.products.find(x => x.id === prodId);
+    if (!p) return;
+
+    await this.toggleFlashSale(prodId, true);
+    this.showToast(`⚡ "${p.name.slice(0, 24)}..." berhasil dimasukkan ke Flash Sale!`);
+    const searchInput = document.getElementById('admin-flash-search-input');
+    if (searchInput) {
+      this.handleSearchFlashSaleCandidates(searchInput.value);
+    }
+  },
+
+  async handleResetFlashSaleCycle() {
+    if (!confirm('⚡ Apakah Anda yakin ingin mereset siklus Flash Sale sekarang?\n\nTimer countdown akan dimulai kembali dari 24:00:00 dan progres kuota terjual akan di-reset ke awal hari.')) {
+      return;
+    }
+
+    try {
+      const res = await this.authFetch('/products/flash-sale/reset', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        this._flashSaleManualResetMs = Date.now();
+        this.showToast(data.message || '⚡ Siklus Flash Sale 24 jam berhasil di-reset!');
+        this.initFlashSaleTimer();
+        const schedEl = document.getElementById('admin-flash-schedule-text');
+        if (schedEl) schedEl.textContent = 'Siklus manual aktif (24 jam)';
+      } else {
+        alert(data.message || 'Gagal reset Flash Sale.');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Gagal menghubungi server untuk reset Flash Sale.');
+    }
+  },
+
+  async handleAutoSelectFlashSale() {
+    if (!confirm('✨ Pilihkan 12 produk terlaris masuk ke Flash Sale otomatis? Produk flash sale yang ada saat ini akan digantikan dengan 12 produk top-ranking.')) {
+      return;
+    }
+
+    try {
+      const res = await this.authFetch('/products/flash-sale/auto-select', {
+        method: 'POST',
+        body: JSON.stringify({ limit: 12 })
+      });
+      const data = await res.json();
+      if (data.success && Array.isArray(data.data)) {
+        const newFlashIds = new Set(data.data.map(x => x.id));
+        this.products.forEach(p => {
+          p.isFlashSale = newFlashIds.has(p.id);
+        });
+        this.renderFlashSaleTable();
+        this.updateStats();
+        this.showToast(data.message || '✨ 12 Produk terlaris berhasil diset ke Flash Sale!');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Gagal mengatur produk Flash Sale otomatis.');
+    }
+  },
+
+  async handleClearAllFlashSale() {
+    if (!confirm('⚠️ Anda yakin ingin mematikan SELURUH produk dari Flash Sale? Banner Flash Sale di toko tidak akan menampilkan produk hingga Anda menambahkan produk lagi.')) {
+      return;
+    }
+
+    try {
+      const res = await this.authFetch('/products/flash-sale/clear', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        this.products.forEach(p => { p.isFlashSale = false; });
+        this.renderFlashSaleTable();
+        this.updateStats();
+        this.showToast('Seluruh produk berhasil dikeluarkan dari Flash Sale.');
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  },
+
+  async handleUpdateFlashDiscount(prodId, discountPercent) {
+    const p = this.products.find(x => x.id === prodId);
+    if (!p) return;
+
+    let pct = parseInt(discountPercent, 10);
+    if (isNaN(pct) || pct < 1) pct = 15;
+    if (pct > 90) pct = 90;
+
+    const origPrice = p.originalPrice || Math.round(p.price * 1.3);
+    const newPrice = Math.round(origPrice * (1 - (pct / 100)));
+
+    p.discountPercent = pct;
+    p.price = newPrice;
+    p.originalPrice = origPrice;
+
+    try {
+      await this.authFetch(`/products/${prodId}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          discountPercent: pct,
+          price: newPrice,
+          originalPrice: origPrice
+        })
+      });
+      this.showToast(`Diskon produk "${p.name.slice(0, 18)}..." diubah menjadi ${pct}% (${this.formatRupiah(newPrice)})!`);
+      this.renderFlashSaleTable();
     } catch (e) {
       console.error(e);
     }

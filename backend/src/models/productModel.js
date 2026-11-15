@@ -290,32 +290,69 @@ class ProductModel {
     return deleted;
   }
 
-  // FLASH SALE (Siklus 24 Jam - Reset Otomatis Setiap Pukul 00:00:00 Tengah Malam WIB)
-  async findFlashSale() {
-    try {
-      // 1. Ambil produk yang ditandai Flash Sale (Prioritas ID 168-p1 LanRui I9)
-      let rows = await dbManager.query('SELECT * FROM products WHERE is_flash_sale = true LIMIT 12');
+  // Helper: Waktu siklus Flash Sale (Mendukung Reset Tengah Malam Otomatis maupun Manual Reset oleh Admin)
+  getFlashSaleTiming() {
+    const now = new Date();
+    let secondsSinceStart = 0;
+    let nextResetMs = 0;
+    let isManualCycle = false;
 
-      // Jika belum ada / kurang dari 6 produk yang di-flag, ambil produk terlaris
-      if (!rows || rows.length < 6) {
-        rows = await dbManager.query('SELECT * FROM products LIMIT 12');
-      }
+    // Jika admin melakukan manual reset dalam 24 jam terakhir
+    if (this._manualResetTimestamp && (now.getTime() - this._manualResetTimestamp) < 86400000) {
+      isManualCycle = true;
+      secondsSinceStart = Math.floor((now.getTime() - this._manualResetTimestamp) / 1000);
+      nextResetMs = this._manualResetTimestamp + 86400000;
+    } else {
+      // Siklus reguler 24 jam berbasis tengah malam WIB (UTC+7)
+      const nowUtcMs = now.getTime();
+      const wibOffsetMs = 7 * 3600 * 1000;
+      const nowWib = new Date(nowUtcMs + wibOffsetMs);
+      const nextMidnightWib = new Date(Date.UTC(
+        nowWib.getUTCFullYear(),
+        nowWib.getUTCMonth(),
+        nowWib.getUTCDate() + 1,
+        0, 0, 0, 0
+      ));
+      nextResetMs = nextMidnightWib.getTime() - wibOffsetMs;
 
-      // 2. Hitung progres waktu dalam siklus 24 jam saat ini
-      const now = new Date();
-      // Konversi ke waktu lokal WIB (UTC+7)
       const utcHours = now.getUTCHours();
       const utcMinutes = now.getUTCMinutes();
       const utcSeconds = now.getUTCSeconds();
       const wibHours = (utcHours + 7) % 24;
-      const secondsSinceMidnight = (wibHours * 3600) + (utcMinutes * 60) + utcSeconds;
-      const dayProgress = Math.min(1.0, Math.max(0.0, secondsSinceMidnight / 86400));
+      secondsSinceStart = (wibHours * 3600) + (utcMinutes * 60) + utcSeconds;
+    }
+
+    const secondsRemaining = Math.max(0, Math.floor((nextResetMs - now.getTime()) / 1000));
+    const dayProgress = Math.min(1.0, Math.max(0.0, secondsSinceStart / 86400));
+
+    return {
+      nowMs: now.getTime(),
+      nextResetMs,
+      secondsRemaining,
+      dayProgress,
+      isManualCycle,
+      resetSchedule: isManualCycle ? 'Siklus 24 Jam Manual (Admin Reset)' : 'Setiap hari pukul 00:00 WIB (Tengah Malam)'
+    };
+  }
+
+  // FLASH SALE (Siklus 24 Jam - Reset Otomatis Setiap Pukul 00:00:00 Tengah Malam WIB)
+  async findFlashSale() {
+    try {
+      const timing = this.getFlashSaleTiming();
+
+      // 1. Ambil produk yang ditandai Flash Sale (Prioritas ID 168-p1 LanRui I9)
+      let rows = await dbManager.query('SELECT * FROM products WHERE is_flash_sale = true LIMIT 18');
+
+      // Jika belum ada / kurang dari 4 produk yang di-flag, ambil produk terlaris
+      if (!rows || rows.length < 4) {
+        rows = await dbManager.query('SELECT * FROM products ORDER BY sold_count DESC LIMIT 12');
+      }
 
       return (rows || []).map((r, idx) => {
         const p = this.formatProductRow(r);
 
         const basePercent = 16 + ((idx * 7) % 12);
-        const dynamicPercent = Math.min(96, Math.max(15, Math.round(basePercent + (dayProgress * (92 - basePercent)))));
+        const dynamicPercent = Math.min(96, Math.max(15, Math.round(basePercent + (timing.dayProgress * (92 - basePercent)))));
 
         p.isFlashSale = true;
         p.flashSaleSold = dynamicPercent;
@@ -336,6 +373,39 @@ class ProductModel {
         return [];
       }
     }
+  }
+
+  // Reset siklus Flash Sale secara manual oleh Admin (Countdown & kuota kembali ke 0 detik ini juga)
+  async resetFlashSaleCycle() {
+    this._manualResetTimestamp = Date.now();
+    return {
+      success: true,
+      resetAt: new Date(this._manualResetTimestamp).toISOString(),
+      timing: this.getFlashSaleTiming()
+    };
+  }
+
+  // Pilihkan otomatis 12 produk terlaris menjadi Flash Sale
+  async autoSelectFlashSale(limit = 12) {
+    if (dbManager.isConnected) {
+      await dbManager.query('UPDATE products SET is_flash_sale = false');
+      // Set 12 produk dengan penjualan tertinggi sebagai Flash Sale
+      const topRows = await dbManager.query('SELECT id FROM products ORDER BY sold_count DESC LIMIT ?', [limit]);
+      if (topRows && topRows.length > 0) {
+        const ids = topRows.map(r => r.id);
+        const placeholders = ids.map(() => '?').join(', ');
+        await dbManager.query(`UPDATE products SET is_flash_sale = true WHERE id IN (${placeholders})`, ids);
+      }
+    }
+    return this.findFlashSale();
+  }
+
+  // Bersihkan semua produk dari Flash Sale
+  async clearAllFlashSale() {
+    if (dbManager.isConnected) {
+      await dbManager.query('UPDATE products SET is_flash_sale = false');
+    }
+    return [];
   }
 }
 

@@ -113,6 +113,14 @@
 
       <div class="menu-category-title">Pemasaran & Sistem</div>
 
+      <button class="sidebar-nav-item" data-tab="flashsale">
+        <span class="nav-icon">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        </span>
+        <span>Kelola Flash Sale</span>
+        <span class="nav-badge" id="badge-flash-count" style="background:#ea580c; color:#fff;">0</span>
+      </button>
+
       <button class="sidebar-nav-item" data-tab="promos">
         <span class="nav-icon">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
@@ -720,8 +728,8 @@
               </p>
             </div>
           </div>
-          <button class="btn-primary" style="font-size:12.5px; padding:8px 16px;" onclick="AdminApp.switchTab('products')">
-            Atur Item Flash Sale →
+          <button class="btn-primary" style="font-size:12.5px; padding:8px 16px; background:#ea580c; border-color:#ea580c;" onclick="AdminApp.switchTab('flashsale')">
+            Kelola Flash Sale 24 Jam →
           </button>
         </div>
 
@@ -1174,7 +1182,103 @@
 
       </section>
 
-    </main>
+      <!-- =========================================================
+           TAB 6: FLASHSALE (PENGATURAN & KONTROL FLASH SALE 24 JAM)
+           ========================================================= -->
+      <section class="admin-tab-pane" id="pane-flashsale">
+        
+        <!-- Header Info & Live Countdown -->
+        <div style="background:#ffffff; border:1px solid var(--admin-border); border-top:3.5px solid #ea580c; border-radius:var(--radius-md); padding:20px 24px; box-shadow:var(--shadow-sm); margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="background:#ea580c; color:#fff; font-size:12px; font-weight:800; padding:2px 8px; border-radius:4px; text-transform:uppercase;">FLASH SALE TOKO</span>
+              <span style="font-size:12px; color:#16a34a; font-weight:700; background:#dcfce7; padding:2px 8px; border-radius:4px;">🟢 Sedang Tayang di Beranda</span>
+            </div>
+            <h2 style="font-size:17px; font-weight:800; color:#0f172a; margin-top:6px;">⚡ Kontrol & Pengaturan Flash Sale 24 Jam</h2>
+            <p style="font-size:12.5px; color:#64748b; margin-top:2px;">
+              Siklus resmi diatur 24 jam dan reset otomatis setiap pukul 00:00 WIB (Tengah Malam). Admin dapat menambah/mengurangi produk serta mereset siklus kapan saja.
+            </p>
+          </div>
+
+          <!-- Countdown Box Admin -->
+          <div style="background:#fff7ed; border:1.5px solid #ffedd5; border-radius:10px; padding:12px 18px; text-align:center;">
+            <div style="font-size:11px; font-weight:800; color:#ea580c; text-transform:uppercase; letter-spacing:0.5px;">Sisa Waktu Menuju Reset:</div>
+            <div id="admin-flash-timer" style="font-size:22px; font-weight:900; color:#9a3412; font-family:ui-monospace, monospace; margin-top:3px; letter-spacing:1px;">
+              00 : 00 : 00
+            </div>
+            <div style="font-size:10.5px; color:#9a3412; margin-top:2px;" id="admin-flash-schedule-text">
+              Reset otomatis setiap 00:00:00 WIB
+            </div>
+          </div>
+        </div>
+
+        <!-- Tombol Aksi Cepat Admin -->
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <button type="button" class="btn-primary" onclick="AdminApp.handleResetFlashSaleCycle()" style="background:#ea580c; border-color:#ea580c; font-size:12.5px; padding:9px 16px; display:inline-flex; align-items:center; gap:6px;">
+              <span>⚡</span>
+              <span>Reset Siklus 24 Jam Sekarang</span>
+            </button>
+            <button type="button" class="btn-secondary" onclick="AdminApp.handleAutoSelectFlashSale()" style="font-size:12.5px; padding:9px 15px; display:inline-flex; align-items:center; gap:6px;">
+              <span>✨</span>
+              <span>Pilihkan 12 Terlaris Otomatis</span>
+            </button>
+            <button type="button" class="btn-secondary" onclick="AdminApp.handleClearAllFlashSale()" style="font-size:12.5px; padding:9px 15px; color:#dc2626; border-color:#fecdd3; display:inline-flex; align-items:center; gap:6px;">
+              <span>🗑️</span>
+              <span>Matikan Semua Flash Sale</span>
+            </button>
+          </div>
+
+          <div style="font-size:13px; font-weight:700; color:#334155;">
+            Total Aktif: <span id="admin-flash-active-count" style="color:#ea580c; font-size:15px;">0</span> produk
+          </div>
+        </div>
+
+        <!-- Pencarian & Tambah Cepat Produk ke Flash Sale -->
+        <div style="background:#ffffff; border:1px solid var(--admin-border); border-radius:var(--radius-md); padding:16px 20px; box-shadow:var(--shadow-sm); margin-bottom:20px;">
+          <label style="font-size:12.5px; font-weight:800; color:#1e293b; display:block; margin-bottom:6px;">
+            🔍 Tambah Produk ke Flash Sale (Cari dari 1.439 Produk Katalog):
+          </label>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <input type="text" id="admin-flash-search-input" class="form-input" placeholder="Ketik nama produk, tipe LCD, IC, Solder, Lem, dsb..." style="flex:1;" oninput="AdminApp.handleSearchFlashSaleCandidates(this.value)">
+            <button type="button" class="btn-secondary" onclick="document.getElementById('admin-flash-search-input').value=''; AdminApp.handleSearchFlashSaleCandidates('');" style="font-size:12px; padding:8px 12px;">Reset Cari</button>
+          </div>
+          <!-- Hasil Pencarian Instan -->
+          <div id="admin-flash-search-results" style="display:none; margin-top:12px; max-height:220px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:6px; background:#f8fafc;"></div>
+        </div>
+
+        <!-- Tabel Daftar Produk Flash Sale Aktif -->
+        <div style="background:#ffffff; border:1px solid var(--admin-border); border-radius:var(--radius-md); box-shadow:var(--shadow-sm); overflow:hidden;">
+          <div style="padding:14px 20px; border-bottom:1px solid var(--admin-border); background:#fafafa; display:flex; align-items:center; justify-content:space-between;">
+            <h3 style="font-size:13.5px; font-weight:800; color:#1e293b;">Daftar Produk yang Sedang Tayang di Flash Sale</h3>
+            <span style="font-size:11.5px; color:#64748b;">Maksimal 12-18 produk tayang di beranda</span>
+          </div>
+
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th style="width:40px;">No</th>
+                  <th>Produk</th>
+                  <th>Kategori</th>
+                  <th>Harga Normal</th>
+                  <th>Diskon (%)</th>
+                  <th>Harga Flash Sale</th>
+                  <th>Stok</th>
+                  <th style="text-align:center;">Status Flash Sale</th>
+                  <th style="text-align:center;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="admin-flash-tbody">
+                <tr>
+                  <td colspan="9" style="text-align:center; padding:30px; color:#94a3b8;">Memuat data produk Flash Sale...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
   </div>
 
   <!-- =========================================================
