@@ -116,59 +116,21 @@ const PasarinApp = {
     imgEl.src = 'images/product-placeholder.svg';
   },
 
-  getProductVisual(p) {
-    if (p && p.image) return p.image;
-    const name = (p && p.name ? p.name : '').toUpperCase();
-    const cat = (p && p.category ? p.category : '').toUpperCase();
-
-    // 1. Lem LCD I9 & Lem Touchscreen
-    if (cat.includes('LEM') || name.includes('LANRUI') || name.includes('LEM') || name.includes('GLUE') || name.includes('ADHESIVE') || name.includes('OCA') || name.includes('PELARUT')) {
-      return 'images/categories/cat-lem.svg';
-    }
-    // 2. LCD & Layar
-    if (cat.includes('LCD') || name.includes('LCD') || name.includes('INCELL') || name.includes('OLED') || name.includes('TOUCHSCREEN') || name.includes('LAYAR') || name.includes('FRAME LCD')) {
-      return 'images/categories/cat-lcd.svg';
-    }
-    // 3. Baterai HP
-    if (cat.includes('BATERAI') || name.includes('BATERAI') || name.includes('BATTERY') || name.includes('BATTERAI')) {
-      return 'images/categories/cat-baterai.svg';
-    }
-    // 4. IC & Chipset
-    if (cat.includes('IC') || name.includes('IC ') || name.includes('CHIPSET') || name.includes('CPU') || name.includes('POWER') || name.includes('WIFI') || name.includes('CHARGER') || name.includes('CHARGE')) {
-      return 'images/categories/cat-ic.svg';
-    }
-    // 5. Solder Station & Timah
-    if (cat.includes('SOLDER') || name.includes('SOLDER') || name.includes('TIMAH') || name.includes('FLUX') || name.includes('BLOWER') || name.includes('GOOTWICK') || name.includes('ELEMEN')) {
-      return 'images/categories/cat-solder.svg';
-    }
-    // 6. Backdoor & Kaca Kamera
-    if (cat.includes('BACKDOOR') || name.includes('BACKDOOR') || name.includes('GLASS') || name.includes('KACA') || name.includes('LENSA')) {
-      return 'images/categories/cat-backdoor.svg';
-    }
-    // 7. Tester & Multitester
-    if (cat.includes('TESTER') || name.includes('TESTER') || name.includes('MULTITESTER') || name.includes('MULTIMETER') || name.includes('AMPERE') || name.includes('VOLT') || name.includes('DETECTOR')) {
-      return 'images/categories/cat-tester.svg';
-    }
-    // 8. Pinset Presisi
-    if (cat.includes('PINSET') || name.includes('PINSET') || name.includes('TWEEZER') || name.includes('ESD')) {
-      return 'images/categories/cat-pinset.svg';
-    }
-    // 9. Alat Servis & Obeng
-    if (cat.includes('ALAT') || name.includes('OBENG') || name.includes('CLIP') || name.includes('PISAU') || name.includes('BOR') || name.includes('TANG') || name.includes('JARUM') || name.includes('KARET')) {
-      return 'images/categories/cat-tools.svg';
-    }
-    // 10. Fleksibel & Kabel
-    if (cat.includes('FLEKSIBEL') || name.includes('FLEKSIBEL') || name.includes('FLEX') || name.includes('KABEL') || name.includes('KONEKTOR') || name.includes('CONNECTOR')) {
-      return 'images/categories/cat-sparepart.svg';
-    }
-
-    return 'images/product-placeholder.svg';
-  },
-
   renderProductMedia(p, fallbackCls = 'i lg') {
-    const imgSrc = this.getProductVisual(p);
-    const prodName = p && p.name ? p.name.replace(/"/g, '&quot;') : 'Produk 168 Parts';
-    return `<img src="${imgSrc}" alt="${prodName}" class="prod-real-img" loading="lazy" onerror="this.onerror=null; this.src='images/product-placeholder.svg';">`;
+    if (p && p.image) {
+      const prodName = p.name ? p.name.replace(/"/g, '&quot;') : 'Produk 168 Parts';
+      return `<img src="${p.image}" alt="${prodName}" class="prod-real-img" loading="lazy">`;
+    }
+    return `
+      <div class="no-img-placeholder">
+        <svg class="no-img-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+          <circle cx="12" cy="13" r="4"></circle>
+          <line x1="1" y1="1" x2="23" y2="23"></line>
+        </svg>
+        <span class="no-img-text">Foto Belum Tersedia</span>
+      </div>
+    `;
   },
 
   async loadInitialData() {
@@ -1912,11 +1874,9 @@ const PasarinApp = {
       ? this.formatRupiah(firstVariant.originalPrice)
       : (product.originalPrice ? this.formatRupiah(product.originalPrice) : '');
 
-    // Visual Produk (Gunakan artwork kategori beresolusi tinggi jika foto kosong)
-    const mainImgUrl = this.getProductVisual(product);
-    const gallery = (product.images && product.images.length > 0) 
-      ? product.images 
-      : [mainImgUrl];
+    // State ketersediaan foto produk
+    const hasPhoto = Boolean(product.image);
+    const gallery = (product.images && product.images.length > 0) ? product.images : (hasPhoto ? [product.image] : []);
 
     const modalId = 'product-detail-modal';
     let modal = document.getElementById(modalId);
@@ -1967,15 +1927,19 @@ const PasarinApp = {
           <!-- Kiri: Galeri Foto & Video -->
           <div class="shopee-gallery-col">
             <div class="shopee-main-media-wrap">
-              <img id="shopee-main-product-img" src="${mainImgUrl}" alt="${product.name}">
-              ${product.image ? `
-                <div class="shopee-media-overlay-tag">
-                  <span style="display:inline-flex; align-items:center; gap:5px;">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                    Pesan sekarang sebelum kehabisan!!
-                  </span>
+              ${hasPhoto ? `
+                <img id="shopee-main-product-img" src="${product.image}" alt="${product.name}">
+              ` : `
+                <div class="detail-no-photo-box">
+                  <svg class="no-img-icon-lg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                  </svg>
+                  <div class="no-photo-title">Foto Produk Belum Tersedia</div>
+                  <div class="no-photo-desc">Spesifikasi, harga, dan varian produk ini telah tercatat resmi di database 168 Parts Surabaya.</div>
                 </div>
-              ` : ''}
+              `}
             </div>
 
             <!-- Thumbnail Strip (Hanya tampil jika ada lebih dari 1 foto asli) -->
