@@ -40,16 +40,119 @@ const SPECS_LANRUI_I9 = [
 ];
 
 function getCategory(name) {
-  const n = name.toLowerCase();
-  if (n.includes('lem') || n.includes('glue') || n.includes('uv') || n.includes('remover') || n.includes('lakban')) return 'Lem LCD I9';
-  if (n.includes('solder') || n.includes('timah') || n.includes('flux') || n.includes('blower') || n.includes('heating') || n.includes('reballing')) return 'Solder Station';
-  if (n.includes('tester') || n.includes('multitester') || n.includes('coil') || n.includes('short') || n.includes('ufi') || n.includes('i2c')) return 'Tester & Multitester';
-  if (n.includes('ic ') || n.includes('chip') || n.includes('emmc') || n.includes('nand') || n.includes('qualcomm') || n.includes('cpu')) return 'IC & Chipset';
-  if (n.includes('lcd') || n.includes('touchscreen') || n.includes('layar') || n.includes('incell') || n.includes('oled')) return 'LCD & Layar';
-  if (n.includes('baterai') || n.includes('battery') || n.includes('mah')) return 'Baterai HP';
-  if (n.includes('backdoor') || n.includes('glass camera') || n.includes('tutup belakang') || n.includes('kaca kamera')) return 'Backdoor Kaca';
-  if (n.includes('pinset') || n.includes('obeng') || n.includes('tang') || n.includes('ragum') || n.includes('sikat') || n.includes('pisau') || n.includes('clip') || n.includes('botol')) return 'Alat Servis';
-  return 'Alat Servis';
+  const n = (name || '').toLowerCase();
+
+  // 1. Lem & Perekat (Termasuk LanRui I9)
+  if (
+    n.includes('lem') || n.includes('glue') || n.includes('uv glue') ||
+    n.includes('lanrui i9') || n.includes('remover') || n.includes('lakban') ||
+    n.includes('double tape') || n.includes('t7000') || n.includes('b7000') ||
+    n.includes('t-7000') || n.includes('b-7000') || n.includes('lem uv') ||
+    n.includes('perekat') || n.includes('adhes') || n.includes('cushion seal')
+  ) {
+    return 'Lem & Perekat';
+  }
+
+  // 2. LCD & Layar
+  if (
+    n.includes('lcd') || n.includes('touchscreen') || n.includes('layar') ||
+    n.includes('incell') || n.includes('oled') || n.includes('amoled') ||
+    /\btc\b/i.test(n) || n.includes('touch screen') || n.includes('glass depan')
+  ) {
+    return 'LCD & Layar';
+  }
+
+  // 3. Solder & Timah
+  if (
+    n.includes('timah') || n.includes('solder') || n.includes('flux') ||
+    n.includes('gootwick') || n.includes('gotwick') || n.includes('wick') ||
+    n.includes('reballing') || n.includes('c210') || n.includes('c115') ||
+    n.includes('c245') || n.includes('mata solder') || n.includes('surgun') ||
+    n.includes('k9 thixotropic') || n.includes('solder pasta')
+  ) {
+    return 'Solder & Timah';
+  }
+
+  // 4. Pinset & Pembuka
+  if (
+    n.includes('pinset') || n.includes('obeng') || n.includes('pisau') ||
+    n.includes('tang ') || n.includes('tang potong') || n.includes('congkel') ||
+    n.includes('disassembler') || n.includes('suction') || n.includes('pembuka baut') ||
+    n.includes('pelepas baut') || n.includes('blade') || n.includes('sikat') ||
+    n.includes('tweezer') || n.includes('drill bit') || n.includes('bor 2uul') ||
+    n.includes('bor univ') || n.includes('bor ycs') || n.includes('mata bor') ||
+    n.includes('pembuka lcd') || n.includes('gunting')
+  ) {
+    return 'Pinset & Pembuka';
+  }
+
+  // 5. Backdoor & Kaca
+  if (
+    (n.includes('backdoor') || n.includes('back cover') || n.includes('tutup belakang') ||
+     n.includes('kaca kamera') || n.includes('glass camera') || n.includes('lens camera')) &&
+    !n.includes('kaca cetak')
+  ) {
+    return 'Backdoor & Kaca';
+  }
+
+  // 6. Baterai HP
+  if (
+    n.includes('baterai') || n.includes('battery') || /\b\d+\s*mah\b/i.test(n) ||
+    n.includes('batt tag') || n.includes('batere') || n.includes('tag on')
+  ) {
+    return 'Baterai HP';
+  }
+
+  // 7. Sparepart Fleksibel
+  if (
+    n.includes('flex') || n.includes('flexible') || n.includes('fleksibel') ||
+    n.includes('papan charge') || n.includes('papan cas') || n.includes('pcb cas') ||
+    n.includes('pcb charge') || n.includes('con cas') || n.includes('plug in') ||
+    n.includes('konektor') || n.includes('connector') || n.includes('sim tray') ||
+    n.includes('tempat sim') || n.includes('tombol') || n.includes('finger') ||
+    n.includes('switch on') || n.includes('on off') || n.includes('on/off') ||
+    n.includes('earpiece') || n.includes('buzzer') || n.includes('speaker') ||
+    /\bmic\b/i.test(n) || n.includes('trackball') || n.includes('antena')
+  ) {
+    return 'Sparepart Fleksibel';
+  }
+
+  // 8. Alat Ukur & Tester
+  if (
+    n.includes('tester') || n.includes('multitester') || n.includes('multimeter') ||
+    n.includes('short') || n.includes('power supply') || n.includes('charging mate') ||
+    n.includes('amper') || n.includes('voltmeter') || n.includes('i2c') ||
+    n.includes('multiboot') || n.includes('detector') || n.includes('w09') ||
+    n.includes('v9') || n.includes('rf4- 3005') || n.includes('sugon 3005') ||
+    n.includes('aixun p3208') || n.includes('test box') || n.includes('boot cable')
+  ) {
+    return 'Alat Ukur & Tester';
+  }
+
+  // 9. IC & Chipset
+  const isIcTool = n.includes('cetak') || n.includes('plat') || n.includes('stensil') ||
+    n.includes('stencil') || n.includes('penutup jalur') || n.includes('heater') ||
+    n.includes('pemanas') || n.includes('thermal paste') || n.includes('thermal pad') ||
+    n.includes('pasta pendingin') || n.includes('alas ') || n.includes('holder') ||
+    n.includes('converter');
+
+  if (
+    !isIcTool && (
+      /\bic\b/i.test(n) || /\bchip\b/i.test(n) || /\bemmc\b/i.test(n) ||
+      /\bnand\b/i.test(n) || /\bqualcomm\b/i.test(n) || /\bcpu\b/i.test(n) ||
+      /\bmediatek\b/i.test(n) || /\bbaseband\b/i.test(n) || /\bwtr\b/i.test(n) ||
+      /\bpmi\b/i.test(n) || /\bpm\d{4}\b/i.test(n) || /\bmt\d{4}\b/i.test(n) ||
+      /\bsdr\d{3}\b/i.test(n) || /\bhi\d{4}\b/i.test(n) || /\bsec\b/i.test(n) ||
+      n.includes('ic power') || n.includes('ic charge') || n.includes('ic audio') ||
+      n.includes('ic lampu') || n.includes('ic pa') || n.includes('ic wifi') ||
+      n.includes('ic rf') || n.includes('ic touch')
+    )
+  ) {
+    return 'IC & Chipset';
+  }
+
+  // 10. Alat Servis & Blower (Blower, Mikroskop, Ragum, Plat BGA, Karpet, Box Flasher, Tatakan, dsb)
+  return 'Alat Servis & Blower';
 }
 
 function getCanonicalKey(name) {
