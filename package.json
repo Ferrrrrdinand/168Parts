@@ -8,6 +8,7 @@
     "dev": "node backend/src/server.js",
     "dev:backend": "node backend/src/server.js",
     "dev:frontend": "cd frontend-react && npm run dev",
+    "build": "cd frontend-react && npm install && npm run build",
     "build:frontend": "cd frontend-react && npm run build",
     "db:migrate": "sequelize-cli db:migrate",
     "db:migrate:undo": "sequelize-cli db:migrate:undo",

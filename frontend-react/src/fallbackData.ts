@@ -512,23 +512,27 @@ export const fallbackProducts: Product[] = [
 
   // --- KATEGORI 6: Lem & Perekat ---
   {
-    id: '168-lem-i9',
-    name: 'Lem LCD LANRUI I9 Black High Adhesive Glue 50ml Kuat Elastis',
+    id: '168-p1',
+    name: 'LEM LCD TOUCHSCREEN DAN LEM BACKDOOR LANRUI I9 55ML',
     category: 'Lem & Perekat',
-    price: 22000,
-    originalPrice: 32000,
-    discountPercent: 31,
+    price: 25000,
+    originalPrice: 35000,
+    discountPercent: 28,
     rating: 4.9,
-    soldCount: 4500,
-    stock: 160,
+    soldCount: 2300,
+    stock: 49,
     location: 'Kota Surabaya',
     shopName: '168 Parts Surabaya',
     shopType: 'Star+',
     isFlashSale: true,
-    flashSaleSold: 155,
-    image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500&auto=format&fit=crop&q=80',
-    description: 'Lem LANRUI I9 warna hitam pekat 50ml. Lem andalan teknisi HP Surabaya. Kering elastis, anti bocor cahaya backlight LCD, daya rekat kuat tahan lama.',
-    specs: ['Warna: Hitam Pekat (Black)', 'Isi: 50 ml', 'Waktu Kering: 15 - 30 menit (Solid 24 Jam)', 'Nozzle: Jarum Presisi Anti Mampet']
+    flashSaleSold: 950,
+    flashSaleSoldUnits: 45,
+    description: 'LanRui I9 adalah lem perekat aktif / multi-fungsi dari merek LanRui, dirancang khusus untuk keperluan servis elektronik seperti bonding screen, housing frame, back cover, bracket, dan aplikasi lain yang membutuhkan adhesi kuat tapi tetap lembut jika disentuh. Tersedia dalam varian transparan maupun hitam.',
+    specs: ['Merek: LanRui', 'Seri: I9 Multi-Function Adhesive', 'Volume: 55ml', 'Varian Warna: Hitam & Transparan', 'Karakteristik: Adhesi Kuat & Lembut Fleksibel', 'Garansi: Garansi Tes 7 Hari Resmi 168 Parts'],
+    variants: [
+      { name: 'LANRUI HITAM', price: 25000, originalPrice: 35000, stock: 49, colorCode: '#18181b', swatchType: 'dark' },
+      { name: 'LANRUI TRANSPARANT', price: 31000, originalPrice: 42000, stock: 49, colorCode: '#e2e8f0', swatchType: 'transparan' }
+    ]
   },
   {
     id: '168-lem-t7000',

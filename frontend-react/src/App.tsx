@@ -13,6 +13,7 @@ import { MobileBottomNav } from './components/MobileBottomNav';
 import { AdminDashboard } from './components/AdminDashboard';
 import { AuthModal } from './components/AuthModal';
 import { RealisticLoader } from './components/RealisticLoader';
+import { ProductDetailModal } from './components/ProductDetailModal';
 
 import { Product, Promo, BannerConfig, CartItem, User } from './types';
 import { fetchProducts, fetchBanners, fetchActivePromos } from './api';
@@ -64,6 +65,7 @@ export function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isPromoModalOpen, setIsPromoModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [selectedProductForDetail, setSelectedProductForDetail] = useState<Product | null>(null);
   const [activeMobileTab, setActiveMobileTab] = useState('home');
 
   // Load initial data from Backend API
@@ -86,6 +88,25 @@ export function App() {
       }, 650);
     }
   };
+
+  useEffect(() => {
+    const handleRoute = () => {
+      const hash = window.location.hash.toLowerCase();
+      const path = window.location.pathname.toLowerCase();
+      if (hash.includes('admin') || path.includes('admin')) {
+        setCurrentView('admin');
+      } else if (hash.includes('checkout') || path.includes('checkout')) {
+        setCurrentView('checkout');
+      }
+    };
+    handleRoute();
+    window.addEventListener('hashchange', handleRoute);
+    window.addEventListener('popstate', handleRoute);
+    return () => {
+      window.removeEventListener('hashchange', handleRoute);
+      window.removeEventListener('popstate', handleRoute);
+    };
+  }, []);
 
   useEffect(() => {
     loadStoreData();
@@ -112,19 +133,26 @@ export function App() {
   }, [currentUser]);
 
   // Cart Operations
-  const handleAddToCart = (product: Product) => {
+  const handleAddToCart = (product: Product, quantity = 1, variation?: string, price?: number) => {
     setCart(prev => {
-      const existing = prev.find(item => item.product.id === product.id);
+      const targetVar = variation || 'STANDAR ORIGINAL';
+      const existing = prev.find(item => item.product.id === product.id && (item.variation || 'STANDAR ORIGINAL') === targetVar);
       if (existing) {
         return prev.map(item =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
+          (item.product.id === product.id && (item.variation || 'STANDAR ORIGINAL') === targetVar)
+            ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       }
-      return [...prev, { product, quantity: 1 }];
+      return [...prev, { product, quantity, variation: targetVar, price: price || product.price }];
     });
     setIsCartOpen(true);
+  };
+
+  const handleBuyNow = (product: Product, quantity = 1, variation?: string, price?: number) => {
+    handleAddToCart(product, quantity, variation, price);
+    setIsCartOpen(false);
+    setCurrentView('checkout');
   };
 
   const handleUpdateQty = (productId: string, delta: number) => {
@@ -263,13 +291,18 @@ export function App() {
 
             {/* Flash Sale Section */}
             <div id="flash-sale-section">
-              <FlashSale products={products} onAddToCart={handleAddToCart} />
+              <FlashSale 
+                products={products} 
+                onAddToCart={(p) => handleAddToCart(p, 1)} 
+                onSelectProduct={(p) => setSelectedProductForDetail(p)}
+              />
             </div>
 
             {/* Product Recommendations & 168part Store Catalog */}
             <ProductGrid
               products={products}
-              onAddToCart={handleAddToCart}
+              onAddToCart={(p) => handleAddToCart(p, 1)}
+              onSelectProduct={(p) => setSelectedProductForDetail(p)}
               selectedCategory={selectedCategory}
             />
           </>
@@ -374,6 +407,14 @@ export function App() {
           setActiveMobileTab(tab);
           if (tab === 'home') setCurrentView('store');
         }}
+      />
+      {/* Shopee Product Detail Modal */}
+      <ProductDetailModal
+        isOpen={Boolean(selectedProductForDetail)}
+        product={selectedProductForDetail}
+        onClose={() => setSelectedProductForDetail(null)}
+        onAddToCart={handleAddToCart}
+        onBuyNow={handleBuyNow}
       />
     </div>
   );

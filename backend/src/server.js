@@ -91,15 +91,14 @@ const fs = require('fs');
 const reactDistPath = path.resolve(__dirname, '../../frontend-react/dist');
 const legacyFrontendPath = path.resolve(__dirname, '../../frontend');
 
-// Support React Vite di /react
+// Melayani Frontend Modern React TSX sebagai frontend default utama
 if (fs.existsSync(reactDistPath)) {
-  app.use('/react', express.static(reactDistPath));
+  app.use(express.static(reactDistPath));
+} else {
+  app.use(express.static(legacyFrontendPath));
 }
 
-// Melayani Original Design sebagai frontend default
-app.use(express.static(legacyFrontendPath));
-
-// Fallback router untuk SPA & Static HTML
+// Fallback router untuk SPA React TSX
 app.use((req, res, next) => {
   const url = req.originalUrl || req.url || '';
   if (url.startsWith('/api') || url.startsWith('/auth') || url.startsWith('/products') || url.startsWith('/cart') || url.startsWith('/orders') || url.startsWith('/promos') || url.startsWith('/banners') || url.startsWith('/chats') || url.startsWith('/notifications')) {
@@ -108,7 +107,7 @@ app.use((req, res, next) => {
       message: `Endpoint API ${req.method} ${url} tidak ditemukan.`
     });
   }
-  if (url.startsWith('/react') && fs.existsSync(reactDistPath)) {
+  if (fs.existsSync(reactDistPath)) {
     return res.sendFile(path.join(reactDistPath, 'index.html'));
   }
   res.sendFile(path.join(legacyFrontendPath, 'index.html'));

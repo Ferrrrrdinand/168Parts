@@ -1,3 +1,13 @@
+export interface ProductVariant {
+  name: string;
+  price: number;
+  originalPrice?: number;
+  stock?: number;
+  image?: string | null;
+  colorCode?: string | null;
+  swatchType?: 'dark' | 'white' | 'transparan' | null;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -13,12 +23,16 @@ export interface Product {
   shopName?: string;
   shopType?: string;
   icon?: string;
-  image?: string;
+  image?: string | null;
   bgPattern?: string;
   isFlashSale?: boolean;
   flashSaleSold?: number;
+  flashSaleSoldUnits?: number;
   description?: string;
   specs?: string[];
+  variants?: ProductVariant[];
+  reviewCount?: number;
+  favoriteCount?: number;
 }
 
 export interface Promo {
@@ -73,6 +87,8 @@ export interface BannerConfig {
 export interface CartItem {
   product: Product;
   quantity: number;
+  variation?: string;
+  price?: number;
 }
 
 export interface OrderItem {

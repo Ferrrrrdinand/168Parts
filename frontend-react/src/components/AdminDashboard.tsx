@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   ArrowLeft, Package, Ticket, Image as ImageIcon, ShoppingBag,
-  TrendingUp, Plus, Edit, Trash2, Check, RefreshCw, Eye, UploadCloud
+  TrendingUp, Plus, Edit, Trash2, Check, RefreshCw, Eye, UploadCloud, Zap, Flame, Clock
 } from 'lucide-react';
 import { Product, Promo, BannerConfig, Order } from '../types';
 import { HeroBanners } from './HeroBanners';
@@ -17,7 +17,7 @@ interface AdminDashboardProps {
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'orders' | 'promos' | 'banners'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'orders' | 'promos' | 'banners' | 'flashsale'>('overview');
 
   const [products, setProducts] = useState<Product[]>([]);
   const [promos, setPromos] = useState<Promo[]>([]);
@@ -197,8 +197,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
           <div>
             <h1 className="text-base sm:text-lg font-black tracking-tight flex items-center gap-2">
               <span>👑 Super Admin 168 Parts</span>
-              <span className="text-[10px] bg-rose-500/20 text-rose-400 font-bold px-2 py-0.5 rounded border border-rose-500/30">
-                Backend Sequelize SQLite
+              <span className="text-[11px] bg-amber-500/15 text-amber-300 font-bold px-2.5 py-1 rounded border border-amber-400/30 flex items-center gap-1.5 shadow-xs" title="Belum ada database karena client belum membeli database">
+                <span className="w-2 h-2 rounded-full bg-amber-400 inline-block"></span>
+                <span>Belum Ada Database (Client Belum Membeli Database)</span>
               </span>
             </h1>
             <p className="text-[11px] text-slate-400">Pusat Manajemen Katalog Sparepart HP Surabaya, Promo Voucher, dan Banner Toko</p>
@@ -267,6 +268,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
               <ImageIcon className="w-4 h-4" />
               <span>Hero Banners</span>
             </button>
+
+            <button
+              onClick={() => setActiveTab('flashsale')}
+              className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg text-xs font-bold transition text-left ${
+                activeTab === 'flashsale' ? 'bg-[#be123c] text-white shadow' : 'text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              <Zap className="w-4 h-4 text-amber-500" />
+              <span>Flash Sale 24 Jam ({products.filter(p => p.isFlashSale).length})</span>
+            </button>
           </div>
         </div>
 
@@ -294,13 +305,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
                   <span className="text-[10px] text-blue-600 font-bold mt-1 block">Tersimpan di SQLite/Sequelize</span>
                 </div>
 
-                <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                <div className="bg-white p-4 rounded-xl border border-amber-200/80 shadow-xs bg-amber-50/20">
                   <span className="text-xs font-semibold text-slate-500">Status Database</span>
-                  <div className="text-base font-black text-emerald-700 mt-2 flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-ping"></span>
-                    <span>Sequelize SQLite</span>
+                  <div className="text-sm font-black text-amber-800 mt-2 flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 bg-amber-500 rounded-full"></span>
+                    <span>Belum Ada Database</span>
                   </div>
-                  <span className="text-[10px] text-slate-400 mt-1 block">pasarin_local.db terhubung</span>
+                  <span className="text-[10px] text-amber-700/80 mt-1 block">Client belum membeli database</span>
                 </div>
               </div>
 
@@ -865,6 +876,83 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
                       className="w-full p-2 bg-white border border-slate-200 rounded text-xs font-mono text-slate-800"
                     />
                   </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: FLASH SALE 24 JAM */}
+          {activeTab === 'flashsale' && (
+            <div className="space-y-4">
+              <div className="bg-white p-5 rounded-xl shadow-xs border border-slate-100 flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                    <Zap className="w-5 h-5 text-amber-500 fill-amber-500" />
+                    <span>⚡ Pengaturan Flash Sale 24 Jam (Reset Otomatis 00:00 WIB)</span>
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1 max-w-xl leading-relaxed">
+                    Produk Flash Sale otomatis direset kuotanya setiap jam 12 malam (00:00:00 WIB). Admin dapat mengatur produk mana yang tampil serta melakukan reset kuota secara manual kapan saja.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    alert('🔄 Kuota dan timer Flash Sale 24 Jam berhasil direset ulang oleh Admin!');
+                  }}
+                  className="px-4 py-2 bg-gradient-to-r from-orange-500 to-rose-600 text-white rounded-lg text-xs font-bold shadow-xs hover:brightness-105 flex items-center gap-2 cursor-pointer transition"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  <span>Reset Kuota Flash Sale Sekarang</span>
+                </button>
+              </div>
+
+              {/* Daftar Produk Flash Sale */}
+              <div className="bg-white rounded-xl shadow-xs border border-slate-100 overflow-hidden">
+                <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+                  <h4 className="text-xs font-extrabold text-slate-800 uppercase tracking-wide">
+                    Daftar Produk Aktif di Flash Sale ({products.filter(p => p.isFlashSale).length})
+                  </h4>
+                  <span className="text-xs text-rose-600 font-semibold">Maksimal 6 Produk Terpilih di Beranda</span>
+                </div>
+
+                <div className="divide-y divide-slate-100">
+                  {products.filter(p => p.isFlashSale).map((p) => (
+                    <div key={p.id} className="p-4 flex items-center justify-between gap-4 hover:bg-slate-50 transition">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded bg-rose-50 text-rose-600 font-bold flex items-center justify-center shrink-0">
+                          ⚡
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-slate-800 line-clamp-1">{p.name}</div>
+                          <div className="text-[11px] text-slate-500 flex items-center gap-2 mt-0.5">
+                            <span className="font-semibold text-rose-600">{formatRupiah(p.price)}</span>
+                            <span>•</span>
+                            <span>Diskon: <strong className="text-amber-600">-{p.discountPercent || 25}%</strong></span>
+                            <span>•</span>
+                            <span>Terjual: <strong>{p.flashSaleSoldUnits || p.flashSaleSold || 15} pcs</strong></span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            try {
+                              await updateProduct(p.id, { isFlashSale: false });
+                              setProducts(prev => prev.map(x => x.id === p.id ? { ...x, isFlashSale: false } : x));
+                            } catch (e) {
+                              alert('Gagal mengubah status');
+                            }
+                          }}
+                          className="px-3 py-1 bg-rose-100 text-rose-700 hover:bg-rose-200 text-xs font-bold rounded transition cursor-pointer"
+                        >
+                          Keluarkan dari Flash Sale
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
