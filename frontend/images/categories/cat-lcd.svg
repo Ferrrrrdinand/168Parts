@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgLcd" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0f9ff" />
+      <stop offset="100%" stop-color="#e0f2fe" />
+    </linearGradient>
+    <linearGradient id="screenGlass" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="50%" stop-color="#0369a1" />
+      <stop offset="100%" stop-color="#0c4a6e" />
+    </linearGradient>
+    <linearGradient id="glassReflection" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35" />
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.05" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </linearGradient>
+    <filter id="shadowLcd" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0284c7" flood-opacity="0.15" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="400" fill="url(#bgLcd)" />
+
+  <!-- LCD Screen Assembly Container -->
+  <g transform="translate(115, 60)" filter="url(#shadowLcd)">
+    <!-- Outer Bezel -->
+    <rect x="0" y="0" width="170" height="260" rx="20" fill="#0f172a" stroke="#334155" stroke-width="2.5" />
+    
+    <!-- Active Display Area -->
+    <rect x="8" y="10" width="154" height="236" rx="14" fill="url(#screenGlass)" />
+    
+    <!-- Glass Reflection Diagonal -->
+    <polygon points="8,10 100,10 8,140" fill="url(#glassReflection)" />
+
+    <!-- Speaker Earpiece Mesh -->
+    <rect x="65" y="14" width="40" height="4" rx="2" fill="#475569" />
+    <!-- Dynamic Island / Punch Hole -->
+    <circle cx="85" cy="24" r="3.5" fill="#0f172a" />
+
+    <!-- Graphic Display Grid Lines -->
+    <g stroke="#38bdf8" stroke-width="1" opacity="0.4">
+      <circle cx="85" cy="130" r="35" fill="none" stroke-dasharray="3 3" />
+      <circle cx="85" cy="130" r="20" fill="none" />
+      <circle cx="85" cy="130" r="5" fill="#38bdf8" />
+    </g>
+
+    <!-- Flex Cable at Bottom (Fleksibel LCD) -->
+    <path d="M 50 258 L 50 278 L 120 278 L 120 258 Z" fill="#b45309" stroke="#92400e" stroke-width="1.5" />
+    <!-- Golden Connector Pins -->
+    <g fill="#fbbf24">
+      <rect x="58" y="272" width="6" height="5" rx="1" />
+      <rect x="68" y="272" width="6" height="5" rx="1" />
+      <rect x="78" y="272" width="6" height="5" rx="1" />
+      <rect x="88" y="272" width="6" height="5" rx="1" />
+      <rect x="98" y="272" width="6" height="5" rx="1" />
+      <rect x="108" y="272" width="6" height="5" rx="1" />
+    </g>
+  </g>
+
+  <!-- Grade Badge -->
+  <g transform="translate(200, 355)">
+    <rect x="-80" y="-14" width="160" height="28" rx="14" fill="#0284c7" />
+    <text x="0" y="5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" fill="#ffffff" letter-spacing="0.8">LCD INCELL GRADE A+</text>
+  </g>
+</svg>

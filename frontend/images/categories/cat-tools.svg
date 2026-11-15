@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgTools" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff7ed" />
+      <stop offset="100%" stop-color="#ffedd5" />
+    </linearGradient>
+    <filter id="shadowTools" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#ea580c" flood-opacity="0.2" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="400" fill="url(#bgTools)" />
+
+  <g transform="translate(200, 180)" filter="url(#shadowTools)">
+    <!-- Crossed Precision Screwdriver and Spudger -->
+    <!-- Screwdriver (Diagonal) -->
+    <g transform="rotate(-30)">
+      <!-- Handle -->
+      <rect x="-14" y="20" width="28" height="110" rx="8" fill="#ea580c" stroke="#c2410c" stroke-width="2" />
+      <line x1="-14" y1="40" x2="14" y2="40" stroke="#9a3412" stroke-width="2" />
+      <line x1="-14" y1="60" x2="14" y2="60" stroke="#9a3412" stroke-width="2" />
+      <line x1="-14" y1="80" x2="14" y2="80" stroke="#9a3412" stroke-width="2" />
+      <line x1="-14" y1="100" x2="14" y2="100" stroke="#9a3412" stroke-width="2" />
+      <circle cx="0" cy="120" r="6" fill="#7c2d12" />
+      <!-- Metal Shaft -->
+      <rect x="-4" y="-80" width="8" height="100" fill="#94a3b8" stroke="#475569" stroke-width="1.5" />
+      <!-- Phillips Head Bit -->
+      <polygon points="-5,-80 5,-80 2,-100 -2,-100" fill="#475569" />
+    </g>
+
+    <!-- Metal Pry Spudger (Crossed Diagonal) -->
+    <g transform="rotate(35)">
+      <!-- Spudger Body -->
+      <rect x="-6" y="-95" width="12" height="190" rx="6" fill="#cbd5e1" stroke="#64748b" stroke-width="2" />
+      <!-- Curved Pry Tip Top -->
+      <path d="M -6 -95 C -12 -110, 12 -110, 6 -95 Z" fill="#94a3b8" />
+      <!-- Flat Blade Tip Bottom -->
+      <polygon points="-6,95 6,95 2,115 -2,115" fill="#94a3b8" />
+      <!-- Grip Ridges -->
+      <line x1="-6" y1="-20" x2="6" y2="-20" stroke="#64748b" stroke-width="2" />
+      <line x1="-6" y1="0" x2="6" y2="0" stroke="#64748b" stroke-width="2" />
+      <line x1="-6" y1="20" x2="6" y2="20" stroke="#64748b" stroke-width="2" />
+    </g>
+
+    <!-- Center Screws / Hardware Graphic -->
+    <circle cx="0" cy="0" r="14" fill="#0f172a" stroke="#cbd5e1" stroke-width="2" />
+    <line x1="-7" y1="0" x2="7" y2="0" stroke="#ffffff" stroke-width="2.5" />
+    <line x1="0" y1="-7" x2="0" y2="7" stroke="#ffffff" stroke-width="2.5" />
+  </g>
+
+  <!-- Badge -->
+  <g transform="translate(200, 355)">
+    <rect x="-85" y="-14" width="170" height="28" rx="14" fill="#ea580c" />
+    <text x="0" y="5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" fill="#ffffff" letter-spacing="0.8">ALAT SERVIS &amp; OBENG</text>
+  </g>
+</svg>

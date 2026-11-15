@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgIc" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f5f3ff" />
+      <stop offset="100%" stop-color="#ede9fe" />
+    </linearGradient>
+    <linearGradient id="icChipGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1b4b" />
+      <stop offset="50%" stop-color="#312e81" />
+      <stop offset="100%" stop-color="#1e1b4b" />
+    </linearGradient>
+    <filter id="shadowIc" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#7c3aed" flood-opacity="0.2" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="400" fill="url(#bgIc)" />
+
+  <!-- PCB Circuit Tracks in Background -->
+  <g stroke="#c4b5fd" stroke-width="2" fill="none" opacity="0.7">
+    <path d="M 50 100 L 100 100 L 130 130" />
+    <path d="M 50 200 L 130 200" />
+    <path d="M 50 300 L 100 300 L 130 270" />
+    <path d="M 350 100 L 300 100 L 270 130" />
+    <path d="M 350 200 L 270 200" />
+    <path d="M 350 300 L 300 300 L 270 270" />
+    <circle cx="50" cy="100" r="4" fill="#a78bfa" />
+    <circle cx="50" cy="200" r="4" fill="#a78bfa" />
+    <circle cx="50" cy="300" r="4" fill="#a78bfa" />
+    <circle cx="350" cy="100" r="4" fill="#a78bfa" />
+    <circle cx="350" cy="200" r="4" fill="#a78bfa" />
+    <circle cx="350" cy="300" r="4" fill="#a78bfa" />
+  </g>
+
+  <!-- IC Chip Container -->
+  <g transform="translate(120, 85)" filter="url(#shadowIc)">
+    <!-- BGA Pins Top & Bottom -->
+    <g fill="#f59e0b">
+      <!-- Top pins -->
+      <rect x="20" y="-8" width="6" height="8" rx="1" />
+      <rect x="35" y="-8" width="6" height="8" rx="1" />
+      <rect x="50" y="-8" width="6" height="8" rx="1" />
+      <rect x="65" y="-8" width="6" height="8" rx="1" />
+      <rect x="80" y="-8" width="6" height="8" rx="1" />
+      <rect x="95" y="-8" width="6" height="8" rx="1" />
+      <rect x="110" y="-8" width="6" height="8" rx="1" />
+      <rect x="125" y="-8" width="6" height="8" rx="1" />
+      <rect x="140" y="-8" width="6" height="8" rx="1" />
+      <!-- Bottom pins -->
+      <rect x="20" y="160" width="6" height="8" rx="1" />
+      <rect x="35" y="160" width="6" height="8" rx="1" />
+      <rect x="50" y="160" width="6" height="8" rx="1" />
+      <rect x="65" y="160" width="6" height="8" rx="1" />
+      <rect x="80" y="160" width="6" height="8" rx="1" />
+      <rect x="95" y="160" width="6" height="8" rx="1" />
+      <rect x="110" y="160" width="6" height="8" rx="1" />
+      <rect x="125" y="160" width="6" height="8" rx="1" />
+      <rect x="140" y="160" width="6" height="8" rx="1" />
+      <!-- Left pins -->
+      <rect x="-8" y="20" width="8" height="6" rx="1" />
+      <rect x="-8" y="35" width="8" height="6" rx="1" />
+      <rect x="-8" y="50" width="8" height="6" rx="1" />
+      <rect x="-8" y="65" width="8" height="6" rx="1" />
+      <rect x="-8" y="80" width="8" height="6" rx="1" />
+      <rect x="-8" y="95" width="8" height="6" rx="1" />
+      <rect x="-8" y="110" width="8" height="6" rx="1" />
+      <rect x="-8" y="125" width="8" height="6" rx="1" />
+      <rect x="-8" y="140" width="8" height="6" rx="1" />
+      <!-- Right pins -->
+      <rect x="160" y="20" width="8" height="6" rx="1" />
+      <rect x="160" y="35" width="8" height="6" rx="1" />
+      <rect x="160" y="50" width="8" height="6" rx="1" />
+      <rect x="160" y="65" width="8" height="6" rx="1" />
+      <rect x="160" y="80" width="8" height="6" rx="1" />
+      <rect x="160" y="95" width="8" height="6" rx="1" />
+      <rect x="160" y="110" width="8" height="6" rx="1" />
+      <rect x="160" y="125" width="8" height="6" rx="1" />
+      <rect x="160" y="140" width="8" height="6" rx="1" />
+    </g>
+
+    <!-- Main Chip Body -->
+    <rect x="0" y="0" width="160" height="160" rx="10" fill="url(#icChipGrad)" stroke="#4338ca" stroke-width="2" />
+    
+    <!-- Pin 1 Dot -->
+    <circle cx="18" cy="18" r="4" fill="#a78bfa" />
+
+    <!-- Laser Engraved Text on IC -->
+    <text x="80" y="55" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, monospace" font-size="13" font-weight="800" fill="#a78bfa" letter-spacing="1">168 CHIPSET</text>
+    <text x="80" y="75" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, monospace" font-size="11" font-weight="700" fill="#e0e7ff">PMI632 / PM660</text>
+    <text x="80" y="95" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, monospace" font-size="9" fill="#818cf8">POWER MANAGEMENT</text>
+    <text x="80" y="115" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, monospace" font-size="8" fill="#6366f1">BGA REBALL TESTED</text>
+    <line x1="30" y1="125" x2="130" y2="125" stroke="#4f46e5" stroke-width="1.5" />
+    <text x="80" y="142" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, monospace" font-size="7.5" fill="#c7d2fe">QC GRADE A+ SURABAYA</text>
+  </g>
+
+  <!-- Badge -->
+  <g transform="translate(200, 355)">
+    <rect x="-85" y="-14" width="170" height="28" rx="14" fill="#7c3aed" />
+    <text x="0" y="5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" fill="#ffffff" letter-spacing="0.8">IC &amp; CHIPSET ORIGINAL</text>
+  </g>
+</svg>

@@ -116,10 +116,58 @@ const PasarinApp = {
     imgEl.src = 'images/product-placeholder.svg';
   },
 
+  getProductVisual(p) {
+    if (p && p.image) return p.image;
+    const name = (p && p.name ? p.name : '').toUpperCase();
+    const cat = (p && p.category ? p.category : '').toUpperCase();
+
+    // 1. Lem LCD I9 & Lem Touchscreen
+    if (cat.includes('LEM') || name.includes('LANRUI') || name.includes('LEM') || name.includes('GLUE') || name.includes('ADHESIVE') || name.includes('OCA') || name.includes('PELARUT')) {
+      return 'images/categories/cat-lem.svg';
+    }
+    // 2. LCD & Layar
+    if (cat.includes('LCD') || name.includes('LCD') || name.includes('INCELL') || name.includes('OLED') || name.includes('TOUCHSCREEN') || name.includes('LAYAR') || name.includes('FRAME LCD')) {
+      return 'images/categories/cat-lcd.svg';
+    }
+    // 3. Baterai HP
+    if (cat.includes('BATERAI') || name.includes('BATERAI') || name.includes('BATTERY') || name.includes('BATTERAI')) {
+      return 'images/categories/cat-baterai.svg';
+    }
+    // 4. IC & Chipset
+    if (cat.includes('IC') || name.includes('IC ') || name.includes('CHIPSET') || name.includes('CPU') || name.includes('POWER') || name.includes('WIFI') || name.includes('CHARGER') || name.includes('CHARGE')) {
+      return 'images/categories/cat-ic.svg';
+    }
+    // 5. Solder Station & Timah
+    if (cat.includes('SOLDER') || name.includes('SOLDER') || name.includes('TIMAH') || name.includes('FLUX') || name.includes('BLOWER') || name.includes('GOOTWICK') || name.includes('ELEMEN')) {
+      return 'images/categories/cat-solder.svg';
+    }
+    // 6. Backdoor & Kaca Kamera
+    if (cat.includes('BACKDOOR') || name.includes('BACKDOOR') || name.includes('GLASS') || name.includes('KACA') || name.includes('LENSA')) {
+      return 'images/categories/cat-backdoor.svg';
+    }
+    // 7. Tester & Multitester
+    if (cat.includes('TESTER') || name.includes('TESTER') || name.includes('MULTITESTER') || name.includes('MULTIMETER') || name.includes('AMPERE') || name.includes('VOLT') || name.includes('DETECTOR')) {
+      return 'images/categories/cat-tester.svg';
+    }
+    // 8. Pinset Presisi
+    if (cat.includes('PINSET') || name.includes('PINSET') || name.includes('TWEEZER') || name.includes('ESD')) {
+      return 'images/categories/cat-pinset.svg';
+    }
+    // 9. Alat Servis & Obeng
+    if (cat.includes('ALAT') || name.includes('OBENG') || name.includes('CLIP') || name.includes('PISAU') || name.includes('BOR') || name.includes('TANG') || name.includes('JARUM') || name.includes('KARET')) {
+      return 'images/categories/cat-tools.svg';
+    }
+    // 10. Fleksibel & Kabel
+    if (cat.includes('FLEKSIBEL') || name.includes('FLEKSIBEL') || name.includes('FLEX') || name.includes('KABEL') || name.includes('KONEKTOR') || name.includes('CONNECTOR')) {
+      return 'images/categories/cat-sparepart.svg';
+    }
+
+    return 'images/product-placeholder.svg';
+  },
+
   renderProductMedia(p, fallbackCls = 'i lg') {
-    const placeholderUrl = 'images/product-placeholder.svg';
-    const imgSrc = (p && p.image) ? p.image : placeholderUrl;
-    const prodName = p && p.name ? p.name.replace(/"/g, '&quot;') : 'Produk';
+    const imgSrc = this.getProductVisual(p);
+    const prodName = p && p.name ? p.name.replace(/"/g, '&quot;') : 'Produk 168 Parts';
     return `<img src="${imgSrc}" alt="${prodName}" class="prod-real-img" loading="lazy" onerror="this.onerror=null; this.src='images/product-placeholder.svg';">`;
   },
 
@@ -179,16 +227,16 @@ const PasarinApp = {
 
   getFallbackCategories() {
     return [
-      { id: 'lcd', name: 'LCD & Layar', icon: 'phone', image: 'images/white-product.svg' },
-      { id: 'baterai', name: 'Baterai HP', icon: 'battery', image: 'images/white-product.svg' },
-      { id: 'ic', name: 'IC & Chipset', icon: 'cpu', image: 'images/white-product.svg' },
-      { id: 'tools', name: 'Alat Servis & Blower', icon: 'tool', image: 'images/white-product.svg' },
-      { id: 'solder', name: 'Solder & Timah', icon: 'flame', image: 'images/white-product.svg' },
-      { id: 'lem', name: 'Lem & Perekat', icon: 'bottle', image: 'images/white-product.svg' },
-      { id: 'backdoor', name: 'Backdoor & Kaca', icon: 'shield', image: 'images/white-product.svg' },
-      { id: 'tester', name: 'Alat Ukur & Tester', icon: 'gauge', image: 'images/white-product.svg' },
-      { id: 'pinset', name: 'Pinset & Pembuka', icon: 'scissors', image: 'images/white-product.svg' },
-      { id: 'fleksibel', name: 'Sparepart Fleksibel', icon: 'zap', image: 'images/white-product.svg' }
+      { id: 'lcd', name: 'LCD & Layar', icon: 'phone', image: 'images/categories/cat-lcd.svg' },
+      { id: 'baterai', name: 'Baterai HP', icon: 'battery', image: 'images/categories/cat-baterai.svg' },
+      { id: 'ic', name: 'IC & Chipset', icon: 'cpu', image: 'images/categories/cat-ic.svg' },
+      { id: 'tools', name: 'Alat Servis & Blower', icon: 'tool', image: 'images/categories/cat-tools.svg' },
+      { id: 'solder', name: 'Solder & Timah', icon: 'flame', image: 'images/categories/cat-solder.svg' },
+      { id: 'lem', name: 'Lem & Perekat', icon: 'bottle', image: 'images/categories/cat-lem.svg' },
+      { id: 'backdoor', name: 'Backdoor & Kaca', icon: 'shield', image: 'images/categories/cat-backdoor.svg' },
+      { id: 'tester', name: 'Alat Ukur & Tester', icon: 'gauge', image: 'images/categories/cat-tester.svg' },
+      { id: 'pinset', name: 'Pinset & Pembuka', icon: 'scissors', image: 'images/categories/cat-pinset.svg' },
+      { id: 'fleksibel', name: 'Sparepart Fleksibel', icon: 'zap', image: 'images/categories/cat-sparepart.svg' }
     ];
   },
 
@@ -1864,11 +1912,11 @@ const PasarinApp = {
       ? this.formatRupiah(firstVariant.originalPrice)
       : (product.originalPrice ? this.formatRupiah(product.originalPrice) : '');
 
-    // Galeri Thumbnail (Gunakan foto asli jika tersedia, jika kosong gunakan placeholder)
-    const mainImgUrl = product.image || 'images/product-placeholder.svg';
+    // Visual Produk (Gunakan artwork kategori beresolusi tinggi jika foto kosong)
+    const mainImgUrl = this.getProductVisual(product);
     const gallery = (product.images && product.images.length > 0) 
       ? product.images 
-      : (product.image ? [product.image] : []);
+      : [mainImgUrl];
 
     const modalId = 'product-detail-modal';
     let modal = document.getElementById(modalId);
@@ -3817,7 +3865,7 @@ const PasarinApp = {
         '⚡ Promo Pengguna Baru: Diskon 50RB',
         '⭐ Sparepart Presisi Siap Kirim'
       ],
-      modelImage: 'images/white-product.svg',
+      modelImage: 'images/hero-banner-main.svg',
       bgGradient: 'linear-gradient(135deg, #881337 0%, #be123c 100%)',
       targetUrl: 'login.html?promo=newuser#register',
       actionText: 'Daftar & Klaim 50RB ↗',
@@ -3831,7 +3879,7 @@ const PasarinApp = {
         '🔋 Solusi Baterai Presisi & Awet',
         '🎥 Tonton Gratis di YouTube'
       ],
-      modelImage: 'images/white-product.svg',
+      modelImage: 'images/categories/cat-tools.svg',
       bgGradient: 'linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%)',
       targetUrl: 'https://www.youtube.com',
       actionText: 'Tonton di YouTube ▶',
@@ -3845,7 +3893,7 @@ const PasarinApp = {
         '🛡️ Garansi Toko Langsung Tukar',
         '🚚 Stok Siap Kirim Hari Ini'
       ],
-      modelImage: 'images/white-product.svg',
+      modelImage: 'images/categories/cat-lcd.svg',
       bgGradient: 'linear-gradient(135deg, #4c0519 0%, #9f1239 100%)',
       targetUrl: '#/product/168-lcd-ip11',
       actionText: 'Lihat Produk Baru ➔',
@@ -3859,7 +3907,7 @@ const PasarinApp = {
         '📦 Bebas Ongkir se-Indonesia',
         '⚡ Kuota Terbatas untuk Member'
       ],
-      modelImage: 'images/white-product.svg',
+      modelImage: 'images/categories/cat-lem.svg',
       bgGradient: 'linear-gradient(135deg, #881337 0%, #e11d48 100%)',
       targetUrl: '#promo',
       actionText: 'Klaim Voucher ↗',
@@ -3875,8 +3923,8 @@ const PasarinApp = {
       pill1Val: '50%',
       pill2Title: 'VOUCHER',
       pill2Val: '100RB',
-      modelImage1: 'images/white-product.svg',
-      modelImage2: 'images/white-product.svg',
+      modelImage1: 'images/categories/cat-lcd.svg',
+      modelImage2: 'images/categories/cat-solder.svg',
       bgGradient: 'linear-gradient(135deg, #4c0519 0%, #9f1239 50%, #be123c 100%)',
       targetUrl: '#promo'
     }

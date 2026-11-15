@@ -10,14 +10,14 @@ const defaultBanners = {
       '⚡ Promo Pengguna Baru: Diskon 50RB',
       '⭐ Sparepart Presisi Siap Kirim'
     ],
-    modelImage: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=320&auto=format&fit=crop&q=80',
+    modelImage: 'images/hero-banner-main.svg',
     bgGradient: 'linear-gradient(135deg, #881337 0%, #be123c 100%)',
     targetUrl: 'login.html?promo=newuser#register'
   },
   right: {
     title: 'Flash Sale & Promo Spesial Teknisi',
-    modelImage1: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=240&auto=format&fit=crop&q=80',
-    modelImage2: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=240&auto=format&fit=crop&q=80',
+    modelImage1: 'images/categories/cat-lcd.svg',
+    modelImage2: 'images/categories/cat-solder.svg',
     pill1Title: 'DISKON S.D.',
     pill1Val: '50%',
     pill2Title: 'VOUCHER',

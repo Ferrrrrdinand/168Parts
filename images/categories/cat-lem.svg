@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgLem" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff1f2" />
+      <stop offset="100%" stop-color="#ffe4e6" />
+    </linearGradient>
+    <linearGradient id="tubeBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#881337" />
+      <stop offset="40%" stop-color="#be123c" />
+      <stop offset="100%" stop-color="#e11d48" />
+    </linearGradient>
+    <filter id="shadowLem" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#be123c" flood-opacity="0.2" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="400" fill="url(#bgLem)" />
+
+  <!-- Lem Tube Composition -->
+  <g transform="translate(200, 185) rotate(-35) translate(-60, -130)" filter="url(#shadowLem)">
+    <!-- Dispenser Needle Tip (Jarum Presisi) -->
+    <path d="M 57 15 L 63 15 L 61 0 L 59 0 Z" fill="#94a3b8" stroke="#475569" stroke-width="1" />
+    <rect x="52" y="15" width="16" height="18" rx="2" fill="#cbd5e1" stroke="#94a3b8" />
+    
+    <!-- Nozzle Base -->
+    <path d="M 45 33 L 75 33 L 80 50 L 40 50 Z" fill="#1e293b" />
+
+    <!-- Main Tube Body -->
+    <rect x="30" y="50" width="60" height="160" rx="6" fill="url(#tubeBody)" stroke="#9f1239" stroke-width="1.5" />
+    
+    <!-- Label Panel on Tube -->
+    <rect x="36" y="70" width="48" height="90" rx="3" fill="#ffffff" />
+    <text x="60" y="90" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="900" fill="#be123c">LanRui</text>
+    <text x="60" y="112" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="900" fill="#0f172a">i9</text>
+    <rect x="42" y="120" width="36" height="12" rx="2" fill="#be123c" />
+    <text x="60" y="129" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="7" font-weight="800" fill="#ffffff">55ML GLUE</text>
+    <text x="60" y="148" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="6.5" font-weight="700" fill="#64748b">ADHESIVE</text>
+
+    <!-- Bottom Crimped Seal -->
+    <path d="M 28 210 L 92 210 L 96 225 L 24 225 Z" fill="#9f1239" stroke="#881337" stroke-width="1.5" />
+    <!-- Crimp ridges -->
+    <line x1="38" y1="212" x2="38" y2="223" stroke="#be123c" stroke-width="1.5" />
+    <line x1="48" y1="212" x2="48" y2="223" stroke="#be123c" stroke-width="1.5" />
+    <line x1="60" y1="212" x2="60" y2="223" stroke="#be123c" stroke-width="1.5" />
+    <line x1="72" y1="212" x2="72" y2="223" stroke="#be123c" stroke-width="1.5" />
+    <line x1="82" y1="212" x2="82" y2="223" stroke="#be123c" stroke-width="1.5" />
+  </g>
+
+  <!-- Glue Drop Graphic -->
+  <circle cx="110" cy="275" r="7" fill="#be123c" opacity="0.85" />
+  <circle cx="95" cy="295" r="4" fill="#be123c" opacity="0.6" />
+
+  <!-- Badge -->
+  <g transform="translate(200, 355)">
+    <rect x="-85" y="-14" width="170" height="28" rx="14" fill="#be123c" />
+    <text x="0" y="5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" fill="#ffffff" letter-spacing="0.8">LEM LANRUI I9 55ML</text>
+  </g>
+</svg>

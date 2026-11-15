@@ -806,12 +806,18 @@ main.w {
 }
 
 .model-hero-img {
-  width: 140px;
-  height: 165px;
-  object-fit: cover;
-  border-radius: 8px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-  border: 2px solid rgba(255, 255, 255, 0.9);
+  width: 210px;
+  height: 180px;
+  object-fit: contain;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.35));
+  transition: transform 0.3s ease;
+}
+
+.hero-shopee-left:hover .model-hero-img {
+  transform: scale(1.04) translateY(-2px);
 }
 
 .shopee-dots {
@@ -857,13 +863,16 @@ main.w {
 }
 
 .side-model {
-  width: 90px;
-  height: 195px;
-  object-fit: cover;
-  border-radius: 6px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  width: 95px;
+  height: 180px;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
   flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(4px);
+  padding: 4px;
 }
 
 .side-promo-content {

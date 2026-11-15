@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgBackdoor" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fdf4ff" />
+      <stop offset="100%" stop-color="#fae8ff" />
+    </linearGradient>
+    <linearGradient id="glassBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="50%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#334155" />
+    </linearGradient>
+    <filter id="shadowBackdoor" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#a855f7" flood-opacity="0.2" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="400" fill="url(#bgBackdoor)" />
+
+  <g transform="translate(120, 65)" filter="url(#shadowBackdoor)">
+    <!-- Backdoor Glass Panel -->
+    <rect x="0" y="0" width="160" height="250" rx="22" fill="url(#glassBody)" stroke="#475569" stroke-width="2" />
+    
+    <!-- Camera Island Module (Top Left) -->
+    <rect x="12" y="14" width="60" height="65" rx="14" fill="#020617" stroke="#1e293b" stroke-width="2" />
+    <!-- Big Camera Lens 1 -->
+    <circle cx="28" cy="30" r="10" fill="#0f172a" stroke="#64748b" stroke-width="2" />
+    <circle cx="28" cy="30" r="5" fill="#38bdf8" opacity="0.6" />
+    <!-- Big Camera Lens 2 -->
+    <circle cx="28" cy="60" r="10" fill="#0f172a" stroke="#64748b" stroke-width="2" />
+    <circle cx="28" cy="60" r="5" fill="#38bdf8" opacity="0.6" />
+    <!-- Secondary Lens 3 & LED Flash -->
+    <circle cx="54" cy="30" r="7" fill="#0f172a" stroke="#64748b" stroke-width="1.5" />
+    <circle cx="54" cy="52" r="5" fill="#fef08a" stroke="#ca8a04" stroke-width="1" />
+
+    <!-- Frosted Glass Sheen Reflection -->
+    <polygon points="30,0 100,0 0,150 0,90" fill="#ffffff" opacity="0.12" />
+
+    <!-- 168 / Brand Logo Center -->
+    <circle cx="80" cy="130" r="12" fill="none" stroke="#64748b" stroke-width="2" />
+    <text x="80" y="134" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="8" font-weight="900" fill="#94a3b8">168</text>
+
+    <!-- CE & Trash Can Legal Marking at Bottom -->
+    <text x="80" y="235" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="7" fill="#64748b">TEMPERED GLASS • QC PASS</text>
+  </g>
+
+  <!-- Badge -->
+  <g transform="translate(200, 355)">
+    <rect x="-85" y="-14" width="170" height="28" rx="14" fill="#a855f7" />
+    <text x="0" y="5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" fill="#ffffff" letter-spacing="0.8">BACKDOOR &amp; KACA LENSA</text>
+  </g>
+</svg>

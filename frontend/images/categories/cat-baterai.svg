@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgBat" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0fdf4" />
+      <stop offset="100%" stop-color="#dcfce7" />
+    </linearGradient>
+    <linearGradient id="batBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <filter id="shadowBat" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#16a34a" flood-opacity="0.18" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="400" fill="url(#bgBat)" />
+
+  <!-- Battery Pack -->
+  <g transform="translate(125, 75)" filter="url(#shadowBat)">
+    <!-- Battery Cell Body -->
+    <rect x="0" y="20" width="150" height="230" rx="12" fill="url(#batBody)" stroke="#334155" stroke-width="2" />
+    
+    <!-- Top Flex Circuit PCB -->
+    <rect x="25" y="0" width="100" height="20" rx="4" fill="#047857" stroke="#065f46" stroke-width="1.5" />
+    <!-- Gold Contacts -->
+    <rect x="40" y="4" width="12" height="6" rx="1" fill="#f59e0b" />
+    <rect x="60" y="4" width="12" height="6" rx="1" fill="#f59e0b" />
+    <rect x="80" y="4" width="12" height="6" rx="1" fill="#f59e0b" />
+    <rect x="100" y="4" width="12" height="6" rx="1" fill="#f59e0b" />
+
+    <!-- Label Specs -->
+    <text x="75" y="65" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="900" fill="#22c55e">168 ORIGINAL</text>
+    <text x="75" y="85" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#94a3b8">LITHIUM-ION BATTERY</text>
+    
+    <!-- Large Capacity Indicator -->
+    <rect x="25" y="105" width="100" height="50" rx="8" fill="#14532d" stroke="#22c55e" stroke-width="1.5" />
+    <text x="75" y="132" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="900" fill="#ffffff">3200 mAh</text>
+    <text x="75" y="146" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="700" fill="#86efac">3.85V / 12.32Wh</text>
+
+    <!-- Certification Icons & Warning -->
+    <g fill="#64748b" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="8">
+      <text x="30" y="185">CE • RoHS • QC PASSED</text>
+      <text x="30" y="202">DO NOT PUNCTURE OR HEAT</text>
+      <text x="30" y="219">SAFETY IC PROTECTION</text>
+    </g>
+
+    <!-- Bolt Icon in Green -->
+    <path d="M 125 45 L 115 65 L 123 65 L 117 80 L 132 60 L 124 60 Z" fill="#22c55e" />
+  </g>
+
+  <!-- Badge -->
+  <g transform="translate(200, 355)">
+    <rect x="-85" y="-14" width="170" height="28" rx="14" fill="#16a34a" />
+    <text x="0" y="5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" fill="#ffffff" letter-spacing="0.8">BATERAI 100% HEALTH</text>
+  </g>
+</svg>
