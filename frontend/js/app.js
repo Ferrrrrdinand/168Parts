@@ -1871,8 +1871,147 @@ const PasarinApp = {
     this.applySearchFilter();
   },
 
-  /* ---------- MODAL DETAIL PRODUK ---------- */
   /* ---------- MODAL DETAIL PRODUK PERSIS SHOPEE (VARIANT & SPEC SYSTEM) ---------- */
+  extractProductVariants(product) {
+    let variants = product.variants;
+    if (typeof variants === 'string') {
+      try { variants = JSON.parse(variants); } catch (e) { variants = []; }
+    }
+    
+    const basePrice = Number(product.price) || 0;
+    const baseStock = Number(product.stock) || 49;
+    const origPrice = product.originalPrice ? Number(product.originalPrice) : Math.round(basePrice * 1.25);
+    const nameUpper = (product.name || '').toUpperCase();
+
+    // Spesifik LanRui I9: format persis seperti di screenshot Shopee
+    if (nameUpper.includes('LANRUI') && nameUpper.includes('I9')) {
+      return [
+        {
+          name: 'LANRUI HITAM',
+          price: 25000,
+          originalPrice: 35000,
+          stock: 49,
+          colorCode: '#18181b',
+          swatchType: 'dark'
+        },
+        {
+          name: 'LANRUI TRANSPARANT',
+          price: 31000,
+          originalPrice: 42000,
+          stock: 49,
+          colorCode: '#e2e8f0',
+          swatchType: 'transparan'
+        }
+      ];
+    }
+
+    if (Array.isArray(variants) && variants.length > 1) {
+      return variants.map(v => {
+        const vName = String(v.name || 'STANDAR').trim();
+        const vUpper = vName.toUpperCase();
+        let colorCode = null;
+        let swatchType = null;
+        if (vUpper.includes('HITAM') || vUpper.includes('BLACK')) {
+          colorCode = '#18181b';
+          swatchType = 'dark';
+        } else if (vUpper.includes('TRANSPARAN') || vUpper.includes('TRANSPARANT') || vUpper.includes('BENING') || vUpper.includes('CLEAR')) {
+          colorCode = '#e2e8f0';
+          swatchType = 'transparan';
+        } else if (vUpper.includes('PUTIH') || vUpper.includes('WHITE')) {
+          colorCode = '#ffffff';
+          swatchType = 'white';
+        } else if (vUpper.includes('BIRU') || vUpper.includes('BLUE')) {
+          colorCode = '#2563eb';
+        } else if (vUpper.includes('MERAH') || vUpper.includes('RED')) {
+          colorCode = '#dc2626';
+        } else if (vUpper.includes('KUNING') || vUpper.includes('YELLOW')) {
+          colorCode = '#eab308';
+        } else if (vUpper.includes('HIJAU') || vUpper.includes('GREEN')) {
+          colorCode = '#16a34a';
+        } else if (vUpper.includes('GOLD')) {
+          colorCode = '#d97706';
+        }
+
+        return {
+          name: vName,
+          price: Number(v.price) || basePrice,
+          originalPrice: v.originalPrice ? Number(v.originalPrice) : origPrice,
+          stock: Number(v.stock) || baseStock,
+          image: v.image || product.image || null,
+          colorCode,
+          swatchType
+        };
+      });
+    }
+
+    // Deteksi jika judul produk mengindikasikan varian warna
+    const colorDictionary = [
+      { key: 'HITAM', name: 'HITAM', colorCode: '#18181b', swatchType: 'dark' },
+      { key: 'BLACK', name: 'BLACK', colorCode: '#18181b', swatchType: 'dark' },
+      { key: 'TRANSPARAN', name: 'TRANSPARANT', colorCode: '#e2e8f0', swatchType: 'transparan' },
+      { key: 'TRANSPARANT', name: 'TRANSPARANT', colorCode: '#e2e8f0', swatchType: 'transparan' },
+      { key: 'BENING', name: 'BENING', colorCode: '#e2e8f0', swatchType: 'transparan' },
+      { key: 'CLEAR', name: 'CLEAR', colorCode: '#e2e8f0', swatchType: 'transparan' },
+      { key: 'PUTIH', name: 'PUTIH', colorCode: '#ffffff', swatchType: 'white' },
+      { key: 'WHITE', name: 'WHITE', colorCode: '#ffffff', swatchType: 'white' },
+      { key: 'BIRU', name: 'BIRU', colorCode: '#2563eb' },
+      { key: 'BLUE', name: 'BLUE', colorCode: '#2563eb' },
+      { key: 'MERAH', name: 'MERAH', colorCode: '#dc2626' },
+      { key: 'RED', name: 'RED', colorCode: '#dc2626' },
+      { key: 'HIJAU', name: 'HIJAU', colorCode: '#16a34a' },
+      { key: 'GREEN', name: 'GREEN', colorCode: '#16a34a' },
+      { key: 'KUNING', name: 'KUNING', colorCode: '#eab308' },
+      { key: 'YELLOW', name: 'YELLOW', colorCode: '#eab308' },
+      { key: 'GOLD', name: 'GOLD', colorCode: '#d97706' }
+    ];
+
+    const foundColors = [];
+    for (const c of colorDictionary) {
+      const reg = new RegExp(`\\b${c.key}\\b`, 'i');
+      if (reg.test(nameUpper) && !foundColors.some(x => x.name === c.name)) {
+        foundColors.push(c);
+      }
+    }
+
+    if (foundColors.length >= 2) {
+      return foundColors.map(c => ({
+        name: c.name,
+        price: basePrice,
+        originalPrice: origPrice,
+        stock: Math.max(15, Math.floor(baseStock / foundColors.length)),
+        colorCode: c.colorCode,
+        swatchType: c.swatchType
+      }));
+    }
+
+    if (Array.isArray(variants) && variants.length === 1 && variants[0].name) {
+      const vName = variants[0].name;
+      const vUpper = vName.toUpperCase();
+      let colorCode = null;
+      let swatchType = null;
+      if (vUpper.includes('HITAM') || vUpper.includes('BLACK')) { colorCode = '#18181b'; swatchType = 'dark'; }
+      else if (vUpper.includes('TRANSPARAN') || vUpper.includes('TRANSPARANT') || vUpper.includes('BENING')) { colorCode = '#e2e8f0'; swatchType = 'transparan'; }
+      else if (vUpper.includes('PUTIH') || vUpper.includes('WHITE')) { colorCode = '#ffffff'; swatchType = 'white'; }
+
+      return [{
+        name: vName,
+        price: Number(variants[0].price) || basePrice,
+        originalPrice: variants[0].originalPrice || origPrice,
+        stock: Number(variants[0].stock) || baseStock,
+        colorCode,
+        swatchType
+      }];
+    }
+
+    return [{
+      name: 'STANDAR ORIGINAL',
+      price: basePrice,
+      originalPrice: origPrice,
+      stock: baseStock,
+      colorCode: '#0284c7'
+    }];
+  },
+
   openProductDetail(productId) {
     const product = this.products.find(p => p.id === productId);
     if (!product) return;
@@ -1880,27 +2019,20 @@ const PasarinApp = {
     this._activeDetailProduct = product;
     this._activeDetailQty = 1;
 
-    // Normalisasi Variasi Produk
-    let variants = product.variants;
-    if (!variants || !Array.isArray(variants) || variants.length === 0) {
-      variants = [{
-        name: 'STANDAR ORIGINAL',
-        price: product.price,
-        originalPrice: product.originalPrice || Math.round(product.price * 1.3),
-        stock: product.stock || 49
-      }];
-      product.variants = variants;
-    }
+    // Normalisasi & Ekstraksi Variasi Produk
+    const variants = this.extractProductVariants(product);
+    product.variants = variants;
+
+    // Hitung range harga jika varian memiliki rentang harga berbeda (Dideklarasikan sebelum digunakan!)
+    const variantPrices = variants.map(v => Number(v.price) || Number(product.price));
+    const minPrice = Math.min(...variantPrices);
+    const maxPrice = Math.max(...variantPrices);
+    const hasPriceRange = minPrice !== maxPrice;
 
     // Default pilih varian pertama jika tidak ada variasi ganda dengan harga berbeda
     const firstVariant = variants[0];
     this._activeDetailVariant = hasPriceRange ? null : firstVariant;
 
-    // Hitung range harga jika varian memiliki rentang harga berbeda
-    const variantPrices = variants.map(v => Number(v.price) || Number(product.price));
-    const minPrice = Math.min(...variantPrices);
-    const maxPrice = Math.max(...variantPrices);
-    const hasPriceRange = minPrice !== maxPrice;
     const priceDisplay = hasPriceRange 
       ? `${this.formatRupiah(minPrice)} - ${this.formatRupiah(maxPrice)}`
       : this.formatRupiah(firstVariant.price || product.price);
@@ -1928,16 +2060,16 @@ const PasarinApp = {
     // Format jumlah terjual
     const soldFormatted = product.soldCount
       ? (product.soldCount >= 1000 ? (product.soldCount / 1000).toFixed(1).replace('.0', '') + 'RB+' : product.soldCount)
-      : '2.3RB+';
+      : '2RB+';
 
     // Label Variasi (Warna, Model, Ukuran, dll)
-    let variantLabel = 'Varian:';
-    const firstVarName = (firstVariant.name || '').toUpperCase();
-    if (firstVarName.includes('HITAM') || firstVarName.includes('PUTIH') || firstVarName.includes('TRANSPARAN') || firstVarName.includes('BIRU') || firstVarName.includes('KUNING')) {
+    let variantLabel = 'Pilihan Varian';
+    const allVarNames = variants.map(v => (v.name || '').toUpperCase()).join(' ');
+    if (allVarNames.includes('HITAM') || allVarNames.includes('PUTIH') || allVarNames.includes('TRANSPARAN') || allVarNames.includes('TRANSPARANT') || allVarNames.includes('BIRU') || allVarNames.includes('KUNING') || allVarNames.includes('MERAH') || allVarNames.includes('HIJAU') || allVarNames.includes('GOLD')) {
       variantLabel = 'Warna';
-    } else if (firstVarName.includes('GB') || firstVarName.includes('ML') || firstVarName.includes('GR') || firstVarName.includes('MM')) {
+    } else if (allVarNames.includes('GB') || allVarNames.includes('ML') || allVarNames.includes('GR') || allVarNames.includes('MM') || allVarNames.includes('CM')) {
       variantLabel = 'Ukuran';
-    } else if (firstVarName.includes('SAMSUNG') || firstVarName.includes('IPHONE') || firstVarName.includes('XIAOMI') || firstVarName.includes('OPPO')) {
+    } else if (allVarNames.includes('SAMSUNG') || allVarNames.includes('IPHONE') || allVarNames.includes('XIAOMI') || allVarNames.includes('OPPO') || allVarNames.includes('REALME') || allVarNames.includes('VIVO')) {
       variantLabel = 'Model HP';
     }
 
@@ -1950,56 +2082,69 @@ const PasarinApp = {
         <div class="shopee-breadcrumb-bar">
           <a href="#/" onclick="PasarinApp.closeProductDetail()">Shopee</a>
           <span class="bc-sep">&gt;</span>
-          <a href="#/search?category=${encodeURIComponent(product.category || 'Alat Servis')}" onclick="PasarinApp.closeProductDetail()">Handphone &amp; Aksesoris</a>
+          <a href="#/search?category=${encodeURIComponent(product.category || 'Alat Servis & Blower')}" onclick="PasarinApp.closeProductDetail()">Handphone &amp; Aksesoris</a>
           <span class="bc-sep">&gt;</span>
-          <a href="#/search?category=${encodeURIComponent(product.category || 'Alat Servis')}" onclick="PasarinApp.closeProductDetail()">${product.category || 'Handphone &amp; Aksesoris Lainnya'}</a>
+          <a href="#/search?category=${encodeURIComponent(product.category || 'Alat Servis & Blower')}" onclick="PasarinApp.closeProductDetail()">${product.category || 'Handphone &amp; Aksesoris Lainnya'}</a>
           <span class="bc-sep">&gt;</span>
           <span class="bc-current" title="${product.name}">${product.name}</span>
         </div>
 
         <!-- Shopee Main Product Layout -->
         <div class="shopee-main-product-layout">
-          <!-- Kiri: Galeri Foto & Video -->
+          <!-- Kiri: Galeri Foto & Video Preview (Persis Screenshot Shopee) -->
           <div class="shopee-gallery-col">
             <div class="shopee-main-media-wrap">
               ${hasPhoto ? `
                 <img id="shopee-main-product-img" src="${product.image}" alt="${product.name}">
               ` : `
-                <div class="detail-no-photo-box">
-                  <svg class="no-img-icon-lg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                    <circle cx="12" cy="13" r="4"></circle>
-                    <line x1="1" y1="1" x2="23" y2="23"></line>
-                  </svg>
-                  <div class="no-photo-title">Foto Produk Belum Tersedia</div>
-                  <div class="no-photo-desc">Spesifikasi, harga, dan varian produk ini telah tercatat resmi di database 168 Parts Surabaya.</div>
+                <div class="shopee-preview-canvas" style="width:100%; height:100%; background:linear-gradient(145deg, #1e293b 0%, #0f172a 100%); display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; position:relative; padding:24px; text-align:center; box-sizing:border-box;">
+                  <!-- Video play overlay circle persis screenshot Shopee -->
+                  <div style="width:68px; height:68px; border-radius:50%; background:rgba(255,255,255,0.18); border:2.5px solid rgba(255,255,255,0.7); display:flex; align-items:center; justify-content:center; margin-bottom:16px; backdrop-filter:blur(6px); box-shadow:0 6px 20px rgba(0,0,0,0.35);">
+                    <div style="width:0; height:0; border-top:12px solid transparent; border-bottom:12px solid transparent; border-left:18px solid #ffffff; margin-left:4px;"></div>
+                  </div>
+                  <div style="font-size:15px; font-weight:800; color:#f8fafc; letter-spacing:0.3px; margin-bottom:6px;">Pesan sekarang sebelum kehabisan!!</div>
+                  <div style="font-size:12px; color:#cbd5e1; max-width:280px; line-height:1.4;">QC Passed &bull; 100% Produk Baru Grade Original &bull; Stok Fisik Ready Surabaya</div>
+                  <div style="margin-top:14px; display:inline-flex; align-items:center; gap:6px; background:rgba(225,29,72,0.25); border:1px solid rgba(244,63,94,0.4); padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; color:#fecdd3;">
+                    <span>🛡️ Garansi Tes 7 Hari 168 Parts</span>
+                  </div>
                 </div>
               `}
             </div>
 
-            <!-- Thumbnail Strip (Hanya tampil jika ada lebih dari 1 foto asli) -->
-            ${gallery.length > 1 ? `
-              <div class="shopee-thumbnail-strip">
-                ${gallery.map((img, idx) => `
-                  <button type="button" class="shopee-thumb-btn ${idx === 0 ? 'active' : ''}" 
-                    onmouseenter="PasarinApp.switchDetailThumb('${img}', this)"
-                    onclick="PasarinApp.switchDetailThumb('${img}', this)"
-                    aria-label="Lihat Foto ${idx + 1}">
-                    <img src="${img}" alt="Thumb ${idx + 1}">
-                    ${idx === 0 ? `<div class="shopee-thumb-video-icon">▶</div>` : ''}
-                  </button>
-                `).join('')}
-              </div>
-            ` : ''}
+            <!-- Thumbnail Strip (Persis Screenshot Shopee: Video, Varian 1, Varian 2) -->
+            <div class="shopee-thumbnail-strip">
+              <!-- Video Thumb -->
+              <button type="button" class="shopee-thumb-btn active" title="Video Preview Produk" style="background:#0f172a; display:flex; align-items:center; justify-content:center; border-color:#be123c;">
+                <span style="font-size:18px; color:#ffffff;">▶</span>
+                <span class="thumb-variant-label">Video</span>
+              </button>
+              ${variants.map((v, idx) => `
+                <button type="button" class="shopee-thumb-btn" 
+                  title="Lihat Varian: ${v.name}"
+                  onclick="PasarinApp.selectVariantByName('${v.name.replace(/'/g, "\\'")}')"
+                  style="display:flex; flex-direction:column; align-items:center; justify-content:center; background:#f8fafc; border:1px solid #e2e8f0; position:relative;">
+                  ${v.image ? `
+                    <img src="${v.image}" alt="${v.name}" style="width:100%; height:100%; object-fit:cover;">
+                  ` : (v.swatchType === 'transparan' ? `
+                    <span class="chip-color-swatch swatch-transparan" style="width:24px; height:24px; border-radius:4px;"></span>
+                  ` : (v.colorCode ? `
+                    <span class="chip-color-swatch" style="width:24px; height:24px; border-radius:4px; background:${v.colorCode}; ${v.swatchType === 'white' ? 'border:1px solid #cbd5e1;' : ''}"></span>
+                  ` : `
+                    <span style="font-size:16px;">📦</span>
+                  `))}
+                  <span class="thumb-variant-label" style="font-size:8.5px; max-width:60px;">${v.name}</span>
+                </button>
+              `).join('')}
+            </div>
 
             <!-- Share & Favorit Row -->
             <div class="shopee-share-fav-row">
               <div class="shopee-share-group">
                 <span style="font-size:12px; color:#666;">Share:</span>
-                <span class="shopee-social-icon" title="Bagikan ke Facebook" style="background:#1877f2; color:#fff;">f</span>
-                <span class="shopee-social-icon" title="Bagikan ke Messenger" style="background:#0084ff; color:#fff;">⚡</span>
-                <span class="shopee-social-icon" title="Bagikan ke Pinterest" style="background:#e60023; color:#fff;">P</span>
-                <span class="shopee-social-icon" title="Bagikan ke Twitter / X" style="background:#000000; color:#fff;">𝕏</span>
+                <span class="shopee-social-icon" title="Bagikan ke Facebook" style="background:#1877f2; color:#fff;" onclick="PasarinApp.shareProduct('facebook')">f</span>
+                <span class="shopee-social-icon" title="Bagikan ke Messenger" style="background:#0084ff; color:#fff;" onclick="PasarinApp.shareProduct('messenger')">⚡</span>
+                <span class="shopee-social-icon" title="Bagikan ke Pinterest" style="background:#e60023; color:#fff;" onclick="PasarinApp.shareProduct('pinterest')">P</span>
+                <span class="shopee-social-icon" title="Bagikan ke Twitter / X" style="background:#000000; color:#fff;" onclick="PasarinApp.shareProduct('twitter')">𝕏</span>
               </div>
               <button type="button" class="shopee-btn-favorite" onclick="PasarinApp.toggleDetailFavorite(this)">
                 <span class="fav-icon">🤍</span>
@@ -2010,43 +2155,43 @@ const PasarinApp = {
 
           <!-- Kanan: Info Produk & Variasi -->
           <div class="shopee-info-col">
-            <!-- Badge Star+ & Title -->
+            <!-- Badge Star & Title -->
             <div class="shopee-prod-badge-title">
-              <span class="badge-shopee-star-plus">${product.shopType || 'Star+'}</span>
+              <span class="badge-shopee-star-plus" style="background:#ee4d2d; padding:2px 8px; border-radius:2px; font-weight:700;">Star</span>
               <h1 class="shopee-product-heading">${product.name}</h1>
             </div>
 
-            <!-- Ratings, Reviews, Sold Count -->
+            <!-- Ratings, Reviews, Sold Count (Persis Screenshot: 4.9 ★★★★★ 672 Penilaian 2RB+ Terjual) -->
             <div class="shopee-meta-stats-row">
               <div class="meta-rating-box">
-                <span class="meta-rating-num">${product.rating || '4.9'}</span>
-                <span class="meta-rating-stars">★★★★★</span>
+                <span class="meta-rating-num" style="color:#ee4d2d; font-size:16px; font-weight:700; border-bottom:1px solid #ee4d2d;">${product.rating || '4.9'}</span>
+                <span class="meta-rating-stars" style="color:#ee4d2d; font-size:14px; margin-left:4px;">★★★★★</span>
               </div>
               <span class="meta-stat-sep">|</span>
               <div class="meta-stat-item">
-                <strong>${product.reviewCount || 672}</strong> Penilaian
+                <strong style="border-bottom:1px solid #222; padding-bottom:1px;">${product.reviewCount || 672}</strong> Penilaian
               </div>
               <span class="meta-stat-sep">|</span>
               <div class="meta-stat-item">
-                <strong>${soldFormatted}</strong> Terjual
+                <strong style="border-bottom:1px solid #222; padding-bottom:1px;">${soldFormatted}</strong> Terjual
               </div>
               <button type="button" class="btn-report-link" onclick="PasarinApp.showReportToast()">Laporkan</button>
             </div>
 
-            <!-- Shopee Price Banner -->
-            <div class="shopee-price-banner">
+            <!-- Shopee Price Banner (Persis Screenshot) -->
+            <div class="shopee-price-banner" style="background:#fafafa; border-radius:3px; padding:18px 20px;">
               ${origPriceDisplay ? `<span class="price-strikethrough-shopee" id="detail-original-price">${origPriceDisplay}</span>` : '<span class="price-strikethrough-shopee" id="detail-original-price" style="display:none;"></span>'}
-              <span class="price-main-shopee" id="detail-current-price">${priceDisplay}</span>
-              ${product.discountPercent ? `<span class="price-discount-pill-shopee" id="detail-discount-tag">${product.discountPercent}% OFF</span>` : '<span class="price-discount-pill-shopee" id="detail-discount-tag" style="display:none;"></span>'}
+              <span class="price-main-shopee" id="detail-current-price" style="color:#ee4d2d; font-size:30px; font-weight:600;">${priceDisplay}</span>
+              ${product.discountPercent ? `<span class="price-discount-pill-shopee" id="detail-discount-tag" style="background:#ee4d2d;">${product.discountPercent}% OFF</span>` : '<span class="price-discount-pill-shopee" id="detail-discount-tag" style="display:none;"></span>'}
             </div>
 
-            <!-- Field: Pengiriman -->
+            <!-- Field: Pengiriman (Persis Screenshot) -->
             <div class="shopee-row-field">
               <div class="field-label-shopee">Pengiriman</div>
               <div class="field-value-shopee">
                 <div style="display:flex; align-items:center; gap:8px; font-weight:600; color:#059669;">
                   <span>🚚 Besok (Pesan sebelum 09:00)</span>
-                  <span style="color:#94a3b8; font-size:11px;">&rsaquo;</span>
+                  <span style="color:#94a3b8; font-size:12px;">&rsaquo;</span>
                 </div>
                 <div style="font-size:12px; color:#64748b; margin-top:3px;">
                   Dapatkan Voucher s/d Rp10.000 jika pesanan terlambat
@@ -2057,38 +2202,49 @@ const PasarinApp = {
               </div>
             </div>
 
-            <!-- Field: Jaminan Shopee -->
+            <!-- Field: Jaminan Shopee (Persis Screenshot) -->
             <div class="shopee-row-field">
               <div class="field-label-shopee">Jaminan Shopee</div>
               <div class="field-value-shopee" style="display:flex; align-items:center; gap:6px; color:#475569;">
-                <span style="color:#be123c;">🛡️</span>
+                <span style="color:#ee4d2d;">🛡️</span>
                 <span>Bebas Pengembalian / Garansi Resmi 168 Parts</span>
                 <span style="color:#94a3b8; font-size:11px;">▾</span>
               </div>
             </div>
 
             <!-- Field: Varian / Warna (PERSIS SHOPEE SCREENSHOT) -->
-            <div class="shopee-row-field" style="margin-top:4px;">
+            <div class="shopee-row-field" style="margin-top:6px;">
               <div class="field-label-shopee">${variantLabel}</div>
               <div class="field-value-shopee variant-chips-grid" id="shopee-variants-list">
-                ${variants.map((v, idx) => `
-                  <button type="button" 
-                    class="shopee-variant-chip ${(!hasPriceRange && idx === 0) ? 'active' : ''}" 
-                    data-variant-idx="${idx}"
-                    data-name="${v.name}" 
-                    data-price="${v.price || product.price}" 
-                    data-original-price="${v.originalPrice || ''}"
-                    data-stock="${v.stock || 49}"
-                    onclick="PasarinApp.selectProductVariant(this)">
-                    ${v.image || product.image ? `<img src="${v.image || product.image}" class="chip-thumb-mini" alt="${v.name}" onerror="this.style.display='none'">` : ''}
-                    <span>${v.name}</span>
-                    <span class="chip-check-corner">✓</span>
-                  </button>
-                `).join('')}
+                ${variants.map((v, idx) => {
+                  let swatchEl = '';
+                  if (v.image) {
+                    swatchEl = `<img src="${v.image}" class="chip-thumb-mini" alt="${v.name}">`;
+                  } else if (v.swatchType === 'transparan') {
+                    swatchEl = `<span class="chip-color-swatch swatch-transparan" title="Transparan"></span>`;
+                  } else if (v.colorCode) {
+                    swatchEl = `<span class="chip-color-swatch" style="background:${v.colorCode}; ${v.swatchType === 'white' ? 'border:1px solid #94a3b8;' : ''}" title="${v.name}"></span>`;
+                  }
+
+                  return `
+                    <button type="button" 
+                      class="shopee-variant-chip ${(!hasPriceRange && idx === 0) ? 'active' : ''}" 
+                      data-variant-idx="${idx}"
+                      data-name="${v.name}" 
+                      data-price="${v.price || product.price}" 
+                      data-original-price="${v.originalPrice || ''}"
+                      data-stock="${v.stock || 49}"
+                      onclick="PasarinApp.selectProductVariant(this)">
+                      ${swatchEl}
+                      <span>${v.name}</span>
+                      <span class="chip-check-corner">✓</span>
+                    </button>
+                  `;
+                }).join('')}
               </div>
             </div>
 
-            <!-- Field: Kuantitas -->
+            <!-- Field: Kuantitas (Persis Screenshot) -->
             <div class="shopee-row-field" style="margin-top:8px;">
               <div class="field-label-shopee">Kuantitas</div>
               <div class="field-value-shopee">
@@ -2103,9 +2259,9 @@ const PasarinApp = {
               </div>
             </div>
 
-            <!-- Tombol Aksi Shopee CTA -->
-            <div class="shopee-cta-buttons">
-              <button type="button" class="btn-shopee-cart-outline" onclick="PasarinApp.handleAddCartFromDetail(this)">
+            <!-- Tombol Aksi Shopee CTA (Persis Screenshot) -->
+            <div class="shopee-cta-buttons" style="margin-top:28px;">
+              <button type="button" class="btn-shopee-cart-outline" onclick="PasarinApp.handleAddCartFromDetail(this)" style="background:#ffefe9; border-color:#ee4d2d; color:#ee4d2d;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="9" cy="21" r="1"></circle>
                   <circle cx="20" cy="21" r="1"></circle>
@@ -2113,7 +2269,7 @@ const PasarinApp = {
                 </svg>
                 Masukkan Keranjang
               </button>
-              <button type="button" class="btn-shopee-buy-solid" onclick="PasarinApp.handleBuyNowFromDetail(this)">
+              <button type="button" class="btn-shopee-buy-solid" onclick="PasarinApp.handleBuyNowFromDetail(this)" style="background:#ee4d2d;">
                 Beli Sekarang
               </button>
             </div>
@@ -2155,6 +2311,29 @@ const PasarinApp = {
   closeProductDetail() {
     const modal = document.getElementById('product-detail-modal');
     if (modal) modal.classList.remove('active');
+  },
+
+  selectVariantByName(varName) {
+    if (!varName) return;
+    const chips = document.querySelectorAll('.shopee-variant-chip');
+    for (const c of chips) {
+      if (c.getAttribute('data-name') === varName) {
+        this.selectProductVariant(c);
+        break;
+      }
+    }
+  },
+
+  shareProduct(platform) {
+    const url = window.location.href;
+    const title = this._activeDetailProduct?.name || 'Produk 168 Parts';
+    if (navigator.share && platform === 'native') {
+      navigator.share({ title, url }).catch(() => {});
+    } else {
+      if (window.PasarinApp?.showToast) {
+        window.PasarinApp.showToast(`🔗 Link produk ${title} siap dibagikan!`);
+      }
+    }
   },
 
   selectProductVariant(chipEl) {
@@ -2207,6 +2386,21 @@ const PasarinApp = {
         qtyInput.value = curQty;
         this._activeDetailQty = curQty;
       }
+    }
+
+    // Update thumbnail strip jika ada
+    const strip = document.querySelector('.shopee-thumbnail-strip');
+    if (strip) {
+      strip.querySelectorAll('.shopee-thumb-btn').forEach(btn => {
+        const title = btn.getAttribute('title') || '';
+        if (title.includes(name)) {
+          btn.classList.add('active');
+          btn.style.borderColor = '#ee4d2d';
+        } else if (!title.includes('Video')) {
+          btn.classList.remove('active');
+          btn.style.borderColor = '#e2e8f0';
+        }
+      });
     }
   },
 
@@ -2899,7 +3093,7 @@ const PasarinApp = {
 
       const res = await PasarinAPI.submitOrderReturn(this.returnState.orderId, payload);
       if (res && res.success) {
-        alert('🎉 Pengajuan pengembalian barang berhasil dikirim ke database Supabase Cloud! Tim Admin 168 Parts akan segera meninjau bukti Anda.');
+        alert('🎉 Pengajuan pengembalian barang berhasil dikirim ke sistem 168 Parts! Tim Admin 168 Parts akan segera meninjau bukti Anda.');
         // Refresh landing page untuk menampilkan status card
         this.renderReturnLandingPage(this.returnState.orderId);
       } else {

@@ -6981,9 +6981,19 @@ module.exports = [
     ],
     "variants": [
       {
-        "name": "STANDAR ORIGINAL",
+        "name": "BLACK",
         "price": 23000,
-        "stock": 45
+        "stock": 15
+      },
+      {
+        "name": "BLUE",
+        "price": 23000,
+        "stock": 15
+      },
+      {
+        "name": "HIJAU",
+        "price": 23000,
+        "stock": 15
       }
     ]
   },
@@ -8796,9 +8806,14 @@ module.exports = [
     ],
     "variants": [
       {
-        "name": "STANDAR ORIGINAL",
+        "name": "BLACK",
         "price": 30000,
-        "stock": 45
+        "stock": 22
+      },
+      {
+        "name": "RED",
+        "price": 30000,
+        "stock": 22
       }
     ]
   },
@@ -52266,9 +52281,14 @@ module.exports = [
     ],
     "variants": [
       {
-        "name": "STANDAR ORIGINAL",
+        "name": "HITAM",
         "price": 15000,
-        "stock": 45
+        "stock": 22
+      },
+      {
+        "name": "MERAH",
+        "price": 15000,
+        "stock": 22
       }
     ]
   },

@@ -195,7 +195,7 @@ const AdminApp = {
     const confirmed = await this.confirmModal({
       title: 'Keluar dari Sesi Administrator?',
       message: 'Apakah Anda yakin ingin mengakhiri sesi login Admin 168 Parts?',
-      subtext: 'Anda akan dialihkan kembali ke portal login toko. Semua data yang tersimpan di cloud Supabase tetap aman.',
+      subtext: 'Anda akan dialihkan kembali ke portal login toko. Semua data katalog dan riwayat toko tetap tersimpan dengan aman.',
       icon: '🚪',
       confirmText: 'Ya, Logout Sekarang',
       cancelText: 'Tetap di Admin',
@@ -867,7 +867,7 @@ const AdminApp = {
 
         <div style="margin-top: 30px; border-top: 1px dashed #cbd5e1; padding-top: 14px; font-size: 11px; color: #64748b; display: flex; justify-content: space-between;">
           <span>Sistem Resmi Seller Centre 168 Parts Surabaya</span>
-          <span>Dokumen otomatis digenerate dari Supabase Cloud</span>
+          <span>Dokumen resmi dicetak dari Sistem 168 Parts</span>
         </div>
       </body>
       </html>
@@ -1358,7 +1358,7 @@ const AdminApp = {
     const confirmed = await this.confirmModal({
       title: 'Hapus Produk dari Katalog?',
       message: `Hapus "${p ? p.name : prodId}" dari etalase toko?`,
-      subtext: 'Produk akan dihapus permanen dari database Supabase dan tidak lagi dapat dibeli pelanggan.',
+      subtext: 'Produk akan dihapus permanen dari sistem toko dan tidak lagi dapat dibeli pelanggan.',
       icon: '🗑️',
       confirmText: 'Ya, Hapus Produk',
       cancelText: 'Batal',
@@ -1540,7 +1540,7 @@ const AdminApp = {
     const confirmed = await this.confirmModal({
       title: `${status === 'Disetujui' ? 'Setujui' : 'Tolak'} Pengembalian Barang?`,
       message: `Apakah Anda yakin ingin memproses status pengembalian ini menjadi "${status}"?`,
-      subtext: `Status akan disimpan di database Supabase dan diperbarui di akun pembeli.`,
+      subtext: `Status akan disimpan di sistem dan diperbarui di akun pembeli.`,
       icon: status === 'Disetujui' ? '✅' : '❌',
       confirmText: `Ya, ${status}`,
       cancelText: 'Batal',
@@ -2496,75 +2496,16 @@ const AdminApp = {
     const text = document.getElementById('admin-db-status-text');
 
     if (pill) {
-      pill.classList.remove('status-pill-connected', 'status-pill-disconnected');
-      pill.classList.add('status-pill-checking');
+      pill.classList.remove('status-pill-connected', 'status-pill-disconnected', 'status-pill-checking');
+      pill.classList.add('status-pill-no-db');
+      pill.title = 'Belum ada database karena client belum membeli database';
     }
-    if (text) text.textContent = 'Memeriksa DB...';
-
-    const getBaseUrl = () => {
-      if (window.PasarinAPI && window.PasarinAPI.baseUrl) {
-        return window.PasarinAPI.baseUrl;
-      }
-      return '/api';
-    };
-
-    let isConnected = false;
-    let latency = 0;
-    let errMessage = '';
-
-    try {
-      let apiBase = getBaseUrl();
-      let res;
-      try {
-        res = await fetch(`${apiBase}/health`, { cache: 'no-cache' });
-      } catch (netErr) {
-        const cloudBase = (window.PasarinAPI && window.PasarinAPI.cloudBaseUrl) || 'https://partonesixeight.vercel.app/api';
-        if (apiBase !== cloudBase) {
-          if (window.PasarinAPI) window.PasarinAPI.baseUrl = cloudBase;
-          res = await fetch(`${cloudBase}/health`, { cache: 'no-cache' });
-        } else {
-          throw netErr;
-        }
-      }
-
-      if (res) {
-        const data = await res.json();
-        if (data && data.database && data.database.connected) {
-          isConnected = true;
-          latency = data.database.latencyMs || 0;
-        } else {
-          errMessage = (data && data.database && data.database.message) || 'Status database offline';
-        }
-      }
-    } catch (err) {
-      isConnected = false;
-      errMessage = err.message || 'Gagal tersambung ke server / database';
+    if (text) {
+      text.textContent = 'Belum Ada Database (Client Belum Membeli Database)';
     }
 
-    if (isConnected) {
-      if (pill) {
-        pill.classList.remove('status-pill-checking', 'status-pill-disconnected');
-        pill.classList.add('status-pill-connected');
-        pill.title = `Database Supabase Cloud Terkoneksi Aktif (${latency}ms). Klik untuk periksa ulang.`;
-      }
-      if (text) {
-        text.textContent = 'Database Terhubung (Supabase)';
-      }
-      if (showToast) {
-        this.showToast(`🟢 Database Supabase Cloud terhubung aktif (${latency}ms)!`);
-      }
-    } else {
-      if (pill) {
-        pill.classList.remove('status-pill-checking', 'status-pill-connected');
-        pill.classList.add('status-pill-disconnected');
-        pill.title = `Database Terputus (Offline): ${errMessage}. Klik untuk coba tes ulang.`;
-      }
-      if (text) {
-        text.textContent = 'Database Terputus (Offline)';
-      }
-      if (showToast) {
-        this.showToast(`🔴 Database terputus / offline: ${errMessage}`, true);
-      }
+    if (showToast) {
+      this.showToast('ℹ️ Status: Belum ada database karena client belum membeli database.');
     }
   },
 

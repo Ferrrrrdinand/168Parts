@@ -663,7 +663,7 @@ const PasarinChatBot = {
     // Jika user memasukkan kode pesanan spesifik (ORD-...)
     if (orderId) {
       return {
-        text: `🔍 **Pengecekan Pesanan #${orderId}:**\n\nSistem sedang memantau pesanan Anda di database Supabase Cloud. Anda dapat melihat detail barang, status pengiriman kurir, tanggal sampai, serta bukti garansi secara lengkap melalui Portal Riwayat Pesanan:`,
+        text: `🔍 **Pengecekan Pesanan #${orderId}:**\n\nSistem sedang memantau pesanan Anda di sistem toko 168 Parts. Anda dapat melihat detail barang, status pengiriman kurir, tanggal sampai, serta bukti garansi secara lengkap melalui Portal Riwayat Pesanan:`,
         actions: [
           { label: `Lihat Detail Pesanan ${orderId}`, icon: '📑', action: `if(window.PasarinApp) PasarinApp.openOrdersModal(); PasarinChatBot.closeChat();`, isPrimary: true },
           { label: 'Ajukan Retur Barang', icon: '🔄', action: `window.location.hash='#/order/return?id=${orderId}'; PasarinChatBot.closeChat();` }
