@@ -101,7 +101,7 @@ const PasarinCart = {
           name: 'Produk Pilihan',
           price: 150000,
           originalPrice: 200000,
-          image: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&auto=format&fit=crop&q=80',
+          image: 'images/product-placeholder.svg',
           shopName: '168 Parts Official Store',
           shopType: 'Mall'
         };
@@ -188,7 +188,7 @@ const PasarinCart = {
       document.body.appendChild(dialog);
     }
 
-    const img = product.image || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&auto=format&fit=crop&q=80';
+    const img = product.image || 'images/product-placeholder.svg';
     const totalCount = this.items.reduce((acc, it) => acc + (it.quantity || 1), 0);
 
     dialog.innerHTML = `
@@ -200,7 +200,7 @@ const PasarinCart = {
         </div>
 
         <div class="cart-popup-body">
-          <img src="${img}" alt="${product.name}" class="cart-popup-img" onerror="this.src='https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&auto=format&fit=crop&q=80'">
+          <img src="${img}" alt="${product.name}" class="cart-popup-img" onerror="this.src='images/product-placeholder.svg'">
           <div class="cart-popup-info">
             <h4 class="cart-popup-pname">${product.name}</h4>
             <div class="cart-popup-meta">

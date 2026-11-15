@@ -1031,7 +1031,7 @@ const AdminApp = {
     }
 
     const stock = Number(document.getElementById('f-prod-stock').value) || 10;
-    const image = document.getElementById('f-prod-image').value.trim() || 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500';
+    const image = document.getElementById('f-prod-image').value.trim() || '';
     const shopName = document.getElementById('f-prod-shop').value.trim() || '168 Parts Surabaya';
     const location = document.getElementById('f-prod-location').value.trim() || 'Kota Surabaya';
     const isFlashSale = document.getElementById('f-prod-flash').checked;

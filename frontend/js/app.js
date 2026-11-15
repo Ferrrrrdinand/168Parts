@@ -1864,13 +1864,11 @@ const PasarinApp = {
       ? this.formatRupiah(firstVariant.originalPrice)
       : (product.originalPrice ? this.formatRupiah(product.originalPrice) : '');
 
-    // Galeri Thumbnail (Mendukung Video Preview & Foto Produk)
-    const gallery = [
-      product.image || 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=700&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=700&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=700&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1517420704952-d9f39e95b43e?w=700&auto=format&fit=crop&q=80'
-    ];
+    // Galeri Thumbnail (Gunakan foto asli jika tersedia, jika kosong gunakan placeholder)
+    const mainImgUrl = product.image || 'images/product-placeholder.svg';
+    const gallery = (product.images && product.images.length > 0) 
+      ? product.images 
+      : (product.image ? [product.image] : []);
 
     const modalId = 'product-detail-modal';
     let modal = document.getElementById(modalId);
@@ -1921,27 +1919,31 @@ const PasarinApp = {
           <!-- Kiri: Galeri Foto & Video -->
           <div class="shopee-gallery-col">
             <div class="shopee-main-media-wrap">
-              <img id="shopee-main-product-img" src="${gallery[0]}" alt="${product.name}">
-              <div class="shopee-media-overlay-tag">
-                <span style="display:inline-flex; align-items:center; gap:5px;">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                  Pesan sekarang sebelum kehabisan!!
-                </span>
-              </div>
+              <img id="shopee-main-product-img" src="${mainImgUrl}" alt="${product.name}">
+              ${product.image ? `
+                <div class="shopee-media-overlay-tag">
+                  <span style="display:inline-flex; align-items:center; gap:5px;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    Pesan sekarang sebelum kehabisan!!
+                  </span>
+                </div>
+              ` : ''}
             </div>
 
-            <!-- Thumbnail Strip -->
-            <div class="shopee-thumbnail-strip">
-              ${gallery.map((img, idx) => `
-                <button type="button" class="shopee-thumb-btn ${idx === 0 ? 'active' : ''}" 
-                  onmouseenter="PasarinApp.switchDetailThumb('${img}', this)"
-                  onclick="PasarinApp.switchDetailThumb('${img}', this)"
-                  aria-label="Lihat Foto ${idx + 1}">
-                  <img src="${img}" alt="Thumb ${idx + 1}">
-                  ${idx === 0 ? `<div class="shopee-thumb-video-icon">▶</div>` : ''}
-                </button>
-              `).join('')}
-            </div>
+            <!-- Thumbnail Strip (Hanya tampil jika ada lebih dari 1 foto asli) -->
+            ${gallery.length > 1 ? `
+              <div class="shopee-thumbnail-strip">
+                ${gallery.map((img, idx) => `
+                  <button type="button" class="shopee-thumb-btn ${idx === 0 ? 'active' : ''}" 
+                    onmouseenter="PasarinApp.switchDetailThumb('${img}', this)"
+                    onclick="PasarinApp.switchDetailThumb('${img}', this)"
+                    aria-label="Lihat Foto ${idx + 1}">
+                    <img src="${img}" alt="Thumb ${idx + 1}">
+                    ${idx === 0 ? `<div class="shopee-thumb-video-icon">▶</div>` : ''}
+                  </button>
+                `).join('')}
+              </div>
+            ` : ''}
 
             <!-- Share & Favorit Row -->
             <div class="shopee-share-fav-row">
@@ -2031,7 +2033,7 @@ const PasarinApp = {
                     data-original-price="${v.originalPrice || ''}"
                     data-stock="${v.stock || 49}"
                     onclick="PasarinApp.selectProductVariant(this)">
-                    <img src="${product.image}" class="chip-thumb-mini" alt="${v.name}" onerror="this.style.display='none'">
+                    ${v.image || product.image ? `<img src="${v.image || product.image}" class="chip-thumb-mini" alt="${v.name}" onerror="this.style.display='none'">` : ''}
                     <span>${v.name}</span>
                     <span class="chip-check-corner">✓</span>
                   </button>
