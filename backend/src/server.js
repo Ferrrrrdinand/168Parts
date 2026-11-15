@@ -91,19 +91,14 @@ const fs = require('fs');
 const reactDistPath = path.resolve(__dirname, '../../frontend-react/dist');
 const legacyFrontendPath = path.resolve(__dirname, '../../frontend');
 
-// Melayani Frontend Modern React TSX sebagai frontend default utama
+// Melayani Frontend Toko Shopee 168 Parts sebagai frontend default
+app.use(express.static(legacyFrontendPath));
+
 if (fs.existsSync(reactDistPath)) {
-  app.use(express.static(reactDistPath));
-} else {
-  app.use(express.static(legacyFrontendPath));
+  app.use('/react', express.static(reactDistPath));
 }
 
-// Redirect legacy HTML paths to React TSX app
-app.get('/frontend/admin.html', (req, res) => res.redirect('/#/admin'));
-app.get('/frontend/index.html', (req, res) => res.redirect('/'));
-app.get('/frontend', (req, res) => res.redirect('/'));
-
-// Fallback router untuk SPA React TSX
+// Fallback router untuk SPA & Static HTML
 app.use((req, res, next) => {
   const url = req.originalUrl || req.url || '';
   if (url.startsWith('/api') || url.startsWith('/auth') || url.startsWith('/products') || url.startsWith('/cart') || url.startsWith('/orders') || url.startsWith('/promos') || url.startsWith('/banners') || url.startsWith('/chats') || url.startsWith('/notifications')) {
@@ -112,7 +107,7 @@ app.use((req, res, next) => {
       message: `Endpoint API ${req.method} ${url} tidak ditemukan.`
     });
   }
-  if (fs.existsSync(reactDistPath)) {
+  if (url.startsWith('/react') && fs.existsSync(reactDistPath)) {
     return res.sendFile(path.join(reactDistPath, 'index.html'));
   }
   res.sendFile(path.join(legacyFrontendPath, 'index.html'));
