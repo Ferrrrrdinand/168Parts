@@ -428,7 +428,9 @@ const PasarinCart = {
       return;
     }
 
-    if (headBar) headBar.style.display = 'flex';
+    if (headBar) {
+      headBar.style.display = (window.innerWidth <= 768) ? 'none' : 'flex';
+    }
     if (stickyBar) stickyBar.style.display = 'block';
 
     // Group items by shopName
