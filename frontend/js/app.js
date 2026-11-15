@@ -1686,6 +1686,18 @@ const PasarinApp = {
       document.title = '168 Parts Surabaya | Pusat Sparepart & Alat Servis HP Terlengkap';
     }
 
+    const isCartOrCheckout = isCart || isCheckout;
+    if (isCartOrCheckout) {
+      document.body.classList.add('viewing-cart-checkout');
+    } else {
+      document.body.classList.remove('viewing-cart-checkout');
+    }
+
+    const appbar = document.getElementById('mobile-bottom-appbar');
+    if (appbar) {
+      appbar.style.display = isCartOrCheckout ? 'none' : 'flex';
+    }
+
     if (isOrders) {
       this.openOrdersModal();
     }

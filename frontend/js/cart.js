@@ -453,12 +453,11 @@ const PasarinCart = {
 
     const memberNoticeHtml = (!window.PasarinAuth?.isLoggedIn()) ? `
       <div class="cart-member-gate-notice" onclick="window.PasarinAuth.openAuthModal('checkout')">
-        <span class="notice-icon">🔒</span>
-        <div class="notice-content">
-          <strong>Masuk atau Daftar Member Diperlukan</strong>
-          <span>Anda wajib masuk sebagai Member Resmi 168 Parts untuk dapat melakukan checkout pesanan. Klik di sini untuk Masuk/Daftar.</span>
+        <div class="notice-left">
+          <span class="notice-icon">👑</span>
+          <span class="notice-text">Masuk sebagai <b>Member 168 Parts</b> untuk menyelesaikan pesanan</span>
         </div>
-        <button type="button" class="btn-notice-auth">Masuk / Daftar &rsaquo;</button>
+        <span class="btn-notice-auth">Masuk &rsaquo;</span>
       </div>
     ` : '';
 
@@ -477,17 +476,34 @@ const PasarinCart = {
               </label>
               <img src="${itemImg}" alt="${it.name}" class="cart-prod-thumb" onerror="this.src='images/product-placeholder.svg'">
               <div class="cart-prod-info">
-                <a href="#/search?q=${encodeURIComponent(it.name)}" class="cart-prod-title">${it.name}</a>
+                <div class="cart-prod-title-wrap">
+                  <a href="#/search?q=${encodeURIComponent(it.name)}" class="cart-prod-title">${it.name}</a>
+                  <button type="button" class="btn-delete-mobile" onclick="PasarinCart.confirmRemoveItem('${it.productId}')" title="Hapus produk">&times;</button>
+                </div>
                 <div class="cart-prod-tags">
                   <span class="badge-cicilan">CICILAN 0%</span>
+                  <span class="badge-garansi">Garansi Toko</span>
                 </div>
-              </div>
-              <div class="cart-prod-variation">
-                <span class="var-label">Variasi: ▾</span>
-                <span class="var-val">${it.variation || 'Standar'}</span>
+                <div class="cart-prod-variation">
+                  <span class="var-val">${it.variation || 'Standar'} ▾</span>
+                </div>
+
+                <!-- Mobile-Only Compact Footer (Price & Stepper) -->
+                <div class="cart-mobile-footer-row">
+                  <div class="cart-mobile-price-group">
+                    <span class="cart-unit-price">${this.formatRupiah(it.price)}</span>
+                    ${it.originalPrice && it.originalPrice > it.price ? `<span class="cart-orig-price">${this.formatRupiah(it.originalPrice)}</span>` : ''}
+                  </div>
+                  <div class="shopee-stepper">
+                    <button type="button" class="stepper-btn" onclick="PasarinCart.stepQty('${it.productId}', -1)" aria-label="Kurangi kuantitas">-</button>
+                    <input type="text" class="stepper-val" value="${it.quantity}" readonly>
+                    <button type="button" class="stepper-btn" onclick="PasarinCart.stepQty('${it.productId}', 1)" aria-label="Tambah kuantitas">+</button>
+                  </div>
+                </div>
               </div>
             </div>
 
+            <!-- Desktop-Only Columns (Hidden on mobile via CSS) -->
             <div class="cart-item-price-col th-col th-price">
               ${it.originalPrice && it.originalPrice > it.price ? `<span class="cart-orig-price">${this.formatRupiah(it.originalPrice)}</span>` : ''}
               <span class="cart-unit-price">${this.formatRupiah(it.price)}</span>
