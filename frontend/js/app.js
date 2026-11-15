@@ -1434,7 +1434,7 @@ const PasarinApp = {
         ${p.originalPrice ? `<div class="original-pr">${this.formatRupiah(p.originalPrice)}</div>` : ''}
         <div class="bar" style="--p:${p.flashSaleSold || 80}%">
           <i></i>
-          <em>${p.flashSaleSold > 90 ? 'Segera Habis' : 'Terjual ' + (p.soldCount || 100)}</em>
+          <em>${p.flashSaleSold >= 85 ? '🔥 Segera Habis' : 'Terjual ' + (p.flashSaleSoldUnits || p.flashSaleSold || 10) + ' pcs'}</em>
         </div>
       </div>
     `).join('');
@@ -1513,15 +1513,46 @@ const PasarinApp = {
   initTimer() {
     const tm = document.getElementById('tm');
     if (!tm) return;
-    let endTime = Date.now() + (1 * 3600 + 30 * 60 + 35) * 1000;
-    setInterval(() => {
-      let remaining = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
-      let pad = n => String(n).padStart(2, '0');
-      let h = Math.floor(remaining / 3600);
-      let m = Math.floor((remaining % 3600) / 60);
-      let s = remaining % 60;
-      tm.innerHTML = `<span class="tm-digit">${pad(h)}</span><span class="tm-colon">:</span><span class="tm-digit">${pad(m)}</span><span class="tm-colon">:</span><span class="tm-digit">${pad(s)}</span>`;
-    }, 1000);
+
+    let hasResetToday = false;
+
+    const tick = () => {
+      const now = new Date();
+      // Waktu tengah malam berikutnya (jam 24:00:00 / 00:00:00)
+      const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
+      let diffSec = Math.max(0, Math.floor((nextMidnight.getTime() - now.getTime()) / 1000));
+
+      // Jika tepat menyentuh 00:00:00 (12 malam), reset siklus baru & muat ulang data Flash Sale
+      if (diffSec <= 0) {
+        if (!hasResetToday) {
+          hasResetToday = true;
+          setTimeout(() => {
+            hasResetToday = false;
+            if (typeof this.loadInitialData === 'function') {
+              this.loadInitialData();
+            }
+          }, 1500);
+        }
+        diffSec = 86400; // 24 jam penuh untuk hari berikutnya
+      }
+
+      const pad = n => String(n).padStart(2, '0');
+      const h = Math.floor(diffSec / 3600);
+      const m = Math.floor((diffSec % 3600) / 60);
+      const s = diffSec % 60;
+
+      tm.innerHTML = `
+        <span class="tm-digit" title="Sisa Jam">${pad(h)}</span>
+        <span class="tm-colon">:</span>
+        <span class="tm-digit" title="Sisa Menit">${pad(m)}</span>
+        <span class="tm-colon">:</span>
+        <span class="tm-digit" title="Sisa Detik">${pad(s)}</span>
+      `;
+    };
+
+    tick();
+    if (this._timerInterval) clearInterval(this._timerInterval);
+    this._timerInterval = setInterval(tick, 1000);
   },
 
   /* ---------- ROUTER ---------- */
@@ -1707,11 +1738,15 @@ const PasarinApp = {
     // Filter keyword
     if (this.searchQuery && this.searchQuery.trim()) {
       const kw = this.searchQuery.toLowerCase().trim();
-      list = list.filter(p => 
-        p.name.toLowerCase().includes(kw) ||
-        (p.category && p.category.toLowerCase().includes(kw)) ||
-        (p.description && p.description.toLowerCase().includes(kw))
-      );
+      if (kw === 'flash' || kw === 'flash sale') {
+        list = list.filter(p => p.isFlashSale);
+      } else {
+        list = list.filter(p => 
+          p.name.toLowerCase().includes(kw) ||
+          (p.category && p.category.toLowerCase().includes(kw)) ||
+          (p.description && p.description.toLowerCase().includes(kw))
+        );
+      }
     }
 
     // Filter Kategori

@@ -172,16 +172,37 @@ exports.getCategories = (req, res) => {
   }
 };
 
-// 7. READ FLASH SALE
+// 7. READ FLASH SALE (Siklus 24 Jam - Reset Pukul 00:00:00 Tengah Malam WIB)
 exports.getFlashSale = async (req, res) => {
   try {
+    const now = new Date();
+    // Hitung waktu tengah malam WIB (UTC+7)
+    const nowUtcMs = now.getTime();
+    const wibOffsetMs = 7 * 60 * 60 * 1000;
+    const nowWib = new Date(nowUtcMs + wibOffsetMs);
+
+    // Tengah malam WIB hari berikutnya (00:00:00)
+    const nextMidnightWib = new Date(Date.UTC(
+      nowWib.getUTCFullYear(),
+      nowWib.getUTCMonth(),
+      nowWib.getUTCDate() + 1,
+      0, 0, 0, 0
+    ));
+    const nextMidnightUtcMs = nextMidnightWib.getTime() - wibOffsetMs;
+    const secondsRemaining = Math.max(0, Math.floor((nextMidnightUtcMs - nowUtcMs) / 1000));
+
     const flashSales = await productModel.findFlashSale();
     return res.json({
       success: true,
-      endTime: Date.now() + (3 * 3600 + 45 * 60) * 1000,
+      cycleHours: 24,
+      resetTime: nextMidnightUtcMs,
+      secondsRemaining: secondsRemaining,
+      resetSchedule: 'Setiap hari pukul 00:00 WIB (Tengah Malam)',
+      total: flashSales.length,
       data: flashSales
     });
   } catch (error) {
+    console.error('Error getFlashSale:', error);
     return res.status(500).json({
       success: false,
       message: 'Gagal memuat produk Flash Sale.'
