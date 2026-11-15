@@ -205,7 +205,8 @@ exports.getFlashSale = async (req, res) => {
     console.error('Error getFlashSale:', error);
     return res.status(500).json({
       success: false,
-      message: 'Gagal memuat produk Flash Sale.'
+      message: 'Gagal memuat produk Flash Sale.',
+      error: error.message
     });
   }
 };
