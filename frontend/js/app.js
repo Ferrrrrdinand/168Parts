@@ -1827,9 +1827,50 @@ const PasarinApp = {
   },
 
   /* ---------- MODAL DETAIL PRODUK ---------- */
+  /* ---------- MODAL DETAIL PRODUK PERSIS SHOPEE (VARIANT & SPEC SYSTEM) ---------- */
   openProductDetail(productId) {
     const product = this.products.find(p => p.id === productId);
     if (!product) return;
+
+    this._activeDetailProduct = product;
+    this._activeDetailQty = 1;
+
+    // Normalisasi Variasi Produk
+    let variants = product.variants;
+    if (!variants || !Array.isArray(variants) || variants.length === 0) {
+      variants = [{
+        name: 'STANDAR ORIGINAL',
+        price: product.price,
+        originalPrice: product.originalPrice || Math.round(product.price * 1.3),
+        stock: product.stock || 49
+      }];
+      product.variants = variants;
+    }
+
+    // Default pilih varian pertama
+    const firstVariant = variants[0];
+    this._activeDetailVariant = firstVariant;
+
+    // Hitung range harga jika varian memiliki rentang harga berbeda
+    const variantPrices = variants.map(v => Number(v.price) || Number(product.price));
+    const minPrice = Math.min(...variantPrices);
+    const maxPrice = Math.max(...variantPrices);
+    const hasPriceRange = minPrice !== maxPrice;
+    const priceDisplay = hasPriceRange 
+      ? `${this.formatRupiah(minPrice)} - ${this.formatRupiah(maxPrice)}`
+      : this.formatRupiah(firstVariant.price || product.price);
+
+    const origPriceDisplay = firstVariant.originalPrice 
+      ? this.formatRupiah(firstVariant.originalPrice)
+      : (product.originalPrice ? this.formatRupiah(product.originalPrice) : '');
+
+    // Galeri Thumbnail (Mendukung Video Preview & Foto Produk)
+    const gallery = [
+      product.image || 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=700&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=700&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=700&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1517420704952-d9f39e95b43e?w=700&auto=format&fit=crop&q=80'
+    ];
 
     const modalId = 'product-detail-modal';
     let modal = document.getElementById(modalId);
@@ -1837,112 +1878,362 @@ const PasarinApp = {
       modal = document.createElement('div');
       modal.id = modalId;
       modal.className = 'pasarin-modal-overlay';
+      modal.onclick = (e) => {
+        if (e.target === modal) PasarinApp.closeProductDetail();
+      };
       document.body.appendChild(modal);
     }
 
-    const discountMarkup = product.discountPercent ? `
-      <div class="detail-discount-badge">Hemat ${product.discountPercent}%</div>
-      <div class="detail-original-price">Rp${Number(product.originalPrice).toLocaleString('id-ID')}</div>
-    ` : '';
+    // Format jumlah terjual
+    const soldFormatted = product.soldCount
+      ? (product.soldCount >= 1000 ? (product.soldCount / 1000).toFixed(1).replace('.0', '') + 'RB+' : product.soldCount)
+      : '2.3RB+';
+
+    // Label Variasi (Warna, Model, Ukuran, dll)
+    let variantLabel = 'Varian:';
+    const firstVarName = (firstVariant.name || '').toUpperCase();
+    if (firstVarName.includes('HITAM') || firstVarName.includes('PUTIH') || firstVarName.includes('TRANSPARAN') || firstVarName.includes('BIRU') || firstVarName.includes('KUNING')) {
+      variantLabel = 'Warna';
+    } else if (firstVarName.includes('GB') || firstVarName.includes('ML') || firstVarName.includes('GR') || firstVarName.includes('MM')) {
+      variantLabel = 'Ukuran';
+    } else if (firstVarName.includes('SAMSUNG') || firstVarName.includes('IPHONE') || firstVarName.includes('XIAOMI') || firstVarName.includes('OPPO')) {
+      variantLabel = 'Model HP';
+    }
 
     modal.innerHTML = `
-      <div class="pasarin-modal-card modal-detail-card">
-        <button class="pasarin-modal-close" onclick="document.getElementById('${modalId}').classList.remove('active')">&times;</button>
-        <div class="detail-content-wrap">
-          <div class="detail-left">
-            <div class="detail-img-box">
-              ${this.renderProductMedia(product, 'i huge')}
+      <div class="pasarin-modal-card modal-detail-card-shopee">
+        <!-- Close Button -->
+        <button class="pasarin-modal-close" onclick="PasarinApp.closeProductDetail()" aria-label="Tutup Detail Produk">&times;</button>
+
+        <!-- Shopee Breadcrumb Bar -->
+        <div class="shopee-breadcrumb-bar">
+          <a href="#/" onclick="PasarinApp.closeProductDetail()">Shopee</a>
+          <span class="bc-sep">&gt;</span>
+          <a href="#/search?category=${encodeURIComponent(product.category || 'Alat Servis')}" onclick="PasarinApp.closeProductDetail()">Handphone &amp; Aksesoris</a>
+          <span class="bc-sep">&gt;</span>
+          <a href="#/search?category=${encodeURIComponent(product.category || 'Alat Servis')}" onclick="PasarinApp.closeProductDetail()">${product.category || 'Handphone &amp; Aksesoris Lainnya'}</a>
+          <span class="bc-sep">&gt;</span>
+          <span class="bc-current" title="${product.name}">${product.name}</span>
+        </div>
+
+        <!-- Shopee Main Product Layout -->
+        <div class="shopee-main-product-layout">
+          <!-- Kiri: Galeri Foto & Video -->
+          <div class="shopee-gallery-col">
+            <div class="shopee-main-media-wrap">
+              <img id="shopee-main-product-img" src="${gallery[0]}" alt="${product.name}">
+              <div class="shopee-media-overlay-tag">
+                <span style="display:inline-flex; align-items:center; gap:5px;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  Pesan sekarang sebelum kehabisan!!
+                </span>
+              </div>
             </div>
-            <div class="detail-badges">
-              <span class="badge-tag">✓ 100% Original</span>
-              <span class="badge-tag">🚚 Bebas Ongkir</span>
-              <span class="badge-tag">🛡️ Garansi Resmi</span>
+
+            <!-- Thumbnail Strip -->
+            <div class="shopee-thumbnail-strip">
+              ${gallery.map((img, idx) => `
+                <button type="button" class="shopee-thumb-btn ${idx === 0 ? 'active' : ''}" 
+                  onmouseenter="PasarinApp.switchDetailThumb('${img}', this)"
+                  onclick="PasarinApp.switchDetailThumb('${img}', this)"
+                  aria-label="Lihat Foto ${idx + 1}">
+                  <img src="${img}" alt="Thumb ${idx + 1}">
+                  ${idx === 0 ? `<div class="shopee-thumb-video-icon">▶</div>` : ''}
+                </button>
+              `).join('')}
+            </div>
+
+            <!-- Share & Favorit Row -->
+            <div class="shopee-share-fav-row">
+              <div class="shopee-share-group">
+                <span style="font-size:12px; color:#666;">Share:</span>
+                <span class="shopee-social-icon" title="Bagikan ke Facebook" style="background:#1877f2; color:#fff;">f</span>
+                <span class="shopee-social-icon" title="Bagikan ke Messenger" style="background:#0084ff; color:#fff;">⚡</span>
+                <span class="shopee-social-icon" title="Bagikan ke Pinterest" style="background:#e60023; color:#fff;">P</span>
+                <span class="shopee-social-icon" title="Bagikan ke Twitter / X" style="background:#000000; color:#fff;">𝕏</span>
+              </div>
+              <button type="button" class="shopee-btn-favorite" onclick="PasarinApp.toggleDetailFavorite(this)">
+                <span class="fav-icon">🤍</span>
+                <span class="fav-text">Favorit (${product.favoriteCount || 189})</span>
+              </button>
             </div>
           </div>
-          <div class="detail-right">
-            <span class="detail-shop-tag">${product.shopType || 'Mall'} · ${product.shopName || '168 Parts Official'}</span>
-            <h2 class="detail-title">${product.name}</h2>
-            <div class="detail-rating-row">
-              <span class="rating-stars">★★★★★</span>
-              <strong>${product.rating || 4.9}</strong>
-              <span class="dot-sep">•</span>
-              <span>${product.soldCount || 100}+ Terjual</span>
-              <span class="dot-sep">•</span>
-              <span>📍 ${product.location || 'Indonesia'}</span>
+
+          <!-- Kanan: Info Produk & Variasi -->
+          <div class="shopee-info-col">
+            <!-- Badge Star+ & Title -->
+            <div class="shopee-prod-badge-title">
+              <span class="badge-shopee-star-plus">${product.shopType || 'Star+'}</span>
+              <h1 class="shopee-product-heading">${product.name}</h1>
             </div>
 
-            <div class="detail-price-box">
-              ${discountMarkup}
-              <div class="detail-price-now">
-                <small>Rp</small>${Number(product.price).toLocaleString('id-ID')}
+            <!-- Ratings, Reviews, Sold Count -->
+            <div class="shopee-meta-stats-row">
+              <div class="meta-rating-box">
+                <span class="meta-rating-num">${product.rating || '4.9'}</span>
+                <span class="meta-rating-stars">★★★★★</span>
+              </div>
+              <span class="meta-stat-sep">|</span>
+              <div class="meta-stat-item">
+                <strong>${product.reviewCount || 672}</strong> Penilaian
+              </div>
+              <span class="meta-stat-sep">|</span>
+              <div class="meta-stat-item">
+                <strong>${soldFormatted}</strong> Terjual
+              </div>
+              <button type="button" class="btn-report-link" onclick="PasarinApp.showReportToast()">Laporkan</button>
+            </div>
+
+            <!-- Shopee Price Banner -->
+            <div class="shopee-price-banner">
+              ${origPriceDisplay ? `<span class="price-strikethrough-shopee" id="detail-original-price">${origPriceDisplay}</span>` : '<span class="price-strikethrough-shopee" id="detail-original-price" style="display:none;"></span>'}
+              <span class="price-main-shopee" id="detail-current-price">${priceDisplay}</span>
+              ${product.discountPercent ? `<span class="price-discount-pill-shopee" id="detail-discount-tag">${product.discountPercent}% OFF</span>` : '<span class="price-discount-pill-shopee" id="detail-discount-tag" style="display:none;"></span>'}
+            </div>
+
+            <!-- Field: Pengiriman -->
+            <div class="shopee-row-field">
+              <div class="field-label-shopee">Pengiriman</div>
+              <div class="field-value-shopee">
+                <div style="display:flex; align-items:center; gap:8px; font-weight:600; color:#059669;">
+                  <span>🚚 Besok (Pesan sebelum 09:00)</span>
+                  <span style="color:#94a3b8; font-size:11px;">&rsaquo;</span>
+                </div>
+                <div style="font-size:12px; color:#64748b; margin-top:3px;">
+                  Dapatkan Voucher s/d Rp10.000 jika pesanan terlambat
+                </div>
+                <div style="font-size:12px; color:#0f172a; margin-top:4px;">
+                  Ongkos Kirim: <strong style="color:#059669;">Rp0 (Gratis Ongkir 168 Parts)</strong>
+                </div>
               </div>
             </div>
 
-            <div class="detail-desc-box">
-              <h4>Deskripsi Produk:</h4>
-              <p>${product.description || 'Produk kualitas terbaik dengan garansi terpercaya di 168 Parts.'}</p>
-              ${product.specs ? `
-                <ul class="detail-specs-list">
-                  ${product.specs.map(s => `<li>${s}</li>`).join('')}
-                </ul>
-              ` : ''}
-            </div>
-
-            <div class="detail-qty-row" style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
-              <span style="font-weight:600;">Jumlah:</span>
-              <div class="qty-stepper">
-                <button class="qty-btn" id="modal-qty-minus">-</button>
-                <input class="qty-input" id="modal-qty-input" type="text" value="1" readonly>
-                <button class="qty-btn" id="modal-qty-plus">+</button>
+            <!-- Field: Jaminan Shopee -->
+            <div class="shopee-row-field">
+              <div class="field-label-shopee">Jaminan Shopee</div>
+              <div class="field-value-shopee" style="display:flex; align-items:center; gap:6px; color:#475569;">
+                <span style="color:#be123c;">🛡️</span>
+                <span>Bebas Pengembalian / Garansi Resmi 168 Parts</span>
+                <span style="color:#94a3b8; font-size:11px;">▾</span>
               </div>
-              <small style="color: #64748b;">Tersisa ${product.stock || 25} buah</small>
             </div>
 
-            <div class="detail-actions">
-              <button class="btn-add-cart" id="modal-btn-add-cart">
-                ${this.renderIcon('cart', 'i')} Masukkan Keranjang
+            <!-- Field: Varian / Warna (PERSIS SHOPEE SCREENSHOT) -->
+            <div class="shopee-row-field" style="margin-top:4px;">
+              <div class="field-label-shopee">${variantLabel}</div>
+              <div class="field-value-shopee variant-chips-grid" id="shopee-variants-list">
+                ${variants.map((v, idx) => `
+                  <button type="button" 
+                    class="shopee-variant-chip ${idx === 0 ? 'active' : ''}" 
+                    data-variant-idx="${idx}"
+                    data-name="${v.name}" 
+                    data-price="${v.price || product.price}" 
+                    data-original-price="${v.originalPrice || ''}"
+                    data-stock="${v.stock || 49}"
+                    onclick="PasarinApp.selectProductVariant(this)">
+                    <img src="${product.image}" class="chip-thumb-mini" alt="${v.name}" onerror="this.style.display='none'">
+                    <span>${v.name}</span>
+                    <span class="chip-check-corner">✓</span>
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Field: Kuantitas -->
+            <div class="shopee-row-field" style="margin-top:8px;">
+              <div class="field-label-shopee">Kuantitas</div>
+              <div class="field-value-shopee">
+                <div class="shopee-qty-group">
+                  <div class="shopee-stepper-box">
+                    <button type="button" onclick="PasarinApp.changeDetailQty(-1)" aria-label="Kurang">&minus;</button>
+                    <input type="text" id="detail-qty-input" value="1" readonly>
+                    <button type="button" onclick="PasarinApp.changeDetailQty(1)" aria-label="Tambah">&plus;</button>
+                  </div>
+                  <span class="shopee-stock-note" id="detail-stock-count">Tersedia ${firstVariant.stock || product.stock || 49}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tombol Aksi Shopee CTA -->
+            <div class="shopee-cta-buttons">
+              <button type="button" class="btn-shopee-cart-outline" onclick="PasarinApp.handleAddCartFromDetail(this)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="9" cy="21" r="1"></circle>
+                  <circle cx="20" cy="21" r="1"></circle>
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+                Masukkan Keranjang
               </button>
-              <button class="btn-buy-now" id="modal-btn-buy-now">
+              <button type="button" class="btn-shopee-buy-solid" onclick="PasarinApp.handleBuyNowFromDetail(this)">
                 Beli Sekarang
               </button>
             </div>
           </div>
         </div>
+
+        <!-- Spesifikasi & Deskripsi Produk (Shopee Bottom Section) -->
+        <div class="shopee-tabs-card">
+          <h3 class="shopee-section-title">SPESIFIKASI PRODUK</h3>
+          <div class="shopee-specs-grid">
+            <div class="spec-key">Kategori</div>
+            <div class="spec-val">Shopee &gt; Handphone &amp; Aksesoris &gt; ${product.category || 'Sparepart & Alat Servis'}</div>
+
+            <div class="spec-key">Merek / Seri</div>
+            <div class="spec-val">${product.brand || (product.name.toUpperCase().includes('LANRUI') ? 'LanRui Official' : '168 Parts Certified')}</div>
+
+            <div class="spec-key">Kondisi</div>
+            <div class="spec-val">Baru (100% Brand New Grade Original)</div>
+
+            <div class="spec-key">Masa Garansi</div>
+            <div class="spec-val">Garansi Tes 7 Hari (Segel Utuh &amp; Tidak Cacat Fisik)</div>
+
+            <div class="spec-key">Dikirim Dari</div>
+            <div class="spec-val">Kota Surabaya, Jawa Timur, Indonesia</div>
+
+            <div class="spec-key">Stok Gudang</div>
+            <div class="spec-val" id="spec-stock-val">${product.stock || 500} unit</div>
+          </div>
+
+          <h3 class="shopee-section-title" style="border-top:1px solid #f0f0f0;">DESKRIPSI PRODUK</h3>
+          <div class="shopee-desc-content">${(product.description || 'Produk kualitas terbaik dengan jaminan original dan garansi terpercaya di 168 Parts Surabaya.').replace(/\n/g, '<br>')}</div>
+        </div>
       </div>
     `;
 
-    let qty = 1;
-    const qtyInput = modal.querySelector('#modal-qty-input');
-    modal.querySelector('#modal-qty-minus').onclick = () => {
-      if (qty > 1) {
-        qty--;
-        qtyInput.value = qty;
-      }
-    };
-    modal.querySelector('#modal-qty-plus').onclick = () => {
-      if (qty < (product.stock || 99)) {
-        qty++;
-        qtyInput.value = qty;
-      }
-    };
-
-    modal.querySelector('#modal-btn-add-cart').onclick = (e) => {
-      if (window.PasarinCart) {
-        window.PasarinCart.addToCart(product.id, qty, null, e.currentTarget);
-      }
-      modal.classList.remove('active');
-    };
-
-    modal.querySelector('#modal-btn-buy-now').onclick = async (e) => {
-      if (window.PasarinCart) {
-        await window.PasarinCart.addToCart(product.id, qty, null, e.currentTarget);
-        modal.classList.remove('active');
-        window.PasarinCart.handleCheckoutClick();
-      }
-    };
-
     modal.classList.add('active');
   },
+
+  closeProductDetail() {
+    const modal = document.getElementById('product-detail-modal');
+    if (modal) modal.classList.remove('active');
+  },
+
+  selectProductVariant(chipEl) {
+    if (!chipEl || !this._activeDetailProduct) return;
+
+    // Set class active
+    const parent = chipEl.parentElement;
+    if (parent) {
+      parent.querySelectorAll('.shopee-variant-chip').forEach(c => c.classList.remove('active'));
+    }
+    chipEl.classList.add('active');
+
+    // Baca data varian
+    const name = chipEl.getAttribute('data-name');
+    const price = Number(chipEl.getAttribute('data-price')) || this._activeDetailProduct.price;
+    const origPrice = Number(chipEl.getAttribute('data-original-price')) || 0;
+    const stock = Number(chipEl.getAttribute('data-stock')) || 49;
+
+    this._activeDetailVariant = { name, price, originalPrice: origPrice, stock };
+
+    // Update harga yang tampil seketika
+    const currentPriceEl = document.getElementById('detail-current-price');
+    if (currentPriceEl) {
+      currentPriceEl.textContent = this.formatRupiah(price);
+    }
+
+    // Update harga coret
+    const origPriceEl = document.getElementById('detail-original-price');
+    if (origPriceEl) {
+      if (origPrice && origPrice > price) {
+        origPriceEl.textContent = this.formatRupiah(origPrice);
+        origPriceEl.style.display = 'inline';
+      } else {
+        origPriceEl.style.display = 'none';
+      }
+    }
+
+    // Update stok
+    const stockEl = document.getElementById('detail-stock-count');
+    if (stockEl) {
+      stockEl.textContent = `Tersedia ${stock}`;
+    }
+
+    // Clamp quantity jika kuantitas saat ini melebihi stok
+    const qtyInput = document.getElementById('detail-qty-input');
+    if (qtyInput) {
+      let curQty = parseInt(qtyInput.value, 10) || 1;
+      if (curQty > stock) {
+        curQty = stock;
+        qtyInput.value = curQty;
+        this._activeDetailQty = curQty;
+      }
+    }
+  },
+
+  changeDetailQty(delta) {
+    const qtyInput = document.getElementById('detail-qty-input');
+    if (!qtyInput) return;
+
+    let cur = parseInt(qtyInput.value, 10) || 1;
+    const maxStock = this._activeDetailVariant?.stock || this._activeDetailProduct?.stock || 49;
+
+    cur += delta;
+    if (cur < 1) cur = 1;
+    if (cur > maxStock) cur = maxStock;
+
+    qtyInput.value = cur;
+    this._activeDetailQty = cur;
+  },
+
+  switchDetailThumb(imgUrl, btnEl) {
+    const mainImg = document.getElementById('shopee-main-product-img');
+    if (mainImg) mainImg.src = imgUrl;
+
+    if (btnEl && btnEl.parentElement) {
+      btnEl.parentElement.querySelectorAll('.shopee-thumb-btn').forEach(b => b.classList.remove('active'));
+      btnEl.classList.add('active');
+    }
+  },
+
+  toggleDetailFavorite(btnEl) {
+    if (!btnEl) return;
+    const isFav = btnEl.classList.toggle('active');
+    const icon = btnEl.querySelector('.fav-icon');
+    const text = btnEl.querySelector('.fav-text');
+    let count = (this._activeDetailProduct?.favoriteCount || 189);
+
+    if (isFav) {
+      count++;
+      if (icon) icon.textContent = '❤️';
+      if (text) text.textContent = `Favorit (${count})`;
+      if (window.PasarinApp?.showToast) {
+        window.PasarinApp.showToast('❤️ Dimasukkan ke daftar Favorit Anda');
+      }
+    } else {
+      if (icon) icon.textContent = '🤍';
+      if (text) text.textContent = `Favorit (${count})`;
+    }
+  },
+
+  handleAddCartFromDetail(btnEl) {
+    if (!this._activeDetailProduct) return;
+    const product = this._activeDetailProduct;
+    const qty = this._activeDetailQty || 1;
+    const variantName = this._activeDetailVariant?.name || 'STANDAR ORIGINAL';
+
+    if (window.PasarinCart) {
+      window.PasarinCart.addToCart(product.id, qty, variantName, btnEl);
+    }
+  },
+
+  async handleBuyNowFromDetail(btnEl) {
+    if (!this._activeDetailProduct) return;
+    const product = this._activeDetailProduct;
+    const qty = this._activeDetailQty || 1;
+    const variantName = this._activeDetailVariant?.name || 'STANDAR ORIGINAL';
+
+    if (window.PasarinCart) {
+      await window.PasarinCart.addToCart(product.id, qty, variantName, btnEl);
+      this.closeProductDetail();
+      window.PasarinCart.handleCheckoutClick();
+    }
+  },
+
+  showReportToast() {
+    alert('Terima kasih. Laporan Anda telah dicatat oleh sistem moderasi 168 Parts.');
+  },
+
 
   /* ---------- MODAL RIWAYAT PESANAN ---------- */
   async openOrdersModal() {

@@ -2534,6 +2534,558 @@ main.w {
   background: var(--primary-hover);
 }
 
+/* =========================================================
+   SHOPEE-ACCURATE PRODUCT DETAIL MODAL & VARIANT SYSTEM
+   ========================================================= */
+
+.modal-detail-card-shopee {
+  max-width: 1020px !important;
+  width: 95vw !important;
+  max-height: 92vh !important;
+  overflow-y: auto !important;
+  border-radius: 4px !important;
+  background: #ffffff !important;
+  padding: 0 !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+  scrollbar-width: thin;
+}
+
+.shopee-breadcrumb-bar {
+  padding: 14px 24px;
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 12px;
+  color: #757575;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.shopee-breadcrumb-bar a {
+  color: #0055aa;
+  text-decoration: none;
+}
+
+.shopee-breadcrumb-bar a:hover {
+  text-decoration: underline;
+}
+
+.shopee-breadcrumb-bar .bc-sep {
+  color: #bbb;
+}
+
+.shopee-breadcrumb-bar .bc-current {
+  color: #333;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 450px;
+}
+
+.shopee-main-product-layout {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 32px;
+  padding: 24px;
+}
+
+@media (max-width: 860px) {
+  .shopee-main-product-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 16px;
+  }
+}
+
+/* Gallery Kiri */
+.shopee-gallery-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.shopee-main-media-wrap {
+  width: 100%;
+  height: 380px;
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.shopee-main-media-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.25s ease;
+}
+
+.shopee-main-media-wrap:hover img {
+  transform: scale(1.03);
+}
+
+.shopee-media-overlay-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+}
+
+.shopee-thumbnail-strip {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.shopee-thumb-btn {
+  width: 68px;
+  height: 68px;
+  border-radius: 3px;
+  border: 2px solid transparent;
+  padding: 0;
+  background: #f8fafc;
+  cursor: pointer;
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.shopee-thumb-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.shopee-thumb-btn:hover {
+  border-color: #fecdd3;
+}
+
+.shopee-thumb-btn.active {
+  border-color: #be123c;
+}
+
+.shopee-thumb-video-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 22px;
+  height: 22px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  pointer-events: none;
+}
+
+.shopee-share-fav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #f1f5f9;
+  font-size: 13px;
+  color: #475569;
+}
+
+.shopee-share-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shopee-social-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.shopee-btn-favorite {
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: #475569;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s ease;
+}
+
+.shopee-btn-favorite:hover,
+.shopee-btn-favorite.active {
+  color: #be123c;
+}
+
+/* Kolom Kanan Detail */
+.shopee-info-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.shopee-prod-badge-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.badge-shopee-star-plus {
+  background: #ea580c;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.shopee-product-heading {
+  font-size: 19px;
+  font-weight: 600;
+  color: #222222;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.shopee-meta-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 13px;
+  color: #757575;
+  margin-bottom: 8px;
+}
+
+.meta-rating-box {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.meta-rating-num {
+  color: #be123c;
+  font-weight: 700;
+  border-bottom: 1px solid #be123c;
+}
+
+.meta-rating-stars {
+  color: #f59e0b;
+  font-size: 13px;
+}
+
+.meta-stat-sep {
+  color: #e2e8f0;
+}
+
+.meta-stat-item strong {
+  color: #222;
+  font-weight: 700;
+}
+
+.btn-report-link {
+  margin-left: auto;
+  color: #94a3b8;
+  font-size: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-report-link:hover {
+  color: #64748b;
+  text-decoration: underline;
+}
+
+/* Price Banner Shopee */
+.shopee-price-banner {
+  background: #fafafa;
+  padding: 16px 20px;
+  margin: 14px 0 20px 0;
+  border-radius: 4px;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.price-strikethrough-shopee {
+  font-size: 14px;
+  color: #929292;
+  text-decoration: line-through;
+}
+
+.price-main-shopee {
+  font-size: 28px;
+  font-weight: 700;
+  color: #be123c;
+  line-height: 1;
+}
+
+.price-discount-pill-shopee {
+  background: #be123c;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 2px;
+  text-transform: uppercase;
+}
+
+/* Spec Rows */
+.shopee-row-field {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.field-label-shopee {
+  width: 110px;
+  color: #757575;
+  font-size: 13px;
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+
+.field-value-shopee {
+  flex: 1;
+}
+
+/* Variant Selector Chips (Persis Shopee) */
+.variant-chips-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.shopee-variant-chip {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: rgba(0, 0, 0, 0.8);
+  padding: 7px 14px;
+  border-radius: 2px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  transition: all 0.15s ease;
+  user-select: none;
+  min-height: 38px;
+}
+
+.shopee-variant-chip:hover {
+  border-color: #be123c;
+  color: #be123c;
+}
+
+.shopee-variant-chip.active {
+  border: 1.5px solid #be123c;
+  color: #be123c;
+  background: #fff5f7;
+}
+
+.shopee-variant-chip .chip-thumb-mini {
+  width: 22px;
+  height: 22px;
+  border-radius: 2px;
+  object-fit: cover;
+  border: 1px solid #f1f5f9;
+}
+
+.shopee-variant-chip .chip-check-corner {
+  display: none;
+}
+
+.shopee-variant-chip.active .chip-check-corner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 13px;
+  height: 13px;
+  background: #be123c;
+  color: #fff;
+  font-size: 8.5px;
+  font-weight: 800;
+  border-top-left-radius: 3px;
+}
+
+/* Quantity */
+.shopee-qty-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.shopee-stepper-box {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.shopee-stepper-box button {
+  width: 32px;
+  height: 32px;
+  background: #ffffff;
+  border: none;
+  font-size: 16px;
+  color: #555;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.shopee-stepper-box button:hover {
+  background: #f8fafc;
+}
+
+.shopee-stepper-box input {
+  width: 48px;
+  height: 32px;
+  border: none;
+  border-left: 1px solid rgba(0, 0, 0, 0.15);
+  border-right: 1px solid rgba(0, 0, 0, 0.15);
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+  outline: none;
+}
+
+.shopee-stock-note {
+  font-size: 12.5px;
+  color: #757575;
+}
+
+/* Action CTA Buttons (Persis Shopee) */
+.shopee-cta-buttons {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.btn-shopee-cart-outline {
+  height: 48px;
+  padding: 0 24px;
+  background: #fff1f2;
+  border: 1.5px solid #be123c;
+  color: #be123c;
+  border-radius: 2px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+}
+
+.btn-shopee-cart-outline:hover {
+  background: #ffe4e6;
+  border-color: #9f1239;
+  color: #9f1239;
+}
+
+.btn-shopee-buy-solid {
+  height: 48px;
+  padding: 0 36px;
+  background: linear-gradient(135deg, #be123c 0%, #e11d48 100%);
+  border: none;
+  color: #ffffff;
+  border-radius: 2px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.09);
+  transition: all 0.2s ease;
+}
+
+.btn-shopee-buy-solid:hover {
+  background: linear-gradient(135deg, #9f1239 0%, #be123c 100%);
+  box-shadow: 0 3px 8px rgba(190, 18, 60, 0.35);
+}
+
+/* Bottom Sections (Spesifikasi & Deskripsi) */
+.shopee-tabs-card {
+  margin: 0 24px 24px 24px;
+  border: 1px solid #f0f0f0;
+  border-radius: 4px;
+  background: #ffffff;
+}
+
+.shopee-section-title {
+  background: #fafafa;
+  padding: 14px 20px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #333333;
+  text-transform: uppercase;
+  border-bottom: 1px solid #f0f0f0;
+  margin: 0;
+}
+
+.shopee-specs-grid {
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 10px 20px;
+  font-size: 13px;
+}
+
+.spec-key {
+  color: #757575;
+}
+
+.spec-val {
+  color: #222222;
+  font-weight: 500;
+}
+
+.shopee-desc-content {
+  padding: 20px;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: #333333;
+  white-space: pre-line;
+}
+
 /* Toast Container */
 .toast-container {
   position: fixed;

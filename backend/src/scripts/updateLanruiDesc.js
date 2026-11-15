@@ -69,3 +69,4 @@ update()
     console.error('❌ Gagal update:', e);
     process.exit(1);
   });
+

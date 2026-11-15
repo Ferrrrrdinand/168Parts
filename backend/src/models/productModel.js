@@ -14,6 +14,15 @@ class ProductModel {
       }
     }
 
+    let variants = [];
+    if (row.variants) {
+      try {
+        variants = typeof row.variants === 'string' ? JSON.parse(row.variants) : row.variants;
+      } catch (e) {
+        variants = [];
+      }
+    }
+
     return {
       id: row.id,
       name: row.name,
@@ -35,6 +44,7 @@ class ProductModel {
       flashSaleSold: Number(row.flash_sale_sold || 0),
       description: row.description || '',
       specs: specs,
+      variants: variants,
       createdAt: row.created_at,
       updatedAt: row.updated_at
     };

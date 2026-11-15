@@ -108,8 +108,17 @@ const PasarinCart = {
       }
     }
 
-    // 2. Tambahkan atau naikkan kuantitas produk di this.items
-    const existingIndex = this.items.findIndex(it => it.productId === productId);
+    // 2. Tambahkan atau naikkan kuantitas produk di this.items (membedakan per variasi seperti Shopee)
+    const effectiveVariation = variation || p.selectedVariation || (p.variants && p.variants[0] ? p.variants[0].name : 'Standar');
+    let effectivePrice = p.price;
+    if (p.variants && p.variants.length > 0) {
+      const matchedVar = p.variants.find(v => v.name === effectiveVariation);
+      if (matchedVar && matchedVar.price > 0) {
+        effectivePrice = matchedVar.price;
+      }
+    }
+
+    const existingIndex = this.items.findIndex(it => it.productId === productId && (it.variation || 'Standar') === effectiveVariation);
     if (existingIndex > -1) {
       this.items[existingIndex].quantity = (this.items[existingIndex].quantity || 0) + qty;
       this.items[existingIndex].itemTotal = this.items[existingIndex].quantity * this.items[existingIndex].price;
@@ -118,16 +127,16 @@ const PasarinCart = {
       this.items.unshift({
         productId: p.id,
         name: p.name,
-        price: p.price,
-        originalPrice: p.originalPrice || p.price,
+        price: effectivePrice,
+        originalPrice: p.originalPrice || Math.round(effectivePrice * 1.25),
         image: p.image || null,
         icon: p.icon || 'bag',
         shopName: p.shopName || (p.shopType ? p.shopType + ' Official Store' : '168 Parts Official Store'),
         shopBadge: p.shopType === 'Mall' ? 'Mall ORI' : 'Star+',
-        variation: variation || p.selectedVariation || 'Standar',
+        variation: effectiveVariation,
         quantity: qty,
         selected: true,
-        itemTotal: p.price * qty
+        itemTotal: effectivePrice * qty
       });
     }
 
