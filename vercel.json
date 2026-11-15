@@ -2,10 +2,31 @@
   "version": 2,
   "buildCommand": "cd frontend-react && npm install && npm run build",
   "outputDirectory": "frontend-react/dist",
+  "redirects": [
+    {
+      "source": "/frontend/admin.html",
+      "destination": "/#/admin",
+      "permanent": false
+    },
+    {
+      "source": "/frontend/index.html",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/frontend",
+      "destination": "/",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/(.*)",
       "destination": "/api/index.js"
+    },
+    {
+      "source": "/assets/(.*)",
+      "destination": "/assets/$1"
     },
     {
       "source": "/(.*)",

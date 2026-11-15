@@ -98,6 +98,11 @@ if (fs.existsSync(reactDistPath)) {
   app.use(express.static(legacyFrontendPath));
 }
 
+// Redirect legacy HTML paths to React TSX app
+app.get('/frontend/admin.html', (req, res) => res.redirect('/#/admin'));
+app.get('/frontend/index.html', (req, res) => res.redirect('/'));
+app.get('/frontend', (req, res) => res.redirect('/'));
+
 // Fallback router untuk SPA React TSX
 app.use((req, res, next) => {
   const url = req.originalUrl || req.url || '';

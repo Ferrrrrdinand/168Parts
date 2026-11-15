@@ -568,3 +568,4 @@ function extractVariants(product: Product): ProductVariant[] {
     }
   ];
 }
+
