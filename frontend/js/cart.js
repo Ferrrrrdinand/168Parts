@@ -80,6 +80,21 @@ const PasarinCart = {
   async addToCart(productId, quantity = 1, variation = null, originEl = null) {
     const qty = Math.max(1, parseInt(quantity, 10) || 1);
 
+    // 0. Wajib Masuk atau Daftar Member Terlebih Dahulu
+    if (!window.PasarinAuth?.isLoggedIn()) {
+      if (window.showToast) {
+        window.showToast('Silakan masuk atau daftar sebagai member terlebih dahulu!', 'warning');
+      }
+      window.PasarinAuth?.openAuthModal('cart', {
+        action: 'add_to_cart',
+        productId,
+        quantity: qty,
+        variation,
+        originEl
+      });
+      return false;
+    }
+
     // 1. Dapatkan data lengkap produk dari katalog atau item yang sudah ada
     let p = window.PasarinApp?.products?.find(x => x.id === productId);
     if (!p) {
@@ -434,7 +449,18 @@ const PasarinCart = {
 
     const stores = Object.values(storeMap);
 
-    listEl.innerHTML = stores.map(store => {
+    const memberNoticeHtml = (!window.PasarinAuth?.isLoggedIn()) ? `
+      <div class="cart-member-gate-notice" onclick="window.PasarinAuth.openAuthModal('checkout')">
+        <span class="notice-icon">🔒</span>
+        <div class="notice-content">
+          <strong>Masuk atau Daftar Member Diperlukan</strong>
+          <span>Anda wajib masuk sebagai Member Resmi 168 Parts untuk dapat melakukan checkout pesanan. Klik di sini untuk Masuk/Daftar.</span>
+        </div>
+        <button type="button" class="btn-notice-auth">Masuk / Daftar &rsaquo;</button>
+      </div>
+    ` : '';
+
+    listEl.innerHTML = memberNoticeHtml + stores.map(store => {
       const isStoreAllSelected = store.items.length > 0 && store.items.every(x => x.selected);
       const safeStoreName = store.shopName.replace(/'/g, "\\'");
 
@@ -715,6 +741,17 @@ const PasarinCart = {
   },
 
   handleCheckoutClick() {
+    // 0. Wajib Masuk atau Daftar Member Terlebih Dahulu
+    if (!window.PasarinAuth?.isLoggedIn()) {
+      if (window.showToast) {
+        window.showToast('Silakan masuk atau daftar sebagai member untuk checkout!', 'warning');
+      }
+      window.PasarinAuth?.openAuthModal('checkout', {
+        action: 'checkout'
+      });
+      return;
+    }
+
     const selectedItems = this.items.filter(x => x.selected);
     if (selectedItems.length === 0) {
       if (window.showToast) {
@@ -745,6 +782,16 @@ const PasarinCart = {
   },
 
   renderCheckoutPage() {
+    // 0. Wajib Masuk atau Daftar Member Terlebih Dahulu
+    if (!window.PasarinAuth?.isLoggedIn()) {
+      if (window.showToast) {
+        window.showToast('Silakan masuk atau daftar sebagai member untuk mengakses checkout!', 'warning');
+      }
+      window.PasarinAuth?.openAuthModal('checkout');
+      window.location.hash = '#/cart';
+      return;
+    }
+
     if (window.PasarinAddressBook) {
       window.PasarinAddressBook.updateCheckoutDisplay();
     } else {
@@ -1020,6 +1067,15 @@ const PasarinCart = {
   },
 
   async submitCheckoutOrder() {
+    // 0. Wajib Masuk atau Daftar Member Terlebih Dahulu
+    if (!window.PasarinAuth?.isLoggedIn()) {
+      if (window.showToast) {
+        window.showToast('Silakan masuk atau daftar sebagai member untuk membuat pesanan!', 'warning');
+      }
+      window.PasarinAuth?.openAuthModal('checkout');
+      return;
+    }
+
     const btn = document.getElementById('btn-buat-pesanan');
     if (btn) {
       btn.disabled = true;
@@ -1085,6 +1141,18 @@ const PasarinCart = {
   },
 
   openCheckoutModal(selectedItems = null) {
+    // 0. Wajib Masuk atau Daftar Member Terlebih Dahulu
+    if (!window.PasarinAuth?.isLoggedIn()) {
+      if (window.showToast) {
+        window.showToast('Silakan masuk atau daftar sebagai member untuk checkout!', 'warning');
+      }
+      window.PasarinAuth?.openAuthModal('checkout', {
+        action: 'checkout_modal',
+        selectedItems
+      });
+      return;
+    }
+
     const user = window.PasarinAuth?.currentUser || {
       name: 'Ferdinand',
       phone: '0812-3456-7890',

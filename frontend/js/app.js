@@ -2470,6 +2470,21 @@ const PasarinApp = {
     const qty = this._activeDetailQty || 1;
     const variantName = this._activeDetailVariant?.name || (variants[0]?.name) || 'STANDAR ORIGINAL';
 
+    // 0. Wajib Masuk atau Daftar Member Terlebih Dahulu
+    if (!window.PasarinAuth?.isLoggedIn()) {
+      if (window.showToast) {
+        window.showToast('Silakan masuk atau daftar sebagai member terlebih dahulu!', 'warning');
+      }
+      window.PasarinAuth?.openAuthModal('cart', {
+        action: 'add_to_cart',
+        productId: product.id,
+        quantity: qty,
+        variation: variantName,
+        originEl: btnEl
+      });
+      return;
+    }
+
     if (window.PasarinCart) {
       window.PasarinCart.addToCart(product.id, qty, variantName, btnEl);
     }
@@ -2495,6 +2510,21 @@ const PasarinApp = {
 
     const qty = this._activeDetailQty || 1;
     const variantName = this._activeDetailVariant?.name || (variants[0]?.name) || 'STANDAR ORIGINAL';
+
+    // 0. Wajib Masuk atau Daftar Member Terlebih Dahulu
+    if (!window.PasarinAuth?.isLoggedIn()) {
+      if (window.showToast) {
+        window.showToast('Silakan masuk atau daftar sebagai member terlebih dahulu!', 'warning');
+      }
+      window.PasarinAuth?.openAuthModal('buy_now', {
+        action: 'buy_now',
+        productId: product.id,
+        quantity: qty,
+        variation: variantName,
+        originEl: btnEl
+      });
+      return;
+    }
 
     if (window.PasarinCart) {
       await window.PasarinCart.addToCart(product.id, qty, variantName, btnEl);
