@@ -1,6 +1,11 @@
 /**
- * Script Khusus: Impor 400 Produk Terlaris 168 Parts (DEDUPED & VARIANT-READY 100%)
- * Ekstrak varian lengkap (Warna, Tipe, Ukuran) dari transaksi toko Shopee 168 Parts.
+ * Script Khusus: Impor Seluruh Produk 168 Parts dari Rekap Penjualan Shopee 2024-2026
+ * - Mencakup seluruh 1.475 produk dari sheet "Ranking Seluruh Produk"
+ * - Deduping kanonikal menghasilkan 1.463 produk unik bebas duplikat
+ * - Ekstraksi variasi asli (Warna, Model, Suhu, Tipe) dari 15.004 transaksi Shopee
+ * - Format LanRui I9 persis screenshot Shopee (Varian Hitam Rp25.000 & Transparan Rp31.000)
+ * - Seluruh gambar diset NULL (tanpa gambar sesuai permintaan user)
+ * - Batch insert cepat ke Supabase Cloud PostgreSQL
  */
 
 require('dotenv').config();
@@ -8,41 +13,6 @@ const fs = require('fs');
 const path = require('path');
 const xlsx = require('xlsx');
 const dbManager = require('../config/database');
-
-const CATEGORY_IMAGES = {
-  'Lem LCD I9': [
-    'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=600&auto=format&fit=crop&q=80'
-  ],
-  'Solder Station': [
-    'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=600&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1581092162384-8987c1d64718?w=600&auto=format&fit=crop&q=80'
-  ],
-  'Alat Servis': [
-    'https://images.unsplash.com/photo-1581092162384-8987c1d64718?w=600&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&auto=format&fit=crop&q=80'
-  ],
-  'Tester & Multitester': [
-    'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=600&auto=format&fit=crop&q=80'
-  ],
-  'IC & Chipset': [
-    'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1555664424-778a1e5e1b48?w=600&auto=format&fit=crop&q=80'
-  ],
-  'LCD & Layar': [
-    'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=600&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&auto=format&fit=crop&q=80'
-  ],
-  'Baterai HP': [
-    'https://images.unsplash.com/photo-1619725002198-6a689b72f41d?w=600&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=600&auto=format&fit=crop&q=80'
-  ],
-  'Backdoor Kaca': [
-    'https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=600&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1580910051074-3eb694886505?w=600&auto=format&fit=crop&q=80'
-  ]
-};
 
 const DESC_LANRUI_I9 = `Deskripsi Produk : 
 
@@ -128,7 +98,7 @@ function generateSlug(name, rank) {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '')
     .substring(0, 70);
-  return `168-${rank}-${clean}`;
+  return `168-p${rank}-${clean}`;
 }
 
 function generateShopeeDescription(name, category, variations) {
@@ -165,7 +135,7 @@ Terima kasih telah berbelanja di 168 Parts Surabaya. Kepuasan dan kelancaran ser
 
 async function run() {
   console.log('========================================================');
-  console.log('💎 168 Parts - Impor 400 Produk Terlaris + Variasi Lengkap');
+  console.log('💎 168 Parts - Impor SELURUH Produk Excel ke Supabase Cloud');
   console.log('========================================================');
 
   const excelPath = path.resolve('f:/Save VS Code/marketplace/Produk/Rekap_Gabungan_Penjualan_2024-2026.xlsx');
@@ -173,7 +143,9 @@ async function run() {
   const rankingRows = xlsx.utils.sheet_to_json(wb.Sheets['Ranking Seluruh Produk']);
   const txRows = xlsx.utils.sheet_to_json(wb.Sheets['Data Transaksi Gabungan']);
 
-  // Extract all variants from transactions grouped by product canonical key
+  console.log(`📊 Data Ditemukan: ${rankingRows.length} baris ranking produk & ${txRows.length} baris transaksi.`);
+
+  // 1. Ekstrak varian dari transaksi
   const txVarMap = new Map();
   const priceMap = new Map();
 
@@ -199,7 +171,7 @@ async function run() {
     }
   }
 
-  // Deduplicate products
+  // 2. Kelompokkan produk tanpa duplikat
   const canonicalMap = new Map();
 
   for (const row of rankingRows) {
@@ -225,11 +197,11 @@ async function run() {
     }
   }
 
-  // Target 400 unique products
-  const TARGET_COUNT = 400;
+  // Ambil SEMUA produk unik yang ada di Excel
   const uniqueProductsList = Array.from(canonicalMap.values())
-    .sort((a, b) => b.sold - a.sold)
-    .slice(0, TARGET_COUNT);
+    .sort((a, b) => b.sold - a.sold);
+
+  console.log(`✨ Total Produk Unik Siap Dimasukkan: ${uniqueProductsList.length}`);
 
   const finalProducts = [];
 
@@ -237,14 +209,18 @@ async function run() {
     const item = uniqueProductsList[i];
     const rank = i + 1;
     const category = getCategory(item.name);
-    const isLanruiI9 = (item.name.toLowerCase().includes('lanrui') && item.name.toLowerCase().includes('i9') && item.name.toLowerCase().includes('lem'));
+    const isLanruiI9 = (item.key === 'lem_lanrui_i9_55ml' || (item.name.toLowerCase().includes('lanrui') && item.name.toLowerCase().includes('i9')));
 
     // Extract variants
     let variants = [];
+    let basePrice = item.price;
+
     if (isLanruiI9) {
+      item.name = 'LEM LCD TOUCHSCREEN DAN LEM BACKDOOR LANRUI I9 55ML';
+      basePrice = 25000;
       variants = [
-        { name: 'LANRUI HITAM', price: item.price, stock: 49 },
-        { name: 'LANRUI TRANSPARANT', price: item.price, stock: 49 }
+        { name: 'LANRUI HITAM', price: 25000, stock: 49 },
+        { name: 'LANRUI TRANSPARANT', price: 31000, stock: 49 }
       ];
     } else if (txVarMap.has(item.key)) {
       const vSubMap = txVarMap.get(item.key);
@@ -257,7 +233,7 @@ async function run() {
       }
     }
 
-    // Fallback variant parsing from title if no transaction variant exists
+    // Fallback varian jika tidak ada transaksi variasi
     if (variants.length === 0) {
       const raw = item.name;
       const tempMatches = raw.match(/\d+[\u00b0\u2070]?[cC]/g);
@@ -282,21 +258,18 @@ async function run() {
       }
     }
 
-    // Default if single SKU
+    // Default jika single SKU
     if (variants.length === 0) {
-      variants = [{ name: 'STANDAR ORIGINAL', price: item.price, stock: 45 }];
+      variants = [{ name: 'STANDAR ORIGINAL', price: basePrice, stock: 45 }];
     }
 
     const discountPercent = rank <= 30 ? 25 : (rank <= 100 ? 20 : 15);
-    const originalPrice = Math.round(item.price / (1 - (discountPercent / 100)));
-
-    const imgList = CATEGORY_IMAGES[category] || CATEGORY_IMAGES['Alat Servis'];
-    const image = imgList[(rank - 1) % imgList.length];
+    const originalPrice = Math.round(basePrice / (1 - (discountPercent / 100)));
 
     const isFlashSale = rank <= 12;
     const flashSaleSold = isFlashSale ? Math.min(item.sold, Math.floor(item.sold * 0.4) + 10) : 0;
-    const rating = Number((4.8 + ((rank % 3) * 0.1)).toFixed(1));
-    const stock = Math.max(25, Math.min(500, Math.floor(item.sold * 0.6) + 30));
+    const rating = isLanruiI9 ? 4.9 : Number((4.7 + ((rank % 4) * 0.1)).toFixed(1));
+    const stock = isLanruiI9 ? 49 : Math.max(25, Math.min(500, Math.floor(item.sold * 0.6) + 30));
 
     const description = isLanruiI9 
       ? DESC_LANRUI_I9 
@@ -317,17 +290,17 @@ async function run() {
       name: item.name,
       slug: generateSlug(item.name, rank),
       category: category,
-      price: item.price,
+      price: basePrice,
       originalPrice: originalPrice,
       discountPercent: discountPercent,
       rating: rating,
-      soldCount: item.sold,
+      soldCount: isLanruiI9 ? 2300 : item.sold,
       stock: stock,
       location: 'Kota Surabaya',
       shopName: '168 Parts Surabaya',
       shopType: 'Star+',
       icon: 'bag',
-      image: image,
+      image: null, // STRICTLY NULL: Gambar dihapus sesuai instruksi user
       bgPattern: '#f8fafc',
       isFlashSale: isFlashSale,
       flashSaleSold: flashSaleSold,
@@ -339,30 +312,44 @@ async function run() {
 
   // 1. Simpan ke seedProducts.js
   const seedFilePath = path.resolve('f:/Save VS Code/marketplace/backend/data/seedProducts.js');
-  fs.writeFileSync(seedFilePath, '// Katalog Resmi 400 Produk Terlaris Shopee 168 Parts Surabaya\nmodule.exports = ' + JSON.stringify(finalProducts, null, 2) + ';\n', 'utf8');
-  console.log(`💾 seedProducts.js berhasil disimpan dengan ${finalProducts.length} produk + varian lengkap!`);
+  fs.writeFileSync(
+    seedFilePath,
+    `// Katalog Lengkap Seluruh ${finalProducts.length} Produk Shopee 168 Parts Surabaya (Dari Excel Rekap)\nmodule.exports = ` +
+      JSON.stringify(finalProducts, null, 2) +
+      ';\n',
+    'utf8'
+  );
+  console.log(`💾 seedProducts.js berhasil disimpan dengan ${finalProducts.length} produk + variasi lengkap (Tanpa Gambar)!`);
 
-  // 2. Simpan ke Supabase Cloud PostgreSQL
+  // 2. Hubungkan ke Supabase Cloud PostgreSQL
   console.log('⚡ Menghubungkan ke Supabase Cloud PostgreSQL...');
   await dbManager.init();
 
   console.log('🗑️ Mengosongkan data lama di Supabase...');
   await dbManager.query('DELETE FROM products');
 
-  console.log(`📥 Memasukkan ${finalProducts.length} produk dengan data VARIAN ke Supabase Cloud...`);
-  let successCount = 0;
+  console.log(`📥 Melakukan batch insert ${finalProducts.length} produk ke Supabase Cloud...`);
 
-  for (const p of finalProducts) {
+  const BATCH_SIZE = 50;
+  let insertedTotal = 0;
+
+  for (let i = 0; i < finalProducts.length; i += BATCH_SIZE) {
+    const chunk = finalProducts.slice(i, i + BATCH_SIZE);
+
+    // Bangun multi-row insert query
+    // Tiap baris: 21 kolom
+    const valuePlaceholders = chunk.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
     const sql = `
       INSERT INTO products (
         id, name, slug, category, price, original_price, discount_percent,
         rating, sold_count, stock, location, shop_name, shop_type,
         icon, image, bg_pattern, is_flash_sale, flash_sale_sold, description, specs, variants
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES ${valuePlaceholders}
     `;
 
-    try {
-      await dbManager.query(sql, [
+    const flatParams = [];
+    for (const p of chunk) {
+      flatParams.push(
         p.id,
         p.name,
         p.slug,
@@ -377,33 +364,33 @@ async function run() {
         p.shopName,
         p.shopType,
         p.icon,
-        p.image,
+        p.image, // null
         p.bgPattern,
         p.isFlashSale,
         p.flashSaleSold,
         p.description,
         JSON.stringify(p.specs),
         JSON.stringify(p.variants)
-      ]);
-      successCount++;
-      if (successCount % 50 === 0 || successCount === finalProducts.length) {
-        console.log(`  -> Berhasil menyimpan ${successCount}/${finalProducts.length} produk...`);
-      }
-    } catch (err) {
-      console.error(`❌ Gagal menyimpan ${p.id} (${p.name}):`, err.message);
+      );
     }
+
+    await dbManager.query(sql, flatParams);
+    insertedTotal += chunk.length;
+    console.log(`  -> Berhasil menyimpan batch: ${insertedTotal} / ${finalProducts.length} produk...`);
   }
 
   console.log('========================================================');
-  console.log(`🎉 SUKSES! 400 Produk + Varian Lengkap tersimpan di Supabase Cloud.`);
+  console.log(`🎉 SUKSES BESAR! Seluruh ${finalProducts.length} Produk + Variasi telah tersimpan di Supabase Cloud.`);
   console.log('========================================================');
 }
 
-run()
-  .catch(err => {
-    console.error('❌ Error migrasi:', err);
-    process.exit(1);
-  })
-  .finally(() => {
-    process.exit(0);
-  });
+if (require.main === module) {
+  run()
+    .then(() => process.exit(0))
+    .catch(err => {
+      console.error('❌ Error migrasi:', err);
+      process.exit(1);
+    });
+}
+
+module.exports = { run, getCategory, getCanonicalKey, cleanTitle };

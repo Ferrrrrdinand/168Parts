@@ -1857,9 +1857,9 @@ const PasarinApp = {
       product.variants = variants;
     }
 
-    // Default pilih varian pertama
+    // Default pilih varian pertama jika tidak ada variasi ganda dengan harga berbeda
     const firstVariant = variants[0];
-    this._activeDetailVariant = firstVariant;
+    this._activeDetailVariant = hasPriceRange ? null : firstVariant;
 
     // Hitung range harga jika varian memiliki rentang harga berbeda
     const variantPrices = variants.map(v => Number(v.price) || Number(product.price));
@@ -2038,7 +2038,7 @@ const PasarinApp = {
               <div class="field-value-shopee variant-chips-grid" id="shopee-variants-list">
                 ${variants.map((v, idx) => `
                   <button type="button" 
-                    class="shopee-variant-chip ${idx === 0 ? 'active' : ''}" 
+                    class="shopee-variant-chip ${(!hasPriceRange && idx === 0) ? 'active' : ''}" 
                     data-variant-idx="${idx}"
                     data-name="${v.name}" 
                     data-price="${v.price || product.price}" 
@@ -2223,8 +2223,23 @@ const PasarinApp = {
   handleAddCartFromDetail(btnEl) {
     if (!this._activeDetailProduct) return;
     const product = this._activeDetailProduct;
+    const variants = product.variants || [];
+
+    if (!this._activeDetailVariant && variants.length > 1) {
+      if (window.PasarinApp?.showToast) {
+        window.PasarinApp.showToast('Silakan pilih salah satu variasi produk terlebih dahulu');
+      } else {
+        alert('Silakan pilih salah satu variasi produk terlebih dahulu');
+      }
+      const chipsBox = document.getElementById('shopee-variants-list');
+      if (chipsBox) {
+        chipsBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
     const qty = this._activeDetailQty || 1;
-    const variantName = this._activeDetailVariant?.name || 'STANDAR ORIGINAL';
+    const variantName = this._activeDetailVariant?.name || (variants[0]?.name) || 'STANDAR ORIGINAL';
 
     if (window.PasarinCart) {
       window.PasarinCart.addToCart(product.id, qty, variantName, btnEl);
@@ -2234,8 +2249,23 @@ const PasarinApp = {
   async handleBuyNowFromDetail(btnEl) {
     if (!this._activeDetailProduct) return;
     const product = this._activeDetailProduct;
+    const variants = product.variants || [];
+
+    if (!this._activeDetailVariant && variants.length > 1) {
+      if (window.PasarinApp?.showToast) {
+        window.PasarinApp.showToast('Silakan pilih salah satu variasi produk terlebih dahulu');
+      } else {
+        alert('Silakan pilih salah satu variasi produk terlebih dahulu');
+      }
+      const chipsBox = document.getElementById('shopee-variants-list');
+      if (chipsBox) {
+        chipsBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
     const qty = this._activeDetailQty || 1;
-    const variantName = this._activeDetailVariant?.name || 'STANDAR ORIGINAL';
+    const variantName = this._activeDetailVariant?.name || (variants[0]?.name) || 'STANDAR ORIGINAL';
 
     if (window.PasarinCart) {
       await window.PasarinCart.addToCart(product.id, qty, variantName, btnEl);
