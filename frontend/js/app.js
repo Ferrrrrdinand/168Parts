@@ -1565,6 +1565,7 @@ const PasarinApp = {
     const isOrderReturn = hash.startsWith('#/order/return') || hash.startsWith('#/user/return');
     const isProfile = hash.startsWith('#/user/profile') || hash === '#/profile';
     const isChangePassword = hash.startsWith('#/user/password') || hash === '#/password';
+    const isSell = hash === '#/jual-barang' || hash === '#/sell' || hash.startsWith('#/jual-barang');
 
     const homeView = document.getElementById('view-home');
     const searchView = document.getElementById('view-search');
@@ -1572,12 +1573,30 @@ const PasarinApp = {
     const checkoutView = document.getElementById('view-checkout');
     const profileView = document.getElementById('view-profile');
     const returnView = document.getElementById('view-order-return');
+    const sellView = document.getElementById('view-sell-item');
     const headerEl = document.querySelector('.hd');
     const cartHeaderTitle = document.getElementById('cart-header-title');
     const cartIconBtn = document.querySelector('.hd .cart');
     const searchSuggestions = document.querySelector('.hd .sb .sg');
 
-    if (isOrderReturn) {
+    if (isSell) {
+      if (homeView) homeView.classList.remove('active');
+      if (searchView) searchView.classList.remove('active');
+      if (cartView) cartView.classList.remove('active');
+      if (checkoutView) checkoutView.classList.remove('active');
+      if (profileView) profileView.classList.remove('active');
+      if (returnView) returnView.classList.remove('active');
+      if (sellView) sellView.classList.add('active');
+      if (headerEl) headerEl.classList.remove('hd-cart-mode');
+      if (cartHeaderTitle) cartHeaderTitle.style.display = 'none';
+      if (cartIconBtn) cartIconBtn.style.display = 'flex';
+      if (searchSuggestions) searchSuggestions.style.display = 'flex';
+      document.title = 'Jual Barang & Titip Jual QC | 168 Parts Surabaya';
+
+      if (window.PasarinConsignment) {
+        window.PasarinConsignment.renderSellPage();
+      }
+    } else if (isOrderReturn) {
       if (homeView) homeView.classList.remove('active');
       if (searchView) searchView.classList.remove('active');
       if (cartView) cartView.classList.remove('active');
@@ -1594,6 +1613,7 @@ const PasarinApp = {
       const orderId = urlParams.get('id') || hash.replace('#/order/return', '').replace('#/user/return', '').replace(/[\/\?]/g, '').trim();
       this.renderReturnLandingPage(orderId);
     } else if (isProfile || isChangePassword) {
+      if (sellView) sellView.classList.remove('active');
       if (returnView) returnView.classList.remove('active');
       if (homeView) homeView.classList.remove('active');
       if (searchView) searchView.classList.remove('active');
@@ -1673,6 +1693,7 @@ const PasarinApp = {
       document.title = 'Hasil Pencarian | 168 Parts';
       this.handleSearchRoute();
     } else {
+      if (sellView) sellView.classList.remove('active');
       if (returnView) returnView.classList.remove('active');
       if (searchView) searchView.classList.remove('active');
       if (cartView) cartView.classList.remove('active');
@@ -1833,10 +1854,11 @@ const PasarinApp = {
           </div>
           <div class="in">
             <div class="tt" title="${p.name}">
-              <span class="shop-badge ${badgeClass}">${p.shopType || 'Mall'}</span>
+              ${p.isConsignment ? '<span class="shop-badge" style="background:linear-gradient(135deg, #0284c7, #0369a1); color:#fff; font-weight:800; padding:1px 5px; border-radius:3px;">🛡️ QC 168</span>' : `<span class="shop-badge ${badgeClass}">${p.shopType || 'Mall'}</span>`}
               ${p.name}
             </div>
             <div class="trust-tags">
+              ${p.isConsignment ? '<span class="trust-tag" style="background:#fef3c7; color:#92400e; border:1px solid #fde68a;">🏷️ Titip Jual Member</span>' : ''}
               <span class="trust-tag gratis-ongkir">🚚 Bebas Ongkir</span>
             </div>
             <div class="price-container">
@@ -2169,9 +2191,18 @@ const PasarinApp = {
           <div class="shopee-info-col">
             <!-- Badge Star & Title -->
             <div class="shopee-prod-badge-title">
-              <span class="badge-shopee-star-plus" style="background:#ee4d2d; padding:2px 8px; border-radius:2px; font-weight:700;">Star</span>
+              ${product.isConsignment ? '<span class="badge-shopee-star-plus" style="background:#0284c7; padding:2px 8px; border-radius:2px; font-weight:700;">🛡️ QC Pass 168 Parts</span>' : '<span class="badge-shopee-star-plus" style="background:#ee4d2d; padding:2px 8px; border-radius:2px; font-weight:700;">Star</span>'}
               <h1 class="shopee-product-heading">${product.name}</h1>
             </div>
+            ${product.isConsignment ? `
+              <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:6px; padding:8px 12px; margin:8px 0 12px; display:flex; align-items:center; gap:8px;">
+                <span style="font-size:20px;">🛡️</span>
+                <div style="font-size:12px; color:#166534; line-height:1.4;">
+                  <b>Titip Jual Resmi Member 168 Parts (Terverifikasi QC Toko Offline Surabaya)</b><br>
+                  Fisik & fungsional diperiksa teknisi 168 Parts sebelum dikirim ke pembeli.
+                </div>
+              </div>
+            ` : ''}
 
             <!-- Ratings, Reviews, Sold Count (Persis Screenshot: 4.9 ★★★★★ 672 Penilaian 2RB+ Terjual) -->
             <div class="shopee-meta-stats-row">
@@ -4447,16 +4478,8 @@ const PasarinApp = {
       return;
     }
 
-    // Cek apakah pop up otomatis diizinkan (belum di-dismiss hari ini)
-    const today = new Date().toDateString();
-    const dismissedDate = localStorage.getItem('pasarin_promo_dismissed_date');
-    const shownThisSession = sessionStorage.getItem('pasarin_promo_shown');
-
-    if (dismissedDate !== today && !shownThisSession) {
-      setTimeout(() => {
-        this.openPromoModal();
-      }, 1400);
-    }
+    // Auto pop up dinonaktifkan agar tidak mengganggu navigasi pembeli di HP/Desktop.
+    // Modal Promo hanya dibuka saat pengguna menekan tombol Promo / Voucher secara eksplisit.
   },
 
   openPromoModal() {
@@ -4767,32 +4790,22 @@ const PasarinApp = {
       return `
         <div class="promo-ticket" data-code="${p.code}">
           <div class="ticket-left">
-            <span class="ticket-icon">${p.icon}</span>
             <span class="ticket-val">${p.valText}</span>
             <span class="ticket-type-lbl">${p.typeText}</span>
           </div>
           <div class="ticket-center">
             <div class="ticket-head-row">
-              <div class="ticket-head-left">
-                ${catBadge}
-                <h4 class="ticket-title" title="${p.title}">${p.title}</h4>
-              </div>
-              ${claimCount > 0 ? `<span class="ticket-owned-badge">✓ Dimiliki ${claimCount}x</span>` : ''}
+              ${catBadge}
+              <h4 class="ticket-title" title="${p.title}">${p.title}</h4>
             </div>
-            ${p.desc ? `<p class="ticket-desc">${p.desc}</p>` : ''}
             <div class="ticket-meta">
-              <span class="ticket-meta-tag">${p.minSpend}</span>
+              <span class="ticket-min-spend">${p.minSpend}</span>
               <span class="ticket-code-pill" onclick="PasarinApp.copyPromoCode('${p.code}', this)" title="Klik untuk salin kode voucher">
-                🎫 <b>${p.code}</b>
+                <b>${p.code}</b> 📋
               </span>
-              <span class="ticket-meta-tag tag-quota">Sisa: ${remainingQuota} kuota</span>
-              <span class="ticket-meta-tag tag-limit">Maks. 3x/akun</span>
             </div>
           </div>
           <div class="ticket-right">
-            <button class="btn-copy-code-direct" onclick="PasarinApp.copyPromoCode('${p.code}', this)" title="Salin kode voucher ke clipboard">
-              📋 Salin Kode
-            </button>
             ${claimBtnHtml}
           </div>
         </div>

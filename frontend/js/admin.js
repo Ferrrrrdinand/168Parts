@@ -344,7 +344,8 @@ const AdminApp = {
         banners: '🎨 Pengaturan & Desain Banner Toko',
         promos: '🎟️ Kelola Voucher & Kode Promo',
         broadcasts: '📢 Broadcast Notifikasi Massal ke Seluruh Member',
-        flashsale: '⚡ Manajemen Flash Sale & Countdown 24 Jam'
+        flashsale: '⚡ Manajemen Flash Sale & Countdown 24 Jam',
+        c2c: '🔍 Titip Jual Member, Quality Check (QC) & Antrean Transfer'
       };
       titleEl.textContent = titles[tabName] || 'Dashboard Admin';
     }
@@ -352,6 +353,10 @@ const AdminApp = {
     if (tabName === 'flashsale') {
       this.renderFlashSaleTable();
       this.initFlashSaleTimer();
+    }
+
+    if (tabName === 'c2c') {
+      this.renderConsignmentTab();
     }
 
     if (tabName === 'broadcasts') {
