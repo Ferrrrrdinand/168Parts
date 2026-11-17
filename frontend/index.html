@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light only">
   <title>168 Parts | Pusat Sparepart & Alat Servis HP Terlengkap Surabaya</title>
-  <link rel="stylesheet" href="css/style.css?v=4.0">
+  <link rel="stylesheet" href="css/style.css?v=4.1">
   <link rel="stylesheet" href="css/gmaps-picker.css?v=2.9">
-  <link rel="stylesheet" href="css/responsive-sensor.css?v=2.9">
+  <link rel="stylesheet" href="css/responsive-sensor.css?v=4.1">
   <link rel="stylesheet" href="css/animations.css?v=2.9">
   <!-- Leaflet Map CSS & JS untuk Pemilihan Lokasi GMaps -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
@@ -225,31 +225,31 @@
       <!-- Hero Banner (Shopee Style Split Banners) -->
       <section class="hero-shopee-row" id="hero-shopee-banners">
         <!-- Banner Kiri: 168 Parts Hero (Bisa Diklik ke Web / YouTube / Promo) -->
-        <div class="hero-shopee-left" id="hero-banner-left" role="button" tabindex="0" title="Klik Banner Promosi (Buka Link / Video)" aria-label="Banner Promosi Utama (Klik untuk membuka)" onclick="if(window.PasarinApp) window.PasarinApp.onHeroBannerLeftClick(event);">
+        <div class="hero-shopee-left" id="hero-banner-left" role="button" tabindex="0" title="Klik Banner Promosi (Buka Link / Video)" aria-label="Banner Promosi Utama (Klik untuk membuka)" onclick="if(window.PasarinApp) window.PasarinApp.onHeroBannerLeftClick(event);" style="background: linear-gradient(135deg, #4c0519 0%, #9f1239 100%);">
           <div class="banner-action-pill" id="banner-left-action" style="position: absolute; top: 12px; right: 14px; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; border: 1px solid rgba(255,255,255,0.25); z-index: 5; pointer-events: none;">
-            <span id="banner-action-icon">🎁</span>
-            <span id="banner-action-text" data-i18n="banner.left_action">Daftar & Klaim 50RB ↗</span>
+            <span id="banner-action-icon">📱</span>
+            <span id="banner-action-text">Lihat Produk ↗</span>
           </div>
 
           <div class="shopee-hero-content">
             <div class="shopee-hero-info">
-              <div class="hero-tag-badge" id="banner-left-badge" data-i18n="banner.left_badge">✨ 168 PARTS SURABAYA</div>
-              <h2 class="hero-banner-title" id="banner-left-title" data-i18n="banner.left_title">Pusat Sparepart & Alat Servis HP Terlengkap</h2>
+              <div class="hero-tag-badge" id="banner-left-badge">🔥 PRODUK TERBARU</div>
+              <h2 class="hero-banner-title" id="banner-left-title">LCD iPhone 11 Incell True Tone Grade A+</h2>
               <div class="shopee-hero-pills" id="banner-left-pills">
-                <span class="shopee-pill"><span class="pill-icon">🏷️</span> <span data-i18n="banner.pill_lcd">LCD & Baterai Bergaransi</span></span>
-                <span class="shopee-pill"><span class="pill-icon">⚡</span> <span data-i18n="banner.pill_promo">Promo Pengguna Baru: Diskon 50RB</span></span>
-                <span class="shopee-pill"><span class="pill-icon">⭐</span> <span data-i18n="banner.pill_precision">Sparepart Presisi Siap Kirim</span></span>
+                <span class="shopee-pill"><span class="pill-icon">📱</span> <span>Layar Jernih & Presisi Tinggi</span></span>
+                <span class="shopee-pill"><span class="pill-icon">🛡️</span> <span>Garansi Toko Langsung Tukar</span></span>
+                <span class="shopee-pill"><span class="pill-icon">🚚</span> <span>Stok Siap Kirim Hari Ini</span></span>
               </div>
             </div>
             <div class="shopee-hero-models">
-              <img id="banner-left-img" src="images/hero-banner-main.svg" alt="Foto Produk Sparepart &amp; Alat Servis" data-i18n-alt="Sparepart &amp; Alat Servis" class="model-hero-img">
+              <img id="banner-left-img" src="images/categories/cat-lcd.svg" alt="Foto Produk Sparepart &amp; Alat Servis" class="model-hero-img">
             </div>
           </div>
           <!-- Dots Indicator (Dapat Diklik untuk Berpindah Slide) -->
           <div class="shopee-dots">
-            <span class="dot active" onclick="event.stopPropagation(); if(window.PasarinApp) window.PasarinApp.goToSlide(0);" title="Slide 1: Promo Baru"></span>
+            <span class="dot active" onclick="event.stopPropagation(); if(window.PasarinApp) window.PasarinApp.goToSlide(0);" title="Slide 1: Produk Baru"></span>
             <span class="dot" onclick="event.stopPropagation(); if(window.PasarinApp) window.PasarinApp.goToSlide(1);" title="Slide 2: Video YouTube"></span>
-            <span class="dot" onclick="event.stopPropagation(); if(window.PasarinApp) window.PasarinApp.goToSlide(2);" title="Slide 3: Produk Baru"></span>
+            <span class="dot" onclick="event.stopPropagation(); if(window.PasarinApp) window.PasarinApp.goToSlide(2);" title="Slide 3: Promo Baru"></span>
             <span class="dot" onclick="event.stopPropagation(); if(window.PasarinApp) window.PasarinApp.goToSlide(3);" title="Slide 4: Voucher Belanja"></span>
           </div>
         </div>
@@ -1224,8 +1224,8 @@
   <script src="js/auth.js?v=4.0"></script>
   <script src="js/cart.js?v=4.0"></script>
   <script src="js/consignment.js?v=4.0"></script>
-  <script src="js/app.js?v=4.0"></script>
+  <script src="js/app.js?v=4.1"></script>
   <script src="js/chatbot.js?v=3.0"></script>
-  <script src="js/sensor.js?v=4.0"></script>
+  <script src="js/sensor.js?v=4.1"></script>
 </body>
 </html>

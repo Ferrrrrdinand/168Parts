@@ -931,32 +931,6 @@
   }
 }
 
-/* =========================================================
-   EXPLICIT ADAPTIVE SENSOR BODY CLASS SAFEGUARDS
-   Ensures single column banner, clean docked bar and no overlap
-   regardless of simulator or browser frame scaling
-   ========================================================= */
-body.device-mobile .hero-shopee-row,
-body.device-tablet .hero-shopee-row {
-  grid-template-columns: 1fr !important;
-  min-height: auto !important;
-}
-
-body.device-mobile .hero-shopee-right,
-body.device-tablet .hero-shopee-right {
-  display: none !important;
-}
-
-body.device-mobile .pasarin-docked-bar,
-body.device-tablet .pasarin-docked-bar {
-  bottom: 72px !important;
-  right: 14px !important;
-  left: auto !important;
-}
-
-body.device-mobile .dock-btn-promo,
-body.device-tablet .dock-btn-promo {
-  display: none !important;
-}
+/* Destructive overrides removed for locked desktop UI stability */
 
 

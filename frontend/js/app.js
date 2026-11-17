@@ -4154,6 +4154,20 @@ const PasarinApp = {
   // 4 Slide Hero Banner Interaktif 168 Parts (Mendukung YouTube, Promo, & Produk Baru)
   heroSlides: [
     {
+      badge: '🔥 PRODUK TERBARU',
+      title: 'LCD iPhone 11 Incell True Tone Grade A+',
+      pills: [
+        '📱 Layar Jernih & Presisi Tinggi',
+        '🛡️ Garansi Toko Langsung Tukar',
+        '🚚 Stok Siap Kirim Hari Ini'
+      ],
+      modelImage: 'images/categories/cat-lcd.svg',
+      bgGradient: 'linear-gradient(135deg, #4c0519 0%, #9f1239 100%)',
+      targetUrl: '#/product/168-lcd-ip11',
+      actionText: 'Lihat Produk ↗',
+      actionIcon: '📱'
+    },
+    {
       badge: '✨ 168 PARTS SURABAYA',
       title: 'Pusat Sparepart & Alat Servis HP Terlengkap',
       pills: [
@@ -4180,20 +4194,6 @@ const PasarinApp = {
       targetUrl: 'https://www.youtube.com',
       actionText: 'Tonton di YouTube ▶',
       actionIcon: '📺'
-    },
-    {
-      badge: '🔥 PRODUK TERBARU',
-      title: 'LCD iPhone 11 Incell True Tone Grade A+',
-      pills: [
-        '📱 Layar Jernih & Presisi Tinggi',
-        '🛡️ Garansi Toko Langsung Tukar',
-        '🚚 Stok Siap Kirim Hari Ini'
-      ],
-      modelImage: 'images/categories/cat-lcd.svg',
-      bgGradient: 'linear-gradient(135deg, #4c0519 0%, #9f1239 100%)',
-      targetUrl: '#/product/168-lcd-ip11',
-      actionText: 'Lihat Produk Baru ➔',
-      actionIcon: '📱'
     },
     {
       badge: '🎟️ VOUCHER SPESIAL TEKNISI',
@@ -4260,11 +4260,9 @@ const PasarinApp = {
     this.renderHeroSlide(this.activeHeroSlideIndex);
     this.renderRightBanner(this.banners.right);
 
-    // Otomatis geser slide banner setiap 5 detik
+    // Banner dikunci stabil pada tampilan yang dipilih user (tidak berganti otomatis agar tidak ngelag/berubah)
     if (this.heroSlideTimer) clearInterval(this.heroSlideTimer);
-    this.heroSlideTimer = setInterval(() => {
-      this.nextSlide();
-    }, 5000);
+    this.heroSlideTimer = null;
   },
 
   goToSlide(index) {

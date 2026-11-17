@@ -40,77 +40,22 @@
     },
 
     detectAndApply() {
+      // Ringan dan tanpa reflow: tidak memutasi class pada body/html agar tidak ngelag
       try {
-        if (typeof window === 'undefined' || !document || !document.body) return;
+        const width = window.innerWidth || document.documentElement.clientWidth || 1024;
+        const isMobile = width <= 768;
 
-        const width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth || 1024;
-        const height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight || 768;
-
-        // Set CSS custom properties untuk viewport height yang presisi di mobile
-        const vh = height * 0.01;
-        document.documentElement.style.setProperty('--vh', `${vh}px`);
-        document.documentElement.style.setProperty('--vw', `${width * 0.01}px`);
-
-        let mode = 'laptop';
-        if (width <= 640) {
-          mode = 'mobile';
-        } else if (width <= 1024) {
-          mode = 'tablet';
-        } else if (width <= 1439) {
-          mode = 'laptop';
-        } else {
-          mode = 'widescreen';
+        const appbar = document.getElementById('mobile-bottom-appbar');
+        if (appbar) {
+          if (!isMobile || document.body.classList.contains('viewing-cart-checkout')) {
+            appbar.style.display = 'none';
+          } else {
+            appbar.style.display = 'flex';
+          }
+        } else if (isMobile && !document.querySelector('.admin-sidebar')) {
+          this.createMobileBottomAppBar();
         }
-
-        const body = document.body;
-        const root = document.documentElement;
-
-        // Sinkronisasi class body & root
-        const deviceClasses = ['device-mobile', 'device-tablet', 'device-laptop', 'device-widescreen'];
-        deviceClasses.forEach(cls => {
-          body.classList.remove(cls);
-          root.classList.remove(cls);
-        });
-
-        const activeClass = `device-${mode}`;
-        body.classList.add(activeClass);
-        root.classList.add(activeClass);
-
-        // Touch capability detection
-        const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-        body.classList.toggle('touch-device', isTouch);
-        body.classList.toggle('no-touch', !isTouch);
-
-        // Orientation detection
-        const isPortrait = height > width;
-        body.classList.toggle('orientation-portrait', isPortrait);
-        body.classList.toggle('orientation-landscape', !isPortrait);
-
-        const prevMode = this.currentMode;
-        this.currentMode = mode;
-
-        this.adaptBehaviors(mode);
-
-        // Dispatch custom event untuk komponen lain yang membutuhkan
-        if (prevMode !== mode) {
-          try {
-            window.dispatchEvent(new CustomEvent('screen-mode-change', {
-              detail: {
-                mode,
-                width,
-                height,
-                isMobile: mode === 'mobile',
-                isTablet: mode === 'tablet',
-                isLaptop: mode === 'laptop',
-                isWidescreen: mode === 'widescreen'
-              }
-            }));
-          } catch (e) {}
-        }
-      } catch (err) {
-        // Jangan sampai melempar error apa pun
-        console.warn('[DisplaySensor] Penyesuaian layar otomatis:', err.message);
-      }
+      } catch (err) {}
     },
 
     adaptBehaviors(mode) {
@@ -220,7 +165,8 @@
           }
         };
 
-        setInterval(updateAppbarBadges, 1000);
+        // Update badges saat cart berubah saja, bukan polling 1 detik terus-menerus
+        updateAppbarBadges();
       } catch (e) {}
     }
   };
