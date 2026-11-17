@@ -9148,3 +9148,52 @@ body.viewing-cart-checkout .shopee-chat-fab {
     font-size: 13px !important;
   }
 }
+
+
+/* =========================================================
+   PERFECTION: MOBILE CART STICKY BAR RESPONSIVENESS (< 580px)
+   Mencegah tombol Checkout terpotong atau teks terhimpit
+   ========================================================= */
+@media (max-width: 580px) {
+  .bar-row-actions {
+    padding: 6px 8px !important;
+    gap: 4px !important;
+  }
+
+  .bar-actions-left {
+    gap: 4px !important;
+  }
+
+  .bar-actions-left .custom-chk-label {
+    font-size: 11px !important;
+    gap: 3px !important;
+  }
+
+  .cart-total-info {
+    min-width: 0 !important;
+    padding-right: 2px !important;
+  }
+
+  .total-label-row span:first-child {
+    font-size: 9.5px !important;
+  }
+
+  .total-amount-val {
+    font-size: 13.5px !important;
+    font-weight: 900 !important;
+  }
+
+  .total-savings-row {
+    display: none !important; /* Hemat ruang vertikal pada layar kecil */
+  }
+
+  .btn-shopee-checkout {
+    height: 38px !important;
+    padding: 0 10px !important;
+    font-size: 12.5px !important;
+    font-weight: 800 !important;
+    min-width: 84px !important;
+    max-width: 120px !important;
+    border-radius: 5px !important;
+  }
+}

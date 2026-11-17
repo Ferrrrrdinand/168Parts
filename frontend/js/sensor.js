@@ -116,6 +116,17 @@
     adaptBehaviors(mode) {
       try {
         const hash = window.location.hash || '#/';
+        const appbar = document.getElementById('mobile-bottom-appbar');
+        if (appbar) {
+          if (window.innerWidth > 768 || document.body.classList.contains('viewing-cart-checkout')) {
+            appbar.style.display = 'none';
+          } else {
+            appbar.style.display = 'flex';
+          }
+        } else if (window.innerWidth <= 768 && !document.querySelector('.admin-sidebar')) {
+          this.createMobileBottomAppBar();
+        }
+
         const homeBtn = document.getElementById('appbar-btn-home');
         if (homeBtn) {
           homeBtn.classList.toggle('active', hash === '#/' || hash === '');

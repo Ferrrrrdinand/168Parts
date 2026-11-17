@@ -971,3 +971,4 @@ if (typeof document !== 'undefined') {
     PasarinConsignment.init();
   });
 }
+
